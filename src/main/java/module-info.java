@@ -11,6 +11,10 @@ module org.example.bookreader {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires java.desktop;
+    requires com.fasterxml.jackson.core;
+    requires com.fasterxml.jackson.databind;
+    requires org.apache.pdfbox;
+    requires javafx.swing;
 
     opens org.example.bookreader to javafx.fxml;
     exports org.example.bookreader;

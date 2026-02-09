@@ -125,5 +125,10 @@ setActiveSort(progressLabel);
 
         active.getStyleClass().add("label-color-active");
     }
+    @FXML
+    //method for adding a book upon the "add" button click
+    private void onAddBookButtonClick() {
+
+    }
 
 }
