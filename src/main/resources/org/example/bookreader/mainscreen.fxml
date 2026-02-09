@@ -4,18 +4,19 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.effect.Glow?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.control.ToggleGroup?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="616.0" prefWidth="986.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="616.0" prefWidth="986.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.bookreader.Controller">
    <left>
       <VBox prefHeight="519.0" prefWidth="151.0" styleClass="left-sidebar" BorderPane.alignment="CENTER">
          <children>
@@ -35,22 +36,17 @@
                   </Label>
                </children>
             </HBox>
-            <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="151.0" text="All">
+            <Button fx:id="allBtn" mnemonicParsing="false" prefHeight="30.0" onAction="#changeToAllBooks" prefWidth="151.0" text="All">
                <font>
                   <Font size="16.0" />
                </font>
             </Button>
-            <Button fx:id="recentBtn" mnemonicParsing="false" prefHeight="24.0" prefWidth="152.0" text="Recent">
+            <Button  fx:id="favBtn" mnemonicParsing="false" prefHeight="24.0" onAction="#changetoFavourites" prefWidth="153.0" text="Favourites">
                <font>
                   <Font size="16.0" />
                </font>
             </Button>
-            <Button fx:id="favBtn" mnemonicParsing="false" prefHeight="24.0" prefWidth="153.0" text="Favourites">
-               <font>
-                  <Font size="16.0" />
-               </font>
-            </Button>
-            <Button fx:id="catBtn" mnemonicParsing="false" prefHeight="24.0" prefWidth="157.0" text="Categories">
+            <Button  fx:id="catBtn" mnemonicParsing="false" prefHeight="24.0" onAction="#changeToCategories" prefWidth="157.0" text="Categories">
                <font>
                   <Font size="16.0" />
                </font>
@@ -61,7 +57,7 @@
                   <Font size="16.0" />
                </font>
             </Button>
-            <Button fx:id="setBtn" mnemonicParsing="false" prefHeight="24.0" prefWidth="152.0" text="Settings">
+            <Button  fx:id="setBtn" mnemonicParsing="false" prefHeight="24.0" prefWidth="152.0" text="Settings">
                <font>
                   <Font size="16.0" />
                </font>
@@ -76,7 +72,7 @@
          </fx:define>
 
          <top>
-            <VBox spacing="10" styleClass="top-bar" style="-fx-background-color: transparent; -fx-padding: 15 25 10 25;">
+            <VBox spacing="10" style="-fx-background-color: transparent; -fx-padding: 15 25 10 25;" styleClass="top-bar">
                <children>
                   <HBox alignment="CENTER_LEFT" spacing="15">
                      <children>
@@ -106,8 +102,14 @@
                               <TextField prefWidth="350.0" promptText="Search in Library" styleClass="text-field" />
                               <HBox style="-fx-border-color: #0f3460; -fx-border-radius: 5;">
                                  <children>
-                                    <ToggleButton mnemonicParsing="false" selected="true" styleClass="toggle-button" text="Grid" toggleGroup="$viewGroup" />
-                                    <ToggleButton mnemonicParsing="false" styleClass="toggle-button" text="List" toggleGroup="$viewGroup" />
+                                    <ToggleButton mnemonicParsing="false" selected="true" styleClass="toggle-button" text="Grid">
+                                       <toggleGroup>
+                                          <ToggleGroup fx:id="$viewGroup" />
+                                       </toggleGroup></ToggleButton>
+                                    <ToggleButton mnemonicParsing="false" styleClass="toggle-button" text="List">
+                                       <toggleGroup>
+                                          <ToggleGroup fx:id="viewGroup" />
+                                       </toggleGroup></ToggleButton>
                                  </children>
                               </HBox>
                            </children>
@@ -115,19 +117,22 @@
                      </children>
                   </HBox>
 
-                  <HBox alignment="CENTER_LEFT" spacing="30" style="-fx-padding: 10 0 0 10;">
+                  <HBox alignment="CENTER_LEFT" spacing="30" styleClass="sort-container">
                      <children>
-                        <Label text="Title" style="-fx-opacity: 0.6;" />
-                        <Label text="Author" style="-fx-opacity: 0.6;" />
-                        <Label text="Date ▼" style="-fx-text-fill: #e94560; -fx-font-weight: bold;" />
-                        <Label text="Progress" style="-fx-opacity: 0.6;" />
+                        <Label fx:id="titleLabel" onMouseClicked="#sortByTitle" styleClass="sort-label" text="Title" />
+                        <Label fx:id="authorLabel" onMouseClicked="#sortByAuthor" styleClass="sort-label" text="Author" />
+                        <Label fx:id="dateLabel" onMouseClicked="#sortByDate" styleClass="sort-label" text="Date " />
+                        <Label fx:id="progressLabel" onMouseClicked="#sortByProgress" styleClass="sort-label" text="Progress" />
                      </children>
                   </HBox>
                </children>
             </VBox>
          </top>
          <center>
-            <StackPane fx:id="contentArea" prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+            <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <AnchorPane fx:id="contentArea" prefHeight="200.0" prefWidth="200.0" />
+               </children></StackPane>
          </center>
       </BorderPane>
    </center>

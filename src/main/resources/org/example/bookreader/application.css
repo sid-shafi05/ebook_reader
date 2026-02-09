@@ -205,3 +205,29 @@
     -fx-background-color: rgba(59, 130, 246, 0.2); /* Slightly darker on hover */
     -fx-cursor: hand;
 }
+
+.all-books-page {
+    -fx-background-color: #533483;
+}
+
+
+/* The default look for all sort labels */
+.sort-label {
+    -fx-text-fill: #e94560;
+    -fx-opacity: 0.6;
+    -fx-cursor: hand;
+    -fx-font-weight: normal;
+    -fx-transition: 0.3s; /* Makes the glow/fade feel smooth */
+}
+
+/* Hover effect (FREE bonus for your UI) */
+.sort-label:hover {
+    -fx-opacity: 0.9;
+}
+
+/* THE DYNAMIC PART: The class your Java code adds/removes */
+.label-color-active {
+    -fx-opacity: 1.0;
+    -fx-font-weight: bold;
+
+}
