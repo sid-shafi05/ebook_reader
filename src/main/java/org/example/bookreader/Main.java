@@ -12,7 +12,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/org/example/bookreader/mainscreen.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 5000, 4400);
+        Scene scene = new Scene(fxmlLoader.load(), 1200, 800);
         String css=this.getClass().getResource("/org/example/bookreader/application.css").toExternalForm();
         scene.getStylesheets().add(css);
         Image icon=new Image(Main.class.getResourceAsStream("/org/example/images/icon.png"));
