@@ -15,7 +15,7 @@ public class Main extends Application {
         Scene scene = new Scene(fxmlLoader.load(), 5000, 4400);
         String css=this.getClass().getResource("/org/example/bookreader/application.css").toExternalForm();
         scene.getStylesheets().add(css);
-        Image icon=new Image(Main.class.getResourceAsStream("/org/example/images/icon.png"));
+       Image icon=new Image(Main.class.getResourceAsStream("/org/example/images/icon.png"));
         stage.getIcons().add(icon);
         stage.setTitle("Hello!");
         stage.setScene(scene);
