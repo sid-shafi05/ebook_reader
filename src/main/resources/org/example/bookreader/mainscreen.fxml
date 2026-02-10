@@ -78,7 +78,7 @@
                      <children>
                         <HBox alignment="CENTER_LEFT" spacing="10">
                            <children>
-                              <Button fx:id="addBtn" styleClass="top-bar-button" text="Add Book">
+                              <Button fx:id="addBtn" styleClass="top-bar-button" text="Add Book" onAction="#onAddBookButtonClick">
                                  <graphic>
                                     <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                        <image><Image url="@../images/plus.png" /></image>
@@ -108,7 +108,7 @@
                                        </toggleGroup></ToggleButton>
                                     <ToggleButton mnemonicParsing="false" styleClass="toggle-button" text="List">
                                        <toggleGroup>
-                                          <ToggleGroup fx:id="viewGroup" />
+                                          <ToggleGroup fx:id="$$viewGroup" />
                                        </toggleGroup></ToggleButton>
                                  </children>
                               </HBox>
