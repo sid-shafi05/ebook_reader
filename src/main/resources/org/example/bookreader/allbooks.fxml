@@ -2,10 +2,23 @@
 
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.text.Font?>
 
-
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1"  styleClass="all-books-page" fx:controller="org.example.bookreader.AllBookController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0"
+            styleClass="all-books-page"
+            xmlns="http://javafx.com/javafx/24.0.1"
+            xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label layoutX="151.0" layoutY="77.0" prefHeight="137.0" prefWidth="255.0" text="ALL BOOKS" />
+      <Label text="All Books"></Label>
+      <FlowPane fx:id="bookGrid"
+                layoutX="20.0"
+                layoutY="70.0"
+                prefWidth="560.0"
+                prefHeight="310.0"
+                hgap="15"
+                vgap="15"
+                style="-fx-background-color: transparent;">
+      </FlowPane>
    </children>
 </AnchorPane>

@@ -61,10 +61,6 @@ public class Controller {
     public void changeToAllBooks() {
         loadPage("allbooks.fxml");
         setActiveStyle(allBtn);
-
-        javafx.application.Platform.runLater(() -> {
-            refreshBookGrid();
-        });
     }
 
     @FXML
@@ -151,66 +147,5 @@ public class Controller {
     }
 
 
-    //AddBooks
-    private java.util.List<Book> bookList = new java.util.ArrayList<>();
 
-    @FXML
-    public void onAddBookButtonClick() {
-        FileChooser filechooser = new FileChooser();
-        filechooser.setTitle("Select a book (pdf):");
-        filechooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
-
-        File selectedFile = filechooser.showOpenDialog(null);
-
-        if (selectedFile != null) {
-            try {
-                File dir = new File("booksdata");
-                if (!dir.exists()) dir.mkdirs();
-
-                File destination = new File(dir, selectedFile.getName());
-                java.nio.file.Files.copy(selectedFile.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
-                Book newBook = new Book(selectedFile.getName(), destination.getAbsolutePath());
-                bookList.add(newBook);
-                refreshBookGrid();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void refreshBookGrid() {
-        javafx.scene.Node gridNode = contentArea.lookup("#bookGrid");
-
-        if (gridNode != null && gridNode instanceof javafx.scene.layout.FlowPane) {
-            javafx.scene.layout.FlowPane bookGrid = (javafx.scene.layout.FlowPane) gridNode;
-            bookGrid.getChildren().clear();
-
-            for (Book book : bookList) {
-                bookGrid.getChildren().add(createBookTile(book));
-            }
-            System.out.println("Grid refreshed with " + bookList.size() + " books.");
-        } else {
-            System.out.println("Grid not found in current view. It will refresh when All Books is opened.");
-        }
-    }
-
-    private VBox createBookTile(Book book) {
-        VBox tile = new VBox(10);
-        tile.setAlignment(Pos.CENTER);
-        tile.getStyleClass().add("book-card");
-        Image image = new Image(getClass().getResourceAsStream("/org/example/bookreader/placeholder.png"));
-        ImageView coverView = new ImageView(image);
-        coverView.setFitWidth(100);
-        coverView.setPreserveRatio(true);
-
-        Label titleLbl = new Label(book.getTitle());
-        titleLbl.getStyleClass().add("book-title");
-        titleLbl.setWrapText(true);
-        titleLbl.setMaxWidth(100);
-
-        tile.getChildren().addAll(coverView, titleLbl);
-        return tile;
-    }
 }
