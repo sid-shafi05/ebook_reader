@@ -45,6 +45,9 @@ public class Controller {
     private Label dateLabel;
 
     @FXML
+    private java.util.List<Book> bookList = new java.util.ArrayList<>();
+
+    @FXML
     //Default Initialization
     public void initialize() {
         loadPage("allbooks.fxml");
@@ -146,6 +149,30 @@ public class Controller {
         active.getStyleClass().add("label-color-active");
     }
 
+    @FXML
+    public void onAddBookButtonClick() {
+        FileChooser filechooser = new FileChooser();
+        filechooser.setTitle("Select a book (pdf):");
+        filechooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
+
+        File selectedFile = filechooser.showOpenDialog(null);
+
+        if (selectedFile != null) {
+            try {
+                File dir = new File("booksdata");
+                if (!dir.exists()) dir.mkdirs();
+
+                File destination = new File(dir, selectedFile.getName());
+                java.nio.file.Files.copy(selectedFile.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+                Book newBook = new Book(selectedFile.getName(), destination.getAbsolutePath());
+                bookList.add(newBook);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 
 }
