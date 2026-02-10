@@ -9,10 +9,14 @@ import javafx.scene.image.Image;
 import java.io.IOException;
 
 public class Main extends Application {
+    private static Controller mainController;
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/org/example/bookreader/mainscreen.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1200, 800);
+
+        mainController=fxmlLoader.getController();
+
         String css=this.getClass().getResource("/org/example/bookreader/application.css").toExternalForm();
         scene.getStylesheets().add(css);
        Image icon=new Image(Main.class.getResourceAsStream("/org/example/images/icon.png"));
@@ -20,7 +24,11 @@ public class Main extends Application {
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.show();
-        PDFEngine engine = new PDFEngine();
-        System.out.println("Pages in my test PDF: " + engine.getPageNumber("C:\\Users\\ASUS\\Desktop\\c++\\heap offline\\Assignment on Heap.pdf"));
+        PDFEngine engine = new PDFEngine("C:\\Users\\ASUS\\Desktop\\c++\\heap offline\\Assignment on Heap.pdf");
+        System.out.println("Pages in my test PDF: " + engine.getPageCount());
+        engine.close();
+    }
+    public static Controller getMainController(){
+        return mainController;
     }
 }

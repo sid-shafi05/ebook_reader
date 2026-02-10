@@ -28,6 +28,7 @@ public static List<Book> loadBooks() {
     return mapper.readValue(f, new TypeReference<List<Book>>(){});
 
     }catch (Exception e){
+        e.printStackTrace();
         return new ArrayList<>();
     }
 }

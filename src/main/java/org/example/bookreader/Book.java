@@ -1,18 +1,33 @@
 package org.example.bookreader;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Book {
     private String title;
     private String pathFile;
-    private String authorName;
+    //private String authorName;
     private int totalPages;
     private int lastReadPageNumber;
     private boolean isFavourite;
+    private String category;//academic,comic,fiction,novel etc
+    private String coverPath;
+    private double progress;
+
     public Book(){}
-    public Book(String title,String author,String path,int total){
+    public Book(String title,String path,int total,String category,String coverPath){
         this.title=title;
-        this.authorName=author;
+       // this.authorName=author;
         this.pathFile=path;
         this.totalPages=total;
+        this.category=category;
+        this.isFavourite=false;
+        this.coverPath=coverPath;
+    }
+    //progress bar logic
+    public double getProgress(){
+        if(totalPages<=0){
+            return 0;
+        }
+        return (double)lastReadPageNumber/totalPages;
     }
     //public setter-getters for data lookup and fetching
     public String getTitle(){
@@ -27,12 +42,12 @@ public class Book {
     public void setFilePath(String path){
         this.pathFile=path;
     }
-    public void setAuthorName(String auth){
-        this.authorName=auth;
-    }
-    public String getAuthorName(){
-        return authorName;
-    }
+  //  public void setAuthorName(String auth){
+    //    this.authorName=auth;
+    //}
+    //public String getAuthorName(){
+      //  return authorName;
+    //}
     public int getTotalPages(){
         return totalPages;
     }
@@ -50,5 +65,17 @@ public class Book {
     }
     public void setFavouriteStatus(boolean fav){
         isFavourite=fav;
+    }
+    public void setCategory(String cat){
+        category=cat;
+    }
+    public String getCategory(){
+        return category;
+    }
+    public String getCoverPath(){
+        return coverPath;
+    }
+    public void setCoverPath(String cover){
+        coverPath=cover;
     }
 }
