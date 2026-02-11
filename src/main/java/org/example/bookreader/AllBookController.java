@@ -1,5 +1,6 @@
 package org.example.bookreader;
 import javafx.geometry.Pos;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.io.File;
@@ -35,18 +36,22 @@ public class AllBookController {
        System.out.println("DEBUG: Found " + mySavedBooks.size() + " books in JSON.");
 
        for (Book book : mySavedBooks) {
-           // 1. Create the container for one book "card"
+
+           // Create the container for one book "card"
            VBox bookUI = new VBox(10); // 10 is the spacing between elements
            bookUI.setAlignment(Pos.CENTER);
            bookUI.setStyle("-fx-padding: 10; -fx-background-color: #2d2d2d; -fx-background-radius: 8;");
 
-           // 2. CREATE THE IMAGEVIEW (The Cover)
+           // CREATE THE IMAGEVIEW (The Cover)
            ImageView coverView = new ImageView();
            coverView.setFitHeight(150); // Set a standard height for covers
            coverView.setFitWidth(100);
            coverView.setPreserveRatio(true);
+           ProgressBar progressBar = new ProgressBar();
+           progressBar.setProgress(book.getProgress());
+           progressBar.setMaxWidth(100);
 
-           // Logic: Load the image from the book's coverPath
+           // Load the image from the book's coverPath
            // We use the file path we saved when adding the book
            if (book.getCoverPath() != null) {
                File imageFile = new File(book.getCoverPath());
@@ -56,20 +61,27 @@ public class AllBookController {
                }
            }
 
-           // 3. Create the Title Label
+           // Create the Title Label
            Label title = new Label(book.getTitle());
            title.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
            title.setWrapText(true); // Ensures long titles don't go off-screen
            title.setMaxWidth(100);
 
-           // 4. THE HANDOFF: Add the Image and the Title to the VBox
-           bookUI.getChildren().addAll(coverView, title);
 
-           // 5. THE WIRING: Clicking the whole VBox opens the reader
+
+
+           // Clicking the whole VBox opens the reader
            bookUI.setOnMouseClicked(event -> {
-               Main.getMainController().openReader(book);
+               // Check if the book object itself is null before calling the main controller
+               if (book != null) {
+                   System.out.println("DEBUG: Successfully clicked on book: " + book.getTitle());
+                   Main.getMainController().openReader(book);
+               } else {
+                   System.out.println("DEBUG: Still clicking a NULL book object!");
+               }
            });
-
+//  Add the Image and the Title to the VBox
+           bookUI.getChildren().addAll(coverView, title);
            // Add this finished "card" to the purple FlowPane
            bookContainer.getChildren().add(bookUI);
        }

@@ -24,9 +24,7 @@ public class Main extends Application {
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.show();
-        PDFEngine engine = new PDFEngine("C:\\Users\\ASUS\\Desktop\\c++\\heap offline\\Assignment on Heap.pdf");
-        System.out.println("Pages in my test PDF: " + engine.getPageCount());
-        engine.close();
+
     }
     public static Controller getMainController(){
         return mainController;

@@ -6,7 +6,7 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="all-books-page" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.bookreader.AllBookController">
    <children>
-      <Label layoutX="151.0" layoutY="77.0" prefHeight="137.0" prefWidth="255.0" text="ALL BOOKS" />
-      <FlowPane fx:id="bookContainer" layoutX="6.0" layoutY="155.0" minHeight="400.0" minWidth="400.0" prefHeight="600.0" prefWidth="800.0" />
+      <Label layoutX="6.0" layoutY="14.0" prefHeight="40.0" prefWidth="73.0" text="ALL BOOKS" />
+      <FlowPane fx:id="bookContainer" layoutX="6.0" layoutY="53.0" minHeight="400.0" minWidth="400.0" prefHeight="702.0" prefWidth="800.0" />
    </children>
 </AnchorPane>

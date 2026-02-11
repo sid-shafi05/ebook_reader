@@ -15,6 +15,7 @@ public class BookController {
     private ImageView pdfView;
     private PDFEngine engine;
     public void startSession(Book book){
+        System.out.println("DEBUG: BookController received book: " + book.getTitle());
         this.currentBook=book;
         this.currentPage=book.getLastReadPageNumber();
         this.sessionStartTime=System.currentTimeMillis();

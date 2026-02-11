@@ -88,7 +88,7 @@ public class Controller {
 
     private void loadPage(String fxmlFile) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/bookreader/" + fxmlFile));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
             Parent page = loader.load();
             contentArea.getChildren().setAll(page);
 
