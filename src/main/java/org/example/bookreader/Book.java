@@ -9,17 +9,18 @@ public class Book {
     private int totalPages;
     private int lastReadPageNumber;
     private boolean isFavourite;
-    private Image coverImage;  // ← ADD THIS
+   // private Image coverImage;  // ← ADD THIS
     private String category;
+    private String coverPath;
     private double progressValue;
 
     public Book() {}
 
     // Updated constructor with coverImage
-    public Book(String title, String path, Image coverImage, int total,String category,double progress) {
+    public Book(String title, String path, int total,String category,double progress,String coverPath) {
         this.title = title;
         this.pathFile = path;
-        this.coverImage = coverImage;  // ← ADD THIS
+        this.coverPath = coverPath;  // ← ADD THIS
         this.totalPages = total;
         this.lastReadPageNumber = 0;
         this.isFavourite = false;
@@ -48,9 +49,7 @@ public class Book {
         return isFavourite;
     }
 
-    public Image getCoverImage() {  // ← ADD THIS
-        return coverImage;
-    }
+
 
 
 
@@ -75,10 +74,9 @@ public class Book {
         this.isFavourite = fav;
     }
 
-    public void setCoverImage(Image coverImage) {  // ← ADD THIS
-        this.coverImage = coverImage;
-    }
 
+    public String getCoverPath() { return coverPath; }
+    public void setCoverPath(String coverPath) { this.coverPath = coverPath; }
 
     public void setCategory(String category){this.category=category;}
     public String getCategory(){return category;}

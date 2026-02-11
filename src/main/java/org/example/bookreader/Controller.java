@@ -24,6 +24,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 public class Controller {
 
@@ -55,13 +56,15 @@ public class Controller {
 
     // No @FXML here! Data is not a UI component.
 // ObservableList tells the UI to refresh automatically when a book is added.
-    private ObservableList<Book> bookList = FXCollections.observableArrayList();
+   // private ObservableList<Book> bookList = FXCollections.observableArrayList();
+    private List<Book> bookList;
     @FXML
     private ImageView bookCoverView;
 
     @FXML
     public void initialize() {
         loadPage("allbooks.fxml");
+        bookList=  Library.loadBooks();
         sortByTitle();
         if (allBtn != null) {
             setActiveStyle(allBtn);
@@ -102,6 +105,7 @@ public class Controller {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
             Parent page = loader.load();
             contentArea.getChildren().setAll(page);
+
 
             AnchorPane.setTopAnchor(page, 0.0);
             AnchorPane.setBottomAnchor(page, 0.0);
@@ -183,10 +187,11 @@ public class Controller {
                 PDFEngine engine = new PDFEngine(destination.getAbsolutePath());
                 Image coverImage = engine.renderingPage(0);
                 int totalPages = engine.getPageCount();
+                String coverPath= saveCover(coverImage,bookTitle);
                 engine.close();
 
                 // 3. Create the Book object (Using the full constructor)
-                Book newBook = new Book(bookTitle, destination.getAbsolutePath(), coverImage, totalPages, finalCategory,0.0); // Simple cover path for now
+                Book newBook = new Book(bookTitle, destination.getAbsolutePath(), totalPages, finalCategory,0.0,coverPath); // Simple cover path for now
                 bookList.add(newBook);
                 Library.saveBookList(bookList);
                 refreshBookGrid();
@@ -194,6 +199,22 @@ public class Controller {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+    // Helper method to save the JavaFX Image to a file
+    private String saveCover(Image image, String title) {
+        String safeTitle = title.replaceAll("[^a-zA-Z0-9]", "_");
+        String path = "covers/" + safeTitle + ".png";
+        File file = new File(path);
+        file.getParentFile().mkdirs(); // Create the 'covers' folder if it doesn't exist
+        try {
+            // Convert JavaFX Image to standard BufferedImage so ImageIO can save it
+            java.awt.image.BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
+            javax.imageio.ImageIO.write(bImage, "png", file);
+            return file.getPath(); // Return the path we saved it to!
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -255,8 +276,13 @@ public class Controller {
 
         // Cover image
         ImageView coverView = new ImageView();
-        if (book.getCoverImage() != null) {
-            coverView.setImage(book.getCoverImage());
+        if (book.getCoverPath() != null) {
+            File imageFile = new File(book.getCoverPath());
+            if (imageFile.exists()) {
+                // This converts the saved path string back into a displayable Image object
+                Image coverImage = new Image(imageFile.toURI().toString());
+                coverView.setImage(coverImage);
+            }
         }
         coverView.setFitWidth(340);
         coverView.setFitHeight(300);
