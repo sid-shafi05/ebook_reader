@@ -21,7 +21,6 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
 
-        PDFEngine engine = new PDFEngine();
-        System.out.println("Pages in my test PDF: " + engine.getPageNumber("C:\\Users\\ASUS\\Desktop\\c++\\heap offline\\Assignment on Heap.pdf"));
+
     }
 }

@@ -9,6 +9,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -174,19 +175,24 @@ public class Controller {
                 File destination = new File(dir, selectedFile.getName());
                 java.nio.file.Files.copy(selectedFile.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-                // Extract cover image
-                Image coverImage = extractPDFCover(destination);
+                String bookTitle = selectedFile.getName().replace(".pdf", "");
 
-                // Extract total pages
-                int totalPages = extractTotalPages(destination);
+                // Get Category from User
+                TextInputDialog dialog = new TextInputDialog("General");
+                dialog.setTitle("New Book Category");
+                dialog.setHeaderText("Categorizing: " + bookTitle);
+                String finalCategory = dialog.showAndWait().orElse("Uncategorized");
 
-                Book newBook = new Book(
-                        selectedFile.getName(),
-                        destination.getAbsolutePath(),
-                        coverImage,
-                        totalPages
-                );
+                // Use PDF Engine
+                PDFEngine engine = new PDFEngine(destination.getAbsolutePath());
+                Image coverImage = engine.renderingPage(0);
+                int totalPages = engine.getPageCount();
+                engine.close();
+
+                // 3. Create the Book object (Using the full constructor)
+                Book newBook = new Book(bookTitle, destination.getAbsolutePath(), coverImage, totalPages, finalCategory); // Simple cover path for now
                 bookList.add(newBook);
+                Library.saveBookList(bookList);
                 refreshBookGrid();
 
             } catch (IOException e) {
@@ -196,7 +202,7 @@ public class Controller {
     }
 
     // Extract first page of PDF as cover image
-    private Image extractPDFCover(File pdfFile) {
+   /* private Image extractPDFCover(File pdfFile) {
         try (PDDocument document = PDDocument.load(pdfFile)) {
             PDFRenderer renderer = new PDFRenderer(document);
             BufferedImage bufferedImage = renderer.renderImageWithDPI(0, 150);
@@ -218,7 +224,7 @@ public class Controller {
             return 0;
         }
     }
-
+*/
     private void refreshBookGrid() {
         System.out.println("=== DEBUG: refreshBookGrid called ===");
         System.out.println("BookList size: " + bookList.size());
@@ -280,7 +286,7 @@ public class Controller {
 
         try {
             // Use your PDFEngine to open the book
-            PDFEngine engine = new PDFEngine();
+            PDFEngine engine = new PDFEngine(book.getFilePath());
 
             // You can either:
             // Option 1: Open in a new window with your PDF reader
@@ -305,8 +311,9 @@ public class Controller {
         javafx.scene.Parent root = loader.load();
 
         // Pass the book to the reader controller
-        // PDFReaderController controller = loader.getController();
+         BookController controller = loader.getController();
         // controller.loadBook(book, engine);
+        controller.startSession(book);
 
         javafx.scene.Scene scene = new javafx.scene.Scene(root, 900, 700);
         readerStage.setTitle(book.getTitle());

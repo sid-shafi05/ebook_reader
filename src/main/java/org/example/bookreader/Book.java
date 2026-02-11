@@ -10,17 +10,20 @@ public class Book {
     private int lastReadPageNumber;
     private boolean isFavourite;
     private Image coverImage;  // ← ADD THIS
+    private String category;
+    private double progressValue;
 
     public Book() {}
 
     // Updated constructor with coverImage
-    public Book(String title, String path, Image coverImage, int total) {
+    public Book(String title, String path, Image coverImage, int total,String category) {
         this.title = title;
         this.pathFile = path;
         this.coverImage = coverImage;  // ← ADD THIS
         this.totalPages = total;
         this.lastReadPageNumber = 0;
         this.isFavourite = false;
+        this.category=category;
     }
 
     // Getters
@@ -80,4 +83,8 @@ public class Book {
     public void setAuthorName(String authorName) {
         this.authorName = authorName;
     }
+    public void setCategory(String category){this.category=category;}
+    public String getCategory(){return category;}
+    public void setProgressValue(double p){progressValue=p;}
+    public double getProgressValue(){return progressValue;}
 }

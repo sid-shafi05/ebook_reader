@@ -21,7 +21,7 @@ public class FileTypeManager {
     }
     public Image getPage(int pageNumber){
         if(currentFileType.equals("pdf")){
-            return pdfEngine.getPageImage(pageNumber);
+            return pdfEngine.renderingPage(pageNumber);
         }
         else{
             return comicEngine.getPage(pageNumber);

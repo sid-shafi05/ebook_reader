@@ -1,5 +1,5 @@
-
 package org.example.bookreader;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import javafx.embed.swing.SwingFXUtils;
@@ -7,14 +7,25 @@ import javafx.scene.image.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+
 public class PDFEngine {
-    //takes the file path and page number of the book
-    //renders it to a buffered image
-    //converts it into JavaFX image and returns it
-    public Image renderingPage(String filePath, int pageNum) {
-        try (PDDocument doc = PDDocument.load(new File(filePath))) {
-            PDFRenderer pdfRenderer = new PDFRenderer(doc);
-            BufferedImage bufferedIm = pdfRenderer.renderImageWithDPI(pageNum, 300);
+    private PDDocument document;
+    private PDFRenderer renderer;
+    private final String filePath; // Remember the path we opened
+
+    // --- CONSTRUCTOR (This is the new "Open File" part) ---
+    public PDFEngine(String filePath) throws IOException {
+        this.filePath = filePath;
+        this.document = PDDocument.load(new File(filePath));
+        this.renderer = new PDFRenderer(document);
+    }
+
+    // --- METHOD TO GET A PAGE (Now faster, as the file is already open) ---
+    // We rename it to match your partner's code structure (renderingPage) but adjust parameters
+    public Image renderingPage(int pageNum) {
+        try {
+            // We use the 'renderer' that was created in the constructor!
+            BufferedImage bufferedIm = renderer.renderImageWithDPI(pageNum, 300);
             return SwingFXUtils.toFXImage(bufferedIm, null);
         } catch (Exception e) {
             System.err.println("Error rendering PDF page: " + e.getMessage());
@@ -22,11 +33,21 @@ public class PDFEngine {
         }
     }
 
-    public int getPageNumber(String filePath) {
-        try (PDDocument doc = PDDocument.load(new File(filePath))) {
-            return doc.getNumberOfPages();
+    // --- METHOD TO GET PAGE COUNT ---
+    public int getPageCount() {
+        if (document == null) return 0;
+        return document.getNumberOfPages();
+    }
+
+    // --- THE MISSING 'CLOSE' METHOD ---
+    public void close() {
+        try {
+            if (document != null) {
+                document.close();
+                System.out.println("PDF Document successfully closed.");
+            }
         } catch (IOException e) {
-            return 0;
+            e.printStackTrace();
         }
     }
 }

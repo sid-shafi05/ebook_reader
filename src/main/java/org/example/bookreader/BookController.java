@@ -30,14 +30,14 @@ public class BookController {
     }
     private void renderCurrentPage(){
         if(engine!=null){
-            pdfView.setImage(engine.getPageImage(currentPage));
+            pdfView.setImage(engine.renderingPage( currentPage));
         }
     }
     @FXML
     public void nextButtonLogic(){
         if(currentPage<engine.getPageCount()-1){
             currentPage++;
-            renderCurrentPage();
+            pdfView.setImage(engine.renderingPage(currentPage));
         }
     }
 
@@ -45,7 +45,7 @@ public class BookController {
     public void prevButtonLogic(){
         if(currentPage>0){
             currentPage--;
-            renderCurrentPage();
+            pdfView.setImage(engine.renderingPage(currentPage));
         }
     }
     //when user closes the book or goees back to the library
