@@ -231,3 +231,49 @@
     -fx-font-weight: bold;
 
 }
+
+
+/* Book card styling */
+.book-card {
+    -fx-background-color: #16213e;
+    -fx-padding: 15;
+    -fx-background-radius: 10;
+    -fx-border-color: #0f3460;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-cursor: hand;
+}
+
+.book-card:hover {
+    -fx-background-color: #1f2937;
+    -fx-border-color: #e94560;
+    -fx-effect: dropshadow(gaussian, rgba(233, 69, 96, 0.3), 10, 0, 0, 0);
+}
+
+.book-title {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+}
+
+/* Sort label styles */
+.sort-label {
+    -fx-text-fill: #e94560;
+    -fx-opacity: 0.6;
+    -fx-cursor: hand;
+}
+
+.sort-label:hover {
+    -fx-opacity: 1.0;
+}
+
+.label-color-active {
+    -fx-opacity: 1.0 !important;
+    -fx-font-weight: bold;
+}
+
+/* Sort container */
+.sort-container {
+    -fx-padding: 10 0 0 10;
+}
