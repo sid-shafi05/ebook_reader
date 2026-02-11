@@ -9,10 +9,12 @@ import javafx.scene.image.Image;
 import java.io.IOException;
 
 public class Main extends Application {
+    private static Controller mainControllerInstance;
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/org/example/bookreader/mainscreen.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 986, 616);
+        mainControllerInstance = fxmlLoader.getController();
         String css=this.getClass().getResource("/org/example/bookreader/application.css").toExternalForm();
         scene.getStylesheets().add(css);
         Image icon=new Image(Main.class.getResourceAsStream("/org/example/images/icon.png"));
@@ -22,5 +24,8 @@ public class Main extends Application {
         stage.show();
 
 
+    }
+    public static Controller getMainController() {
+        return mainControllerInstance;
     }
 }
