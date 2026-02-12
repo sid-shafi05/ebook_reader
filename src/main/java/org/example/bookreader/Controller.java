@@ -7,11 +7,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
@@ -26,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Optional;
 
 public class Controller {
 
@@ -267,7 +266,7 @@ public class Controller {
         }
     }
 
-    private VBox createBookTile(Book book) {
+   /* private VBox createBookTile(Book book) {
         VBox tile = new VBox(10);
         tile.setAlignment(Pos.CENTER);
         tile.getStyleClass().add("book-card");
@@ -311,11 +310,136 @@ public class Controller {
         progBar.setMaxHeight(80);
 
         //a small circle button with a "X" inside it
-       // Circle delCircle = new Circle(12);
-        //delCircle.set
+        // 1. Create the visual Circle shape (The Button Body)
+        Circle deleteShape = new Circle(10); // Radius of 10
+        deleteShape.setFill(javafx.scene.paint.Color.RED);
 
+// 2. Create the 'X' text
+        Label deleteText = new Label("X");
+        deleteText.setTextFill(javafx.scene.paint.Color.WHITE);
+        deleteText.setAlignment(Pos.CENTER);
+        deleteText.setStyle("-fx-font-size: 10pt;"); // Make the X visible
+
+// 3. Create the Container (StackPane) to layer them: X goes ON TOP of the Circle
+        StackPane deleteButton = new StackPane(deleteShape, deleteText);
+        deleteButton.setPrefSize(20, 20); // Make the whole clickable area 20x20
+
+// 4. Set the hover effect using CSS (This needs to be in your application.css file)
+        deleteButton.getStyleClass().add("delete-button");
+
+// 5. Wire the Click Action
+        deleteButton.setOnMouseClicked(event -> {
+            // Make sure you are passing the 'book' object correctly!
+            deleteBook(book);
+        });
+
+// 6. Add the whole delete button to the VBox card
+        tile.getChildren().add(deleteButton);
+        tile.getStyleClass().add("delete-button");
         tile.getChildren().addAll(coverView, titleLbl, pagesLbl, progBar);
         return tile;
+    }*/
+   private VBox createBookTile(Book book) {
+       VBox tile = new VBox(5); // Main card container
+       tile.setAlignment(Pos.TOP_CENTER); // Center the content vertically
+       tile.setStyle("-fx-padding: 10; -fx-background-color: #2d2d2d; -fx-background-radius: 8;");
+       tile.setPrefSize(150, 200); // Fixed size for consistency
+
+       // 1. THE COVER IMAGE
+       ImageView coverView = new ImageView();
+       if (book.getCoverPath() != null) {
+           File imageFile = new File(book.getCoverPath());
+           if (imageFile.exists()) {
+               // This converts the saved path string back into a displayable Image object
+               Image coverImage = new Image(imageFile.toURI().toString());
+               coverView.setImage(coverImage);
+           }
+       }
+       coverView.setFitWidth(100);
+       coverView.setFitHeight(130);
+       coverView.setPreserveRatio(true);
+
+       // --- NEW: Make the whole card clickable for OPENING THE BOOK ---
+
+
+       // --- NEW: Create the Custom Circular DELETE Button ---
+       StackPane deleteButton = new StackPane();
+       deleteButton.setPrefSize(20, 20);
+       deleteButton.getStyleClass().add("delete-button"); // Apply CSS style for hover/look
+
+       Label deleteText = new Label("X");
+       deleteText.setTextFill(javafx.scene.paint.Color.WHITE);
+       deleteText.setStyle("-fx-font-size: 10pt; -fx-font-weight: bold;");
+       deleteButton.getChildren().add(deleteText);
+       tile.setOnMouseClicked(event -> {
+           // ONLY run this if the click DID NOT happen on the delete button
+           if (!event.getTarget().equals(deleteButton)) { // We need to define deleteButton
+               openBook(book); // This calls the open logic we fixed in Controller.java
+           }
+       });
+
+       // Set the action ONLY on the delete button
+       deleteButton.setOnMouseClicked(event -> {
+           deleteBook(book); // Calls your deletion logic
+           event.consume(); // Stops the click from bubbling up to the VBox behind it!
+       });
+
+       // --- ASSEMBLY ---
+       // We use an AnchorPane here to easily position the delete button at the TOP RIGHT
+       AnchorPane cardContent = new AnchorPane();
+       cardContent.getChildren().addAll(coverView);
+
+       // Position the delete button at the top-right corner of the cover area
+       AnchorPane.setTopAnchor(deleteButton, 5.0);
+       AnchorPane.setRightAnchor(deleteButton, 5.0);
+
+       cardContent.getChildren().add(deleteButton); // Add the button to the image area
+
+       // Create the Labels (Title/Progress)
+       Label titleLbl = new Label(book.getTitle());
+       // ... (Styling for titleLbl) ...
+
+       Label pagesLbl = new Label(book.getTotalPages() + " Pages");
+       // ... (Styling for pagesLbl) ...
+
+       ProgressBar progBar = new ProgressBar();
+       progBar.setProgress(book.getProgressValue());
+       progBar.setMaxWidth(100);
+
+       // Add everything to the main VBox container
+       tile.getChildren().addAll(cardContent, titleLbl, pagesLbl, progBar);
+
+       return tile;
+   }
+
+    public void deleteBook(Book bookToDelete) {
+
+        // 1. CONFIRMATION: Ask the user "Are you sure?" (Best practice)
+        // We use JavaFX Alert for a native look
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                "Are you sure you want to delete '" + bookToDelete.getTitle() + "'?",
+                ButtonType.YES, ButtonType.NO);
+        alert.setTitle("Confirm Deletion");
+        alert.setHeaderText("Delete Book?");
+
+        // Wait for the user to click YES or NO
+        Optional<ButtonType> result = alert.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.YES) {
+
+            // 2. LOGIC: Remove the object from the live list
+            // This is why using ObservableList is better - it auto-updates the UI!
+            bookList.remove(bookToDelete);
+
+            // 3. PERSISTENCE: Save the new, smaller list back to the JSON file
+            Library.saveBookList(bookList); // Assuming LibraryData is your save utility
+
+            // 4. UI REFRESH: Force the shelf to redraw without the deleted book
+            refreshBookGrid();
+
+            System.out.println(bookToDelete.getTitle() + " has been permanently deleted.");
+        }
+        // If the user clicks NO, nothing happens, and we quietly exit.
     }
 
     //open the book upon clicking on a book card

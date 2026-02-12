@@ -107,7 +107,9 @@ public class BookController {
         }
     }
 
+public void deleteBook(Book b){
 
+}
 
 
 }
