@@ -13,6 +13,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -30,6 +31,7 @@ public class Controller {
 
     @FXML
     private AnchorPane contentArea;
+
 
     //Buttons
     @FXML
@@ -61,7 +63,7 @@ public class Controller {
     @FXML
     private ImageView bookCoverView;
 
-    @FXML
+   @FXML
     public void initialize() {
         loadPage("allbooks.fxml");
         bookList=  Library.loadBooks();
@@ -181,6 +183,7 @@ public class Controller {
                 TextInputDialog dialog = new TextInputDialog("General");
                 dialog.setTitle("New Book Category");
                 dialog.setHeaderText("Categorizing: " + bookTitle);
+
                 String finalCategory = dialog.showAndWait().orElse("Uncategorized");
 
                 // Use PDF Engine
@@ -191,7 +194,7 @@ public class Controller {
                 engine.close();
 
                 // 3. Create the Book object (Using the full constructor)
-                Book newBook = new Book(bookTitle, destination.getAbsolutePath(), totalPages, finalCategory,0.0,coverPath); // Simple cover path for now
+                Book newBook = new Book(bookTitle, destination.getAbsolutePath(), totalPages, finalCategory,0.0,coverPath,0); // Simple cover path for now
                 bookList.add(newBook);
                 Library.saveBookList(bookList);
                 refreshBookGrid();
@@ -201,6 +204,8 @@ public class Controller {
             }
         }
     }
+
+
     // Helper method to save the JavaFX Image to a file
     private String saveCover(Image image, String title) {
         String safeTitle = title.replaceAll("[^a-zA-Z0-9]", "_");
@@ -242,7 +247,7 @@ public class Controller {
         }
     }
 */
-    private void refreshBookGrid() {
+    public void refreshBookGrid() {
         System.out.println("=== DEBUG: refreshBookGrid called ===");
         System.out.println("BookList size: " + bookList.size());
 
@@ -267,7 +272,7 @@ public class Controller {
         tile.setAlignment(Pos.CENTER);
         tile.getStyleClass().add("book-card");
         tile.setPrefWidth(200);
-        tile.setPrefHeight(200);
+        tile.setPrefHeight(180);
 
         // Make the tile clickable
         tile.setOnMouseClicked(event -> {
@@ -284,15 +289,16 @@ public class Controller {
                 coverView.setImage(coverImage);
             }
         }
-        coverView.setFitWidth(340);
-        coverView.setFitHeight(300);
+        coverView.setFitWidth(180);
+        coverView.setFitHeight(100);
         coverView.setPreserveRatio(false);
 
         // Title
         Label titleLbl = new Label(book.getTitle());
         titleLbl.getStyleClass().add("book-title");
         titleLbl.setWrapText(true);
-        titleLbl.setMaxWidth(100);
+        titleLbl.setMaxWidth(180);
+        titleLbl.setMaxHeight(50);
 
         // Page count
         Label pagesLbl = new Label(book.getTotalPages() + " Pages");
@@ -302,6 +308,11 @@ public class Controller {
         ProgressBar progBar = new ProgressBar();
         progBar.setProgress(book.getProgressValue());
         progBar.setMaxWidth(100);
+        progBar.setMaxHeight(80);
+
+        //a small circle button with a "X" inside it
+       // Circle delCircle = new Circle(12);
+        //delCircle.set
 
         tile.getChildren().addAll(coverView, titleLbl, pagesLbl, progBar);
         return tile;
@@ -369,12 +380,15 @@ public class Controller {
             Parent readerPage = loader.load();
 
             // 2. Get the Brain of the Reader Screen
+           // readerPage.getStyleClass().add("full-screen-root");
             BookController readerBrain = loader.getController();
 
             // 3. Start the Engine and load the PDF
             readerBrain.startSession(book);
 
             // 4. SWAP THE SCREEN: Put the reader's FXML into the main window's content area
+
+           // readingScreen.getChildren().setAll(readerPage);
             contentArea.getChildren().setAll(readerPage);
 
             // 5. Make the reader fill the entire available space (very modern look)

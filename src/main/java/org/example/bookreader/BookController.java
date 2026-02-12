@@ -19,6 +19,7 @@ public class BookController {
     private int sessionStartPage;
     private Book currentBook;
     private int currentPage;
+    private int pageProgress;
 
     @FXML private ImageView pdfView;
     @FXML private Label pageNumberLabel;
@@ -31,6 +32,7 @@ public class BookController {
         this.currentPage=book.getLastReadPageNumber();
         this.sessionStartTime=System.currentTimeMillis();
         this.sessionStartPage=currentPage;
+        this.pageProgress=currentPage;
         try{
             this.engine=new PDFEngine(book.getFilePath());
             renderCurrentPage();
@@ -52,6 +54,7 @@ public class BookController {
     public void nextButtonLogic(){
         if(currentPage<engine.getPageCount()-1){
             currentPage++;
+            pageProgress++;
             renderCurrentPage();
         }
     }
@@ -61,20 +64,6 @@ public class BookController {
         if(currentPage>0){
             currentPage--;
             renderCurrentPage();
-        }
-    }
-    //when user closes the book or goes back to the library
-    public void stopSession(){
-        long endTime=System.currentTimeMillis();
-        long seconds=(endTime-sessionStartTime)/1000;
-        int pagesReadInThisSession=Math.abs(currentPage-sessionStartPage);
-        SingleReadingEvent event=new SingleReadingEvent(java.time.LocalDate.now().toString(),currentBook.getTitle(),pagesReadInThisSession,seconds, currentBook.getCategory());
-        StatsManagement.saveNewEvent(event);
-        currentBook.setLastReadPageNumber(currentPage);
-        List<Book> library=Library.loadBooks();
-        Library.saveBookList(library);
-        if(engine!=null){
-            engine.close();
         }
     }
 
@@ -92,5 +81,33 @@ public class BookController {
         // This calls the main controller to swap the content area back to the library
         Main.getMainController().changeToAllBooks();
     }
+
+    //when user closes the book or goes back to the library
+    public void stopSession(){
+        long endTime=System.currentTimeMillis();
+        long seconds=(endTime-sessionStartTime)/1000;
+        int pagesReadInThisSession=Math.abs(pageProgress-sessionStartPage);
+        currentBook.setProgressValue((double)(pagesReadInThisSession/currentBook.getTotalPages()));
+        SingleReadingEvent event=new SingleReadingEvent(java.time.LocalDate.now().toString(),currentBook.getTitle(),pagesReadInThisSession,seconds, currentBook.getCategory());
+        StatsManagement.saveNewEvent(event);
+        currentBook.setLastReadPageNumber(currentPage);
+        List<Book> library=Library.loadBooks();
+        for(Book b : library) {
+            if (b.getFilePath().equals(currentBook.getFilePath())) {
+                b.setLastReadPageNumber(currentPage);
+                b.setProgressValue((double)(pagesReadInThisSession/currentBook.getTotalPages()));
+                // Update progress bar data here too
+            }
+        }
+
+        System.out.println("savingggg");
+        Library.saveBookList(library);
+        if(engine!=null){
+            engine.close();
+        }
+    }
+
+
+
 
 }

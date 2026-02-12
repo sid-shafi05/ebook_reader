@@ -263,6 +263,10 @@
     -fx-opacity: 0.6;
     -fx-cursor: hand;
 }
+.full-screen-root {
+    -fx-pref-width: INFINITY;
+    -fx-pref-height: INFINITY;
+}
 
 .sort-label:hover {
     -fx-opacity: 1.0;

@@ -1,4 +1,10 @@
 package org.example.bookreader;
+
+
+// ----------SingleReadingEvent.java class---------
+
+
+
 //on "date", "x" book was read for "y" seconds
 public class SingleReadingEvent {
     private String date;

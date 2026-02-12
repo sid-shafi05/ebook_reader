@@ -17,7 +17,7 @@ public class Book {
     public Book() {}
 
     // Updated constructor with coverImage
-    public Book(String title, String path, int total,String category,double progress,String coverPath) {
+    public Book(String title, String path, int total,String category,double progress,String coverPath,int lastReadPageNumber) {
         this.title = title;
         this.pathFile = path;
         this.coverPath = coverPath;  // ← ADD THIS
@@ -26,6 +26,7 @@ public class Book {
         this.isFavourite = false;
         this.category=category;
         this.progressValue=progress;
+        this.lastReadPageNumber=0;
     }
 
     // Getters
