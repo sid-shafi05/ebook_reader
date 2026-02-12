@@ -3,22 +3,11 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0"
-            styleClass="all-books-page"
-            xmlns="http://javafx.com/javafx/24.0.1"
-            xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="all-books-page" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label text="All Books"></Label>
-      <FlowPane fx:id="bookGrid"
-                layoutX="20.0"
-                layoutY="70.0"
-                prefWidth="560.0"
-                prefHeight="310.0"
-                hgap="15"
-                vgap="15"
-                style="-fx-background-color: transparent;">
+      <Label text="All Books" />
+      <FlowPane fx:id="bookGrid" hgap="15" layoutX="20.0" layoutY="70.0" prefHeight="310.0" prefWidth="560.0" style="-fx-background-color: transparent;" vgap="15">
       </FlowPane>
    </children>
 </AnchorPane>

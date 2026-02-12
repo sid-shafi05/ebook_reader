@@ -16,6 +16,6 @@ module org.example.bookreader {
     requires org.apache.pdfbox;
     requires javafx.swing;
 
-    opens org.example.bookreader to javafx.fxml;
+    opens org.example.bookreader to javafx.fxml, com.fasterxml.jackson.databind;
     exports org.example.bookreader;
 }

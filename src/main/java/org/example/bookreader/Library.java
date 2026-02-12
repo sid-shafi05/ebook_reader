@@ -14,6 +14,7 @@ public class Library {
             mapper.writeValue(new File(File_Name),books);
         }catch(Exception e){
             System.err.println("Error saving: "+e.getMessage());
+            e.printStackTrace();
         }
 
     }
