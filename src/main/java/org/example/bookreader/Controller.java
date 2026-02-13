@@ -342,8 +342,9 @@ public class Controller {
    private VBox createBookTile(Book book) {
        VBox tile = new VBox(5); // Main card container
        tile.setAlignment(Pos.TOP_CENTER); // Center the content vertically
+       tile.getStyleClass().add("book-card");
        tile.setStyle("-fx-padding: 10; -fx-background-color: #2d2d2d; -fx-background-radius: 8;");
-       tile.setPrefSize(150, 200); // Fixed size for consistency
+       tile.setPrefSize(200, 220); // Fixed size for consistency
 
        // 1. THE COVER IMAGE
        ImageView coverView = new ImageView();
@@ -355,8 +356,8 @@ public class Controller {
                coverView.setImage(coverImage);
            }
        }
-       coverView.setFitWidth(100);
-       coverView.setFitHeight(130);
+       coverView.setFitWidth(150);
+       coverView.setFitHeight(120);
        coverView.setPreserveRatio(true);
 
        // --- NEW: Make the whole card clickable for OPENING THE BOOK ---
@@ -367,7 +368,7 @@ public class Controller {
        deleteButton.setPrefSize(20, 20);
        deleteButton.getStyleClass().add("delete-button"); // Apply CSS style for hover/look
 
-       Label deleteText = new Label("X");
+       Label deleteText = new Label("-");
        deleteText.setTextFill(javafx.scene.paint.Color.WHITE);
        deleteText.setStyle("-fx-font-size: 10pt; -fx-font-weight: bold;");
        deleteButton.getChildren().add(deleteText);
@@ -390,21 +391,27 @@ public class Controller {
        cardContent.getChildren().addAll(coverView);
 
        // Position the delete button at the top-right corner of the cover area
-       AnchorPane.setTopAnchor(deleteButton, 5.0);
-       AnchorPane.setRightAnchor(deleteButton, 5.0);
+       AnchorPane.setTopAnchor(deleteButton, 1.5);
+       AnchorPane.setRightAnchor(deleteButton, 1.5);
 
        cardContent.getChildren().add(deleteButton); // Add the button to the image area
 
        // Create the Labels (Title/Progress)
        Label titleLbl = new Label(book.getTitle());
        // ... (Styling for titleLbl) ...
+       titleLbl.getStyleClass().add("book-title");
+       titleLbl.setWrapText(true);
+       titleLbl.setMaxWidth(130);
+       //titleLbl.setMaxHeight(50);
 
        Label pagesLbl = new Label(book.getTotalPages() + " Pages");
        // ... (Styling for pagesLbl) ...
 
        ProgressBar progBar = new ProgressBar();
        progBar.setProgress(book.getProgressValue());
-       progBar.setMaxWidth(100);
+       progBar.setPrefWidth(100);
+       progBar.setPrefHeight(10);
+       progBar.setStyle("-fx-accent: #39FF14; -fx-pref-height: 10;"); // Makes it a thin, bright green line
 
        // Add everything to the main VBox container
        tile.getChildren().addAll(cardContent, titleLbl, pagesLbl, progBar);
