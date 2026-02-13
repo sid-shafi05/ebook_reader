@@ -1,0 +1,40 @@
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+<BorderPane minHeight="0" minWidth="0" style="-fx-background-color: #0a0a0d;" xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"  fx:controller="org.example.bookreader.BookController">
+    <center>
+        <!--
+         fitToWidth keeps the PDF centred; the ImageView preserves aspect ratio
+        -->
+        <ScrollPane fitToWidth="true" fitToHeight="false" style="-fx-background: #0a0a0d; -fx-background-color: #0a0a0d;" BorderPane.alignment="CENTER">
+            <content>
+                <ImageView fx:id="pdfView" fitWidth="1200.0" preserveRatio="true" pickOnBounds="true" smooth="true"/>
+            </content>
+        </ScrollPane>
+    </center>
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="16" style="-fx-background-color: #0b0c10; -fx-padding: 10 20; -fx-border-color: #1e2130; -fx-border-width: 0 0 1 0;" BorderPane.alignment="CENTER">
+            <children>
+                <Button mnemonicParsing="false" onAction="#onBackButtonClick" text="Back" style="-fx-background-color: #181b25; -fx-text-fill: #7880a0; -fx-background-radius: 6; -fx-border-color: #2e3550; -fx-border-width: 1; -fx-border-radius: 6; -fx-padding: 7 16; -fx-font-size: 12px; -fx-cursor: hand;"/>
+            </children>
+        </HBox>
+    </top>
+    <bottom>
+        <HBox fx:id="navigationBar" alignment="CENTER" spacing="24" style="-fx-background-color: #0b0c10; -fx-padding: 12 20; -fx-border-color: #1e2130; -fx-border-width: 1 0 0 0;" BorderPane.alignment="CENTER">
+            <children>
+                <Button mnemonicParsing="false" onAction="#prevButtonLogic" text="Prev" style="-fx-background-color: #181b25; -fx-text-fill: #4f8ef7; -fx-font-size: 16px; -fx-background-radius: 7; -fx-border-color: #2e3550; -fx-border-width: 1; -fx-border-radius: 7; -fx-padding: 8 22; -fx-cursor: hand; -fx-min-width: 50;"/>
+                <Label fx:id="pageNumberLabel" text="Page 1 of 1" style="-fx-text-fill: #3a3f54; -fx-font-size: 13px;">
+                    <font>
+                        <Font size="13.0"/>
+                    </font>
+                </Label>
+                <Button mnemonicParsing="false" onAction="#nextButtonLogic" text="Next" style="-fx-background-color: #181b25; -fx-text-fill: #4f8ef7; -fx-font-size: 16px; -fx-background-radius: 7; -fx-border-color: #2e3550; -fx-border-width: 1; -fx-border-radius: 7; -fx-padding: 8 22; -fx-cursor: hand; -fx-min-width: 50;"/>
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>

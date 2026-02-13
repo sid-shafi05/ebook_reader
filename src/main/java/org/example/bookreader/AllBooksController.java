@@ -1,137 +1,101 @@
 package org.example.bookreader;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class AllBooksController {
-    @FXML
-    private FlowPane bookGrid;
+
+    @FXML private FlowPane bookGrid;
+
+    private String currentSort   = "title";
+    private String currentFilter = "";
 
     @FXML
     public void initialize() {
-        System.out.println("=== AllBooksController initialized ===");
+        loadBooks();
+    }
+
+    public void setSort(String sort) {
+        this.currentSort = sort;
+        loadBooks();
+    }
+
+    public void filterBooks(String query) {
+        this.currentFilter = query;
         loadBooks();
     }
 
     public void loadBooks() {
-        System.out.println("=== Loading books ===");
-
-        if (bookGrid == null) {
-            System.out.println("ERROR: bookGrid is NULL!");
-            return;
-        }
-
+        if (bookGrid == null) return;
         bookGrid.getChildren().clear();
 
-        int bookCount = BookDatabase.getInstance().getBookCount();
-        System.out.println("Books in database: " + bookCount);
+        List<Book> books = new ArrayList<>(BookDatabase.getInstance().getAllBooks());
 
-        if (bookCount == 0) {
-            Label emptyLabel = new Label("No books yet.\nClick 'Add Book' to get started!");
-            emptyLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #666666; -fx-padding: 50;");
-            bookGrid.getChildren().add(emptyLabel);
+        // Filter
+        if (!currentFilter.isEmpty()) {
+            books = books.stream()
+                    .filter(b -> b.getTitle().toLowerCase().contains(currentFilter)
+                            || b.getAuthorName().toLowerCase().contains(currentFilter)
+                            || b.getCategory().toLowerCase().contains(currentFilter))
+                    .collect(Collectors.toList());
+        }
+
+        // Sort
+        switch (currentSort) {
+            case "author":
+                books.sort(Comparator.comparing(b -> b.getAuthorName().toLowerCase()));
+                break;
+            case "date":
+                books.sort(Comparator.comparingLong(Book::getDateAdded).reversed());
+                break;
+            case "progress":
+                books.sort(Comparator.comparingDouble(Book::getProgress).reversed());
+                break;
+            default: // title
+                books.sort(Comparator.comparing(b -> b.getTitle().toLowerCase()));
+        }
+
+        if (books.isEmpty()) {
+            String msg = currentFilter.isEmpty()
+                    ? "No books yet. Click 'Add Book' to get started!"
+                    : "No books match \"" + currentFilter + "\"";
+            Label lbl = new Label(msg);
+            lbl.setStyle("-fx-font-size: 16px; -fx-text-fill: #aaaaaa; -fx-padding: 50;");
+            bookGrid.getChildren().add(lbl);
             return;
         }
 
-        for (Book book : BookDatabase.getInstance().getAllBooks()) {
-            System.out.println("Creating card for: " + book.getTitle());
-            createBookCard(book);
-        }
-
-        System.out.println("Total items in grid: " + bookGrid.getChildren().size());
-    }
-
-    private void createBookCard(Book book) {
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("book.fxml"));
-
-            VBox bookCard = loader.load();
-
-            ImageView coverView = (ImageView) bookCard.lookup("#bookCoverView");
-            Label titleLabel = (Label) bookCard.lookup("#bookTitleLabel");
-
-            if (titleLabel != null) {
-                titleLabel.setText(book.getTitle());
-            }
-
-            // Regenerate cover if not in memory
-            if (coverView != null) {
-                if (book.getCoverImage() == null) {
-                    // Generate cover image on-demand
-                    try {
-                        Image coverImage = PDFEngine.renderingPage(book.getFilePath(), 0);
-                        book.setCoverImage(coverImage);
-                        coverView.setImage(coverImage);
-                        System.out.println("Generated cover for: " + book.getTitle());
-                    } catch (Exception e) {
-                        System.out.println("Could not generate cover: " + e.getMessage());
-                    }
-                } else {
-                    coverView.setImage(book.getCoverImage());
-                }
-            }
-
-            bookCard.setOnMouseClicked(event -> {
-                System.out.println("Opening book: " + book.getTitle());
-                openBook(book);
-            });
-
-            bookCard.setStyle(bookCard.getStyle() + "-fx-cursor: hand;");
-            bookGrid.getChildren().add(bookCard);
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        // Get the main Controller to use its createBookTile method (consistent UI)
+        for (Book book : books) {
+            // Lookup mainCtrl at tile-creation time so it's always fresh
+            Controller mainCtrl = Main.getMainController();
+            VBox tile = (mainCtrl != null)
+                    ? mainCtrl.createBookTile(book)
+                    : fallbackTile(book);
+            bookGrid.getChildren().add(tile);
         }
     }
 
-    private void openBook(Book book) {
-        try {
-            System.out.println("=== Opening Book Reader ===");
-
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("bookreader.fxml"));
-
-            if (loader.getLocation() == null) {
-                System.out.println("ERROR: Cannot find bookreader.fxml!");
-                return;
-            }
-
-            Parent root = loader.load();
-
-            BookController bookController = loader.getController();
-            bookController.setBook(book);
-
-            Stage stage = (Stage) bookGrid.getScene().getWindow();
-            Scene scene = new Scene(root);
-
-            try {
-                String css = getClass().getResource("application.css").toExternalForm();
-                scene.getStylesheets().add(css);
-            } catch (Exception e) {
-                System.out.println("Warning: Could not load CSS");
-            }
-
-            stage.setScene(scene);
-
-        } catch (Exception e) {
-            System.out.println("ERROR opening book reader:");
-            e.printStackTrace();
-        }
+    /** Simple fallback tile if main controller isn't available yet */
+    private VBox fallbackTile(Book book) {
+        VBox tile = new VBox(5);
+        tile.getStyleClass().add("book-card");
+        tile.getChildren().add(new Label(book.getTitle()));
+        tile.setOnMouseClicked(e -> {
+            if (Main.getMainController() != null)
+                Main.getMainController().openBook(book);
+        });
+        return tile;
     }
 
     public void refreshBooks() {
-        System.out.println("=== Refreshing books display ===");
         loadBooks();
     }
 }

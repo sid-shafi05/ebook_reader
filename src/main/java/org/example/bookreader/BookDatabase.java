@@ -1,5 +1,6 @@
 package org.example.bookreader;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.collections.FXCollections;
@@ -13,11 +14,15 @@ import java.util.List;
 public class BookDatabase {
     private static BookDatabase instance;
     private ObservableList<Book> books;
-    private static final String DATABASE_FILE = "books_database.json";
+
+    // Fixed path - always resolves to same place regardless of working directory
+    private static final String DATABASE_FILE =
+            System.getProperty("user.home") + File.separator + ".stackshelf" + File.separator + "books_database.json";
     private static final ObjectMapper mapper = new ObjectMapper();
 
     private BookDatabase() {
         books = FXCollections.observableArrayList();
+        ensureDirectoryExists();
         loadFromFile();
     }
 
@@ -28,104 +33,119 @@ public class BookDatabase {
         return instance;
     }
 
-    // Load books from JSON file
+    private void ensureDirectoryExists() {
+        File dir = new File(DATABASE_FILE).getParentFile();
+        if (!dir.exists()) dir.mkdirs();
+    }
+
     private void loadFromFile() {
         File file = new File(DATABASE_FILE);
         if (!file.exists()) {
             System.out.println("No database file found. Starting fresh.");
             return;
         }
-
         try {
-            List<BookData> bookDataList = mapper.readValue(file, new TypeReference<List<BookData>>() {});
-
-            for (BookData data : bookDataList) {
-                Book book = new Book(data.title, data.filePath);
-                book.setAuthorName(data.authorName);
-                book.setCategory(data.category);
-                book.setTotalPages(data.totalPages);
-                book.setLastReadPageNumber(data.lastReadPageNumber);
-                book.setFavouriteStatus(data.isFavourite);
-                // Note: Cover images will be regenerated when needed
+            List<BookData> dataList = mapper.readValue(file, new TypeReference<List<BookData>>() {});
+            for (BookData d : dataList) {
+                Book book = new Book(d.title != null ? d.title : "Unknown",
+                        d.filePath != null ? d.filePath : "");
+                book.setAuthorName(d.authorName != null ? d.authorName : "Unknown Author");
+                book.setCategory(d.category != null ? d.category : "Uncategorized");
+                book.setTotalPages(d.totalPages);
+                book.setLastReadPageNumber(d.lastReadPageNumber);
+                book.setFavouriteStatus(d.isFavourite);
+                book.setCoverPath(d.coverPath);
+                book.setProgressValue(d.progressValue);
+                book.setDateAdded(d.dateAdded != 0 ? d.dateAdded : System.currentTimeMillis());
                 books.add(book);
             }
-
-            System.out.println("Loaded " + books.size() + " books from database");
-
+            System.out.println("Loaded " + books.size() + " books from " + DATABASE_FILE);
         } catch (IOException e) {
             System.err.println("Error loading database: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
-    // Save books to JSON file
-    private void saveToFile() {
+    public void saveToFile() {
         try {
-            List<BookData> bookDataList = new ArrayList<>();
-
+            List<BookData> dataList = new ArrayList<>();
             for (Book book : books) {
-                BookData data = new BookData();
-                data.title = book.getTitle();
-                data.filePath = book.getFilePath();
-                data.authorName = book.getAuthorName();
-                data.category = book.getCategory();
-                data.totalPages = book.getTotalPages();
-                data.lastReadPageNumber = book.getLastReadPageNumber();
-                data.isFavourite = book.isFavourite();
-                bookDataList.add(data);
+                BookData d = new BookData();
+                d.title             = book.getTitle();
+                d.filePath          = book.getFilePath();
+                d.authorName        = book.getAuthorName();
+                d.category          = book.getCategory();
+                d.totalPages        = book.getTotalPages();
+                d.lastReadPageNumber = book.getLastReadPageNumber();
+                d.isFavourite       = book.isFavourite();
+                d.coverPath         = book.getCoverPath();
+                d.progressValue     = book.getProgressValue();
+                d.dateAdded         = book.getDateAdded();
+                dataList.add(d);
             }
-
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(DATABASE_FILE), bookDataList);
-            System.out.println("Saved " + books.size() + " books to database");
-
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(DATABASE_FILE), dataList);
         } catch (IOException e) {
             System.err.println("Error saving database: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
     public void addBook(Book book) {
+        if (getBookByPath(book.getFilePath()) != null) return; // no duplicates
         books.add(book);
-        saveToFile(); // Auto-save when book is added
-        System.out.println("Book added to database: " + book.getTitle());
-        System.out.println("Total books in database: " + books.size());
+        saveToFile();
+        System.out.println("Book added: " + book.getTitle() + " | Total: " + books.size());
     }
 
     public void removeBook(Book book) {
         books.remove(book);
-        saveToFile(); // Auto-save when book is removed
+        saveToFile();
     }
 
     public void updateBook(Book book) {
-        // Find and update the book
         for (int i = 0; i < books.size(); i++) {
             if (books.get(i).getFilePath().equals(book.getFilePath())) {
                 books.set(i, book);
                 break;
             }
         }
-        saveToFile(); // Auto-save when book is updated
-        System.out.println("Book updated: " + book.getTitle() + " (Last page: " + book.getLastReadPageNumber() + ")");
+        saveToFile();
     }
 
-    public ObservableList<Book> getAllBooks() {
-        return books;
-    }
-
-    public int getBookCount() {
-        return books.size();
-    }
+    public ObservableList<Book> getAllBooks()    { return books; }
+    public int getBookCount()                    { return books.size(); }
 
     public Book getBookByPath(String filePath) {
-        for (Book book : books) {
-            if (book.getFilePath().equals(filePath)) {
-                return book;
-            }
+        for (Book b : books) {
+            if (b.getFilePath().equals(filePath)) return b;
         }
         return null;
     }
 
-    // Inner class for JSON serialization (without Image field)
+    public List<String> getAllCategories() {
+        List<String> cats = new ArrayList<>();
+        for (Book b : books) {
+            String c = b.getCategory();
+            if (c != null && !c.isEmpty() && !cats.contains(c)) cats.add(c);
+        }
+        return cats;
+    }
+
+    public List<Book> getBooksByCategory(String category) {
+        List<Book> result = new ArrayList<>();
+        for (Book b : books) {
+            if (category.equals(b.getCategory())) result.add(b);
+        }
+        return result;
+    }
+
+    public List<Book> getFavouriteBooks() {
+        List<Book> result = new ArrayList<>();
+        for (Book b : books) {
+            if (b.isFavourite()) result.add(b);
+        }
+        return result;
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private static class BookData {
         public String title;
         public String filePath;
@@ -134,5 +154,8 @@ public class BookDatabase {
         public int totalPages;
         public int lastReadPageNumber;
         public boolean isFavourite;
+        public String coverPath;
+        public double progressValue;
+        public long dateAdded;
     }
 }

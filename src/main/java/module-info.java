@@ -16,6 +16,8 @@ module org.example.bookreader {
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
 
-    opens org.example.bookreader to javafx.fxml;
+    // opens to javafx.fxml for FXML injection
+    // opens to jackson.databind for JSON serialization (bro's addition - needed!)
+    opens org.example.bookreader to javafx.fxml, com.fasterxml.jackson.databind;
     exports org.example.bookreader;
 }

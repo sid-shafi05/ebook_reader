@@ -1,56 +1,58 @@
 package org.example.bookreader;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.stage.Stage;
+import javafx.scene.layout.HBox;
 
 import java.io.IOException;
 
 public class BookController {
-    @FXML
-    private ImageView pdfView;
 
-    @FXML
-    private Label pageNumberLabel;
+    @FXML private ImageView pdfView;
+    @FXML private Label pageNumberLabel;
+    @FXML public HBox navigationBar;
 
     private Book currentBook;
-    private FileTypeManager fileTypeManager;
-    private int currentPage = 0;
+    private PDFEngine engine;
+    private int currentPage;
+    private int pageProgress;
     private long sessionStartTime;
     private int sessionStartPage;
 
-    public void setBook(Book book) throws IOException {
-        System.out.println("BookController.setBook called for: " + book.getTitle());
+    /** Called by Controller.openBook() to load and start a reading session */
+    public void startSession(Book book) {
+        System.out.println("BookController.startSession: " + book.getTitle());
         this.currentBook = book;
-        this.fileTypeManager = new FileTypeManager();
-        this.fileTypeManager.fileType(book.getFilePath());
-
-        // Resume from last read page
         this.currentPage = book.getLastReadPageNumber();
         this.sessionStartPage = currentPage;
+        this.pageProgress = currentPage;
         this.sessionStartTime = System.currentTimeMillis();
 
-        displayCurrentPage();
-        System.out.println("Book loaded! Starting at page: " + (currentPage + 1));
+        try {
+            this.engine = new PDFEngine(book.getFilePath());
+            renderCurrentPage();
+        } catch (IOException e) {
+            System.err.println("Error opening PDF: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
-    private void displayCurrentPage() {
-        if (fileTypeManager != null) {
-            pdfView.setImage(fileTypeManager.getPage(currentPage));
-            pageNumberLabel.setText("Page " + (currentPage + 1) + " of " + fileTypeManager.getTotalPage());
+    private void renderCurrentPage() {
+        if (engine != null && pdfView != null) {
+            pdfView.setImage(engine.renderingPage(currentPage));
+            if (pageNumberLabel != null) {
+                pageNumberLabel.setText("Page " + (currentPage + 1) + " of " + engine.getPageCount());
+            }
         }
     }
 
     @FXML
     public void nextButtonLogic() {
-        if (currentPage < fileTypeManager.getTotalPage() - 1) {
+        if (engine != null && currentPage < engine.getPageCount() - 1) {
             currentPage++;
-            displayCurrentPage();
-            saveProgress();
+            pageProgress++;
+            renderCurrentPage();
         }
     }
 
@@ -58,70 +60,57 @@ public class BookController {
     public void prevButtonLogic() {
         if (currentPage > 0) {
             currentPage--;
-            displayCurrentPage();
-            saveProgress();
-        }
-    }
-
-    private void saveProgress() {
-        if (currentBook != null) {
-            currentBook.setLastReadPageNumber(currentPage);
-            BookDatabase.getInstance().updateBook(currentBook);
-            System.out.println("Progress saved: Page " + (currentPage + 1));
+            renderCurrentPage();
         }
     }
 
     @FXML
     public void onBackButtonClick() {
+        stopSession();
         try {
-            System.out.println("Going back to library...");
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/org/example/bookreader/mainscreen.fxml"));
+            javafx.scene.Parent root = loader.load();
 
-            // Save final progress
-            saveProgress();
+            // Register the new Controller BEFORE swapping root so that
+            // initialize() -> loadBooks() -> tile clicks all see the right instance
+            Controller newCtrl = loader.getController();
+            Main.setMainController(newCtrl);
 
-            // Calculate and log session stats
-            long sessionEndTime = System.currentTimeMillis();
-            long secondsRead = (sessionEndTime - sessionStartTime) / 1000;
-            int pagesRead = Math.abs(currentPage - sessionStartPage);
+            // Swap root on existing scene — window keeps its size perfectly
+            Main.getPrimaryStage().getScene().setRoot(root);
 
-            System.out.println("Session stats:");
-            System.out.println("- Pages read: " + pagesRead);
-            System.out.println("- Time: " + secondsRead + " seconds");
-
-            // Log to stats (your friend's code)
-            StatsManagement.readLog(
-                    currentBook.getTitle(),
-                    pagesRead,
-                    secondsRead,
-                    currentBook.getCategory()
-            );
-
-            // Close file manager
-            if (fileTypeManager != null) {
-                fileTypeManager.close();
-            }
-
-            // Return to main screen
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("mainscreen.fxml")
-            );
-            Parent root = loader.load();
-
-            Stage stage = (Stage) pdfView.getScene().getWindow();
-            Scene scene = new Scene(root, 986, 616);
-
-            try {
-                String css = getClass().getResource("application.css").toExternalForm();
-                scene.getStylesheets().add(css);
-            } catch (Exception e) {
-                System.out.println("Warning: Could not load CSS");
-            }
-
-            stage.setScene(scene);
-            System.out.println("Returned to library");
-
-        } catch (IOException e) {
+        } catch (Exception e) {
+            System.err.println("Error returning to library: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    /** Saves progress and logs reading stats */
+    public void stopSession() {
+        if (currentBook == null) return;
+
+        long seconds = (System.currentTimeMillis() - sessionStartTime) / 1000;
+        int pagesRead = Math.abs(pageProgress - sessionStartPage);
+
+        // Update progress value (0.0 to 1.0)
+        if (currentBook.getTotalPages() > 0) {
+            currentBook.setProgressValue((double) currentPage / currentBook.getTotalPages());
+        }
+        currentBook.setLastReadPageNumber(currentPage);
+
+        // Persist to database
+        BookDatabase.getInstance().updateBook(currentBook);
+
+        // Log reading event for stats
+        StatsManagement.readLog(
+                currentBook.getTitle(), pagesRead, seconds, currentBook.getCategory());
+
+        System.out.println("Session ended: " + pagesRead + " pages, " + seconds + "s");
+
+        if (engine != null) {
+            engine.close();
+            engine = null;
         }
     }
 }

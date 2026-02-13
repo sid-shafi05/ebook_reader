@@ -1,279 +1,423 @@
-/* StackShelf App Styling */
+/* ═══════════════════════════════════════════════════════════════════
+   StackShelf  ·  Deep Slate Theme
+   Vibe: Premium dark IDE meets reading app. Cool, geometric, crisp.
+   Palette:
+     bg-base    #0d0e11  — near-black with a hint of blue
+     bg-panel   #12141a  — sidebar
+     bg-surface #181b22  — content area
+     bg-card    #1e2130  — cards / raised surfaces
+     bg-hover   #252a38  — hover state
+     accent     #4f8ef7  — ice blue
+     accent-dim #2d5fb8  — dimmed blue
+     accent-bright #7aaeff — bright blue glow
+     text-hi    #e8ecf4  — primary text, slightly cool white
+     text-mid   #7880a0  — secondary text
+     text-lo    #3a3f54  — placeholder / disabled
+     border     #1e2130  — card/panel borders
+     border-lit #2e3550  — lit border on hover
+     danger     #e05c6a  — delete / error red
+   ═══════════════════════════════════════════════════════════════════ */
 
-/* Root colors - Dark theme with accent colors */
+/* ── Root ──────────────────────────────────────────────────────── */
 .root {
-    -fx-background-color: #1a1a2e;
-    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-background-color: #0d0e11;
+    -fx-font-family: "Segoe UI", "SF Pro Display", "Arial", sans-serif;
 }
 
-/* BorderPane background */
-.border-pane {
-    -fx-background-color: #1a1a2e;
-}
-
-/* Left Sidebar - Distinct dark background */
+/* ── Sidebar ───────────────────────────────────────────────────── */
 .left-sidebar {
-    -fx-background-color: #0d1117;
-    -fx-border-color: #0f3460;
-    -fx-border-width: 0 2 0 0;
+    -fx-background-color: #0b0c10;
+    -fx-border-color: #1e2130;
+    -fx-border-width: 0 1 0 0;
 }
 
-/* Sidebar Buttons - DEFAULT STATE (lighter and more visible) */
-.left-sidebar .button {
-    -fx-background-color: #1f2937;
-    -fx-text-fill: #d1d5db;
-    -fx-font-size: 16px;
+/* Logo */
+#iconText {
+    -fx-text-fill: #e8ecf4;
+    -fx-font-size: 15px;
     -fx-font-weight: bold;
+    -fx-letter-spacing: 1px;
+}
+
+/* ── Sidebar Nav Buttons ───────────────────────────────────────── */
+.left-sidebar .button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #3a3f54;
+    -fx-font-size: 13px;
+    -fx-font-weight: normal;
     -fx-cursor: hand;
-    -fx-background-radius: 8;
+    -fx-background-radius: 0;
     -fx-border-width: 0;
-    -fx-padding: 15 20;
+    -fx-padding: 14 20;
     -fx-alignment: center-left;
 }
 
-/* Sidebar Buttons - HOVER STATE (clearly visible) */
 .left-sidebar .button:hover {
-    -fx-background-color: #374151;
-    -fx-text-fill: #ff6b9d;
+    -fx-background-color: #13161f;
+    -fx-text-fill: #7880a0;
 }
 
-/* Sidebar Buttons - CLICKED/ACTIVE STATE (very different from default) */
-.left-sidebar .button:pressed,
-.left-sidebar .button:armed {
-    -fx-background-color: #e94560;
-    -fx-text-fill: #ffffff;
-    -fx-scale-y: 0.98;
-    -fx-scale-x: 0.98;
+.left-sidebar .button:pressed {
+    -fx-background-color: #181b25;
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
 }
 
-/* For a "selected" button that stays highlighted */
+/* Active / selected nav button — left strip + tinted bg */
 .left-sidebar .button.active {
-    -fx-background-color: #533483;
-    -fx-text-fill: #ffffff;
-    -fx-border-color: #e94560;
-    -fx-border-width: 0 0 0 3;
-}
-
-/* App Title/Logo */
-.icon-text {
-    -fx-text-fill: #e94560;
-    -fx-font-size: 20px;
+    -fx-background-color: linear-gradient(to right, #162040, #0d0e11);
+    -fx-text-fill: #4f8ef7;
     -fx-font-weight: bold;
+    -fx-border-color: #4f8ef7 transparent transparent transparent;
+    /* Left accent strip — fake it with a left border */
+    -fx-border-color: transparent transparent transparent #4f8ef7;
+    -fx-border-width: 0 0 0 2;
 }
 
-/* Top Bar Buttons (Add Book, Add Folder) - WITH ICON SPACE */
-/* Unified Add Button Style */
-.top-bar-button {
-    -fx-background-color: rgba(233, 69, 96, 0.15); /* Soft transparent rose */
-    -fx-text-fill: #e94560;                        /* Bright rose text */
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-background-radius: 8;
-    -fx-padding: 8 16;
-    -fx-cursor: hand;
-    -fx-border-color: rgba(233, 69, 96, 0.3);
-    -fx-border-width: 1;
-    -fx-border-radius: 8;
-}
-
-.top-bar-button:hover {
-    -fx-background-color: rgba(233, 69, 96, 0.3);
-    -fx-border-color: #e94560;
-}
-
-.top-bar .button:pressed {
-    -fx-background-color: #c73a54;
-    -fx-scale-y: 0.98;
-    -fx-scale-x: 0.98;
-}
-
-/* Special styling for Add buttons with icons */
-#addBtn .image-view,
-#addFBtn .image-view {
-    -fx-opacity: 0.9;
-}
-
-/* Search TextField */
-.text-field {
-    -fx-background-color: #16213e;
-    -fx-text-fill: #ffffff;
-    -fx-prompt-text-fill: #7f8c9a;
-    -fx-font-size: 14px;
-    -fx-background-radius: 20;
-    -fx-border-radius: 20;
-    -fx-border-color: #0f3460;
-    -fx-border-width: 2;
-    -fx-padding: 8 15;
-}
-
-.text-field:focused {
-    -fx-border-color: #e94560;
-    -fx-effect: dropshadow(gaussian, rgba(233, 69, 96, 0.3), 8, 0, 0, 0);
-}
-
-/* Toggle Buttons - CLEAR STATES */
-.toggle-button {
-    -fx-background-color: #16213e;
-    -fx-text-fill: #8b92a0;
-    -fx-border-color: #0f3460;
-    -fx-border-width: 1;
-    -fx-cursor: hand;
-    -fx-padding: 8 15;
-    -fx-background-radius: 5;
-}
-
-.toggle-button:hover {
-    -fx-background-color: #1f2937;
-    -fx-text-fill: #e94560;
-}
-
-.toggle-button:selected {
-    -fx-background-color: #e94560;
-    -fx-text-fill: #ffffff;
-    -fx-border-color: #ff6b9d;
-    -fx-effect: dropshadow(gaussian, rgba(233, 69, 96, 0.5), 8, 0, 0, 0);
-}
-
-/* Labels */
-.label {
-    -fx-text-fill: #ffffff;
-}
-
-/* HBox and VBox styling */
-.hbox, .vbox {
-    -fx-background-color: transparent;
-}
-
-/* StackPane (content area) */
-.stack-pane {
-    -fx-background-color: #1a1a2e;
-}
-
-/* Scrollbar styling */
-.scroll-bar {
-    -fx-background-color: #16213e;
-}
-
-.scroll-bar .thumb {
-    -fx-background-color: #e94560;
-    -fx-background-radius: 10;
-}
-
-.scroll-bar .thumb:hover {
-    -fx-background-color: #ff6b9d;
-}
-
-.scroll-bar .track {
-    -fx-background-color: #0f3460;
-}
-
-/* Help and Settings buttons - SAME STYLE AS OTHER BUTTONS NOW */
+/* ── Help / Settings (bottom sidebar) ─────────────────────────── */
 #helpBtn, #setBtn {
-    -fx-background-color: #1f2937;
-    -fx-text-fill: #d1d5db;
-    -fx-border-color: #374151;
+    -fx-text-fill: #2a2f42;
+    -fx-border-color: #181b25 transparent transparent transparent;
     -fx-border-width: 1 0 0 0;
+    -fx-font-size: 12px;
 }
 
 #helpBtn:hover, #setBtn:hover {
-    -fx-background-color: #374151;
-    -fx-text-fill: #ff6b9d;
+    -fx-text-fill: #4a5070;
+    -fx-background-color: #13161f;
 }
 
-#helpBtn:pressed, #setBtn:pressed {
-    -fx-background-color: #e94560;
+/* ── Top-bar Add Buttons ───────────────────────────────────────── */
+.top-bar-button {
+    -fx-background-color: #181b25;
+    -fx-text-fill: #4f8ef7;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 7;
+    -fx-border-radius: 7;
+    -fx-border-color: #2e3550;
+    -fx-border-width: 1;
+    -fx-padding: 8 18;
+    -fx-cursor: hand;
+}
+
+.top-bar-button:hover {
+    -fx-background-color: #1e2438;
+    -fx-border-color: #4f8ef7;
+    -fx-effect: dropshadow(gaussian, rgba(79,142,247,0.25), 12, 0, 0, 0);
+}
+
+.top-bar-button:pressed {
+    -fx-scale-x: 0.96;
+    -fx-scale-y: 0.96;
+    -fx-background-color: #243050;
+}
+
+/* ── Search Bar ────────────────────────────────────────────────── */
+.text-field {
+    -fx-background-color: #12141a;
+    -fx-text-fill: #c8cfe8;
+    -fx-prompt-text-fill: #2e3350;
+    -fx-font-size: 13px;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #1e2130;
+    -fx-border-width: 1;
+    -fx-padding: 9 14;
+}
+
+.text-field:focused {
+    -fx-border-color: #4f8ef7;
+    -fx-background-color: #141720;
+    -fx-effect: dropshadow(gaussian, rgba(79,142,247,0.2), 10, 0, 0, 0);
+}
+
+/* ── Toggle Buttons (Grid / List) ──────────────────────────────── */
+.toggle-button {
+    -fx-background-color: #12141a;
+    -fx-text-fill: #3a3f54;
+    -fx-border-color: #1e2130;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-padding: 7 16;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-font-size: 12px;
+}
+
+.toggle-button:hover {
+    -fx-background-color: #181b25;
+    -fx-text-fill: #7880a0;
+}
+
+.toggle-button:selected {
+    -fx-background-color: #4f8ef7;
     -fx-text-fill: #ffffff;
-}
-
-/* ImageView in buttons - make sure icons show up */
-.button .image-view {
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 2, 0, 0, 1);
-}
-
-
-/* Add this to your style.css file */
-.blue-button {
-    -fx-background-color: rgba(59, 130, 246, 0.1); /* Very transparent blue */
-    -fx-text-fill: #1a73e8;                        /* Strong blue text */
-    -fx-background-radius: 5;                      /* Slightly rounded corners */
+    -fx-border-color: #4f8ef7;
     -fx-font-weight: bold;
-    -fx-padding: 8 15 8 15;
+    -fx-effect: dropshadow(gaussian, rgba(79,142,247,0.35), 8, 0, 0, 0);
 }
 
-/* Hover effect to make it feel interactive */
-.blue-button:hover {
-    -fx-background-color: rgba(59, 130, 246, 0.2); /* Slightly darker on hover */
-    -fx-cursor: hand;
-}
-
-.all-books-page {
-    -fx-background-color: #533483;
-}
-
-
-/* The default look for all sort labels */
+/* ── Sort Labels ───────────────────────────────────────────────── */
 .sort-label {
-    -fx-text-fill: #e94560;
-    -fx-opacity: 0.6;
+    -fx-text-fill: #2e3350;
+    -fx-font-size: 11px;
     -fx-cursor: hand;
-    -fx-font-weight: normal;
-    -fx-transition: 0.3s; /* Makes the glow/fade feel smooth */
+    -fx-padding: 3 10;
+    -fx-background-radius: 4;
 }
 
-/* Hover effect (FREE bonus for your UI) */
 .sort-label:hover {
-    -fx-opacity: 0.9;
+    -fx-text-fill: #7880a0;
+    -fx-background-color: #13161f;
 }
 
-/* THE DYNAMIC PART: The class your Java code adds/removes */
 .label-color-active {
-    -fx-opacity: 1.0;
+    -fx-text-fill: #4f8ef7;
     -fx-font-weight: bold;
-
+    -fx-background-color: rgba(79,142,247,0.08);
 }
 
+.sort-container {
+    -fx-padding: 2 0 2 2;
+}
 
-/* Book card styling */
+/* ── Generic Label ─────────────────────────────────────────────── */
+.label {
+    -fx-text-fill: #c8cfe8;
+}
+
+/* ── Book Cards ────────────────────────────────────────────────── */
 .book-card {
-    -fx-background-color: #16213e;
-    -fx-padding: 15;
+    -fx-background-color: #13161f;
     -fx-background-radius: 10;
-    -fx-border-color: #0f3460;
-    -fx-border-width: 2;
+    -fx-border-color: #1e2130;
+    -fx-border-width: 1;
     -fx-border-radius: 10;
     -fx-cursor: hand;
+    -fx-padding: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 3);
 }
 
 .book-card:hover {
-    -fx-background-color: #1f2937;
-    -fx-border-color: #e94560;
-    -fx-effect: dropshadow(gaussian, rgba(233, 69, 96, 0.3), 10, 0, 0, 0);
+    -fx-background-color: #181c28;
+    -fx-border-color: #4f8ef7;
+    -fx-effect: dropshadow(gaussian, rgba(79,142,247,0.18), 18, 0, 0, 0);
 }
 
 .book-title {
-    -fx-text-fill: #ffffff;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
+    -fx-text-fill: #c8cfe8;
+    -fx-font-size: 11px;
     -fx-text-alignment: center;
+    -fx-wrap-text: true;
 }
 
-/* Sort label styles */
-.sort-label {
-    -fx-text-fill: #e94560;
-    -fx-opacity: 0.6;
+/* ── Progress Bar ──────────────────────────────────────────────── */
+.progress-bar {
+    -fx-pref-height: 4;
+    -fx-background-color: #1e2130;
+    -fx-background-radius: 2;
+}
+
+.progress-bar > .bar {
+    -fx-background-color: linear-gradient(to right, #2d5fb8, #4f8ef7);
+    -fx-background-radius: 2;
+    -fx-background-insets: 0;
+}
+
+.progress-bar > .track {
+    -fx-background-color: #1e2130;
+    -fx-background-radius: 2;
+    -fx-background-insets: 0;
+}
+
+/* ── Delete Button ─────────────────────────────────────────────── */
+.delete-button {
+    -fx-background-color: rgba(224, 92, 106, 0.8);
+    -fx-background-radius: 50;
     -fx-cursor: hand;
 }
 
-.sort-label:hover {
-    -fx-opacity: 1.0;
+.delete-button:hover {
+    -fx-background-color: #e05c6a;
+    -fx-scale-x: 1.15;
+    -fx-scale-y: 1.15;
+    -fx-effect: dropshadow(gaussian, rgba(224,92,106,0.4), 8, 0, 0, 0);
 }
 
-.label-color-active {
-    -fx-opacity: 1.0 !important;
+/* ── Scrollbars — thin and minimal ─────────────────────────────── */
+.scroll-bar {
+    -fx-background-color: transparent;
+    -fx-pref-width: 5;
+    -fx-pref-height: 5;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #2e3550;
+    -fx-background-radius: 3;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #4f8ef7;
+}
+
+.scroll-bar .track,
+.scroll-bar .track-background {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button,
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-background-color: transparent;
+    -fx-shape: "";
+    -fx-pref-height: 0;
+    -fx-pref-width: 0;
+}
+
+/* ── ScrollPane ────────────────────────────────────────────────── */
+.scroll-pane,
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+/* ── All Books / Fav / Cat pages ───────────────────────────────── */
+.all-books-page {
+    -fx-background-color: #0d0e11;
+}
+
+/* ── Dialogs ───────────────────────────────────────────────────── */
+.dialog-pane {
+    -fx-background-color: #12141a;
+    -fx-border-color: #2e3550;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: #181b25;
+    -fx-background-radius: 10 10 0 0;
+}
+
+.dialog-pane .header-panel .label {
+    -fx-text-fill: #e8ecf4;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
 }
 
-/* Sort container */
-.sort-container {
-    -fx-padding: 10 0 0 10;
+.dialog-pane .content.label {
+    -fx-text-fill: #7880a0;
+    -fx-font-size: 13px;
+}
+
+.dialog-pane .button-bar .button {
+    -fx-background-color: #1e2130;
+    -fx-text-fill: #c8cfe8;
+    -fx-border-color: #2e3550;
+    -fx-border-width: 1;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-padding: 7 20;
+    -fx-cursor: hand;
+    -fx-font-size: 12px;
+}
+
+.dialog-pane .button-bar .button:hover {
+    -fx-background-color: #252a38;
+    -fx-border-color: #4f8ef7;
+    -fx-text-fill: #4f8ef7;
+}
+
+/* ── ChoiceDialog combo ────────────────────────────────────────── */
+.combo-box, .combo-box-base {
+    -fx-background-color: #1e2130;
+    -fx-border-color: #2e3550;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.combo-box .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #c8cfe8;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #181b25;
+    -fx-border-color: #4f8ef7;
+    -fx-border-width: 1;
+}
+
+.combo-box-popup .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #c8cfe8;
+    -fx-padding: 6 12;
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #1e2438;
+    -fx-text-fill: #4f8ef7;
+}
+
+/* ── BorderPane (reader + main containers) ─────────────────────── */
+.border-pane {
+    -fx-background-color: #0d0e11;
+}
+
+/* ── Reader nav bar ────────────────────────────────────────────── */
+#navigationBar {
+    -fx-background-color: #0b0c10;
+    -fx-border-color: #1e2130 transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 10;
+    -fx-spacing: 20;
+}
+
+#navigationBar .button {
+    -fx-background-color: #181b25;
+    -fx-text-fill: #4f8ef7;
+    -fx-font-size: 15px;
+    -fx-background-radius: 7;
+    -fx-border-color: #2e3550;
+    -fx-border-width: 1;
+    -fx-border-radius: 7;
+    -fx-padding: 8 22;
+    -fx-cursor: hand;
+    -fx-min-width: 48;
+}
+
+#navigationBar .button:hover {
+    -fx-background-color: #1e2438;
+    -fx-border-color: #4f8ef7;
+    -fx-effect: dropshadow(gaussian, rgba(79,142,247,0.2), 8, 0, 0, 0);
+}
+
+#navigationBar .button:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+#pageNumberLabel {
+    -fx-text-fill: #3a3f54;
+    -fx-font-size: 12px;
+}
+
+/* ── Top-bar reader back button ────────────────────────────────── */
+.border-pane > .top > HBox .button {
+    -fx-background-color: #181b25;
+    -fx-text-fill: #7880a0;
+    -fx-background-radius: 6;
+    -fx-border-color: #2e3550;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-padding: 7 16;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+}
+
+.border-pane > .top > HBox .button:hover {
+    -fx-text-fill: #4f8ef7;
+    -fx-border-color: #4f8ef7;
 }
