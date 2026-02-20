@@ -87,13 +87,8 @@ public class Controller {
     public void changeToAllBooks() {
         currentAllBooksController = (AllBookController) loadPage("allbooks.fxml");
         setActiveStyle(allBtn);
-        javafx.application.Platform.runLater(() -> {
-            try {
-                refreshBookGrid();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        // AllBookController.initialize() → loadBooks() runs automatically
+        // no need to call refreshBookGrid() here
     }
 
     @FXML
@@ -284,10 +279,23 @@ public class Controller {
         favButton.setOnAction(e -> {
             e.consume();
             book.setFavouriteStatus(!book.isFavourite());
-            // update in bookList and save
+
+            // find and update the matching book in bookList
+            for (Book b : bookList) {
+                if (b.getFilePath().equals(book.getFilePath())) {
+                    b.setFavouriteStatus(book.isFavourite());
+                    break;
+                }
+            }
             Library.saveBookList(bookList);
-            // update button look
+
+            // update button appearance
             favButton.setText(book.isFavourite() ? "♥" : "♡");
+            favButton.setStyle(book.isFavourite()
+                    ? "-fx-background-color: rgba(79,142,247,0.85); -fx-text-fill: white; " +
+                    "-fx-background-radius: 50; -fx-cursor: hand;"
+                    : "-fx-background-color: rgba(30,33,48,0.75); -fx-text-fill: #4f8ef7; " +
+                    "-fx-background-radius: 50; -fx-cursor: hand;");
         });
 
 // add favButton to your card somehow — depends on your book.fxml layout
@@ -296,7 +304,10 @@ public class Controller {
 
         // click handlers
         card.setOnMouseClicked(e -> {
-            if (!e.getTarget().equals(ctrl.getDeleteButton()))
+            if (!e.getTarget().equals(ctrl.getDeleteButton())
+                    && !e.getTarget().equals(favButton)
+                    && !(e.getTarget() instanceof javafx.scene.text.Text
+                    && ((javafx.scene.text.Text)e.getTarget()).getParent().equals(favButton)))
                 openBook(book);
         });
         ctrl.getDeleteButton().setOnMouseClicked(e -> {
