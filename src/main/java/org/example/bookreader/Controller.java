@@ -65,8 +65,8 @@ public class Controller {
 
    @FXML
     public void initialize() throws IOException {
+       bookList=  Library.loadBooks();
        currentAllBooksController = (AllBookController) loadPage("allbooks.fxml");
-        bookList=  Library.loadBooks();
         sortByTitle();
         if (allBtn != null) {
             setActiveStyle(allBtn);
@@ -85,6 +85,7 @@ public class Controller {
 
     @FXML
     public void changeToAllBooks() {
+        bookList = Library.loadBooks();
         currentAllBooksController = (AllBookController) loadPage("allbooks.fxml");
         setActiveStyle(allBtn);
         // AllBookController.initialize() → loadBooks() runs automatically
@@ -278,18 +279,33 @@ public class Controller {
 
         favButton.setOnAction(e -> {
             e.consume();
-            book.setFavouriteStatus(!book.isFavourite());
 
-            // find and update the matching book in bookList
-            for (Book b : bookList) {
+            System.out.println("=== FAV BUTTON CLICKED ===");
+            System.out.println("Book: " + book.getTitle());
+            System.out.println("isFavourite BEFORE: " + book.isFavourite());
+
+            book.setFavouriteStatus(!book.isFavourite());
+            System.out.println("isFavourite AFTER toggle: " + book.isFavourite());
+
+            List<Book> freshList = Library.loadBooks();
+            System.out.println("Fresh list size: " + freshList.size());
+
+            boolean found = false;
+            for (Book b : freshList) {
                 if (b.getFilePath().equals(book.getFilePath())) {
                     b.setFavouriteStatus(book.isFavourite());
+                    found = true;
+                    System.out.println("Found matching book in list, updated to: " + b.isFavourite());
                     break;
                 }
             }
-            Library.saveBookList(bookList);
+            System.out.println("Book found in list: " + found);
 
-            // update button appearance
+            Library.saveBookList(freshList);
+            System.out.println("Saved. Check LibraryData.json now.");
+
+            bookList = freshList;
+
             favButton.setText(book.isFavourite() ? "♥" : "♡");
             favButton.setStyle(book.isFavourite()
                     ? "-fx-background-color: rgba(79,142,247,0.85); -fx-text-fill: white; " +

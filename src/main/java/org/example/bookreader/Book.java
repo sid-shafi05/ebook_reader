@@ -1,6 +1,7 @@
 package org.example.bookreader;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import javafx.scene.image.Image;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Book {
@@ -47,9 +48,9 @@ public class Book {
         return lastReadPageNumber;
     }
 
-    public boolean isFavourite() {  // Fixed method name
-        return isFavourite;
-    }
+    @JsonProperty("favourite")
+    public boolean isFavourite() { return isFavourite; }
+
 
 
 
@@ -73,9 +74,9 @@ public class Book {
         this.lastReadPageNumber = last;
     }
 
-    public void setFavouriteStatus(boolean fav) {
-        this.isFavourite = fav;
-    }
+
+    @JsonProperty("favourite")
+    public void setFavouriteStatus(boolean fav) { this.isFavourite = fav; }
 
 
     public String getCoverPath() { return coverPath; }
