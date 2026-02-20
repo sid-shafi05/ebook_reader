@@ -13,6 +13,7 @@ public class Book {
     private String category;
     private String coverPath;
     private double progressValue;
+    private long dateAdded;
 
     public Book() {}
 
@@ -54,6 +55,7 @@ public class Book {
 
 
 
+
     // Setters
     public void setTitle(String title) {  // Fixed bug: was setting title=title
         this.title = title;
@@ -83,4 +85,13 @@ public class Book {
     public String getCategory(){return category;}
     public void setProgressValue(double p){progressValue=p;}
     public double getProgressValue(){return progressValue;}
+    public long getDateAdded() { return dateAdded; }
+    public void setDateAdded(long dateAdded) { this.dateAdded = dateAdded; }
+
+    public double getProgress()
+    {
+        if(totalPages<=0) return 0;
+        return (double)lastReadPageNumber/totalPages;
+    }
+
 }

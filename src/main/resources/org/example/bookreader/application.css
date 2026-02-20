@@ -296,3 +296,23 @@
     -fx-scale-y: 1.1; /* Makes it slightly bigger */
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 5, 0, 0, 2); /* Adds a subtle shadow */
 }
+.book-card {
+    -fx-background-color: #2d2d2d;
+    -fx-background-radius: 8;
+    -fx-padding: 10;
+    -fx-cursor: hand;
+}
+
+.book-card:hover {
+    -fx-border-color: #e94560;
+    -fx-effect: dropshadow(gaussian, rgba(233,69,96,0.3), 10, 0, 0, 0);
+}
+
+.book-progress {
+    -fx-accent: #39FF14;
+}
+
+.pages-label {
+    -fx-text-fill: #8b92a0;
+    -fx-font-size: 10px;
+}

@@ -4,8 +4,19 @@
 <?import javafx.scene.layout.AnchorPane?>
 
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1"  styleClass="all-books-page" fx:controller="org.example.bookreader.FavController">
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.FlowPane?>
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" styleClass="all-books-page" fx:controller="org.example.bookreader.FavController">
     <children>
-        <Label layoutX="151.0" layoutY="77.0" prefHeight="137.0" prefWidth="255.0" text="FAVOURITES" />
+        <ScrollPane fitToWidth="true"
+                    AnchorPane.topAnchor="0"
+                    AnchorPane.bottomAnchor="0"
+                    AnchorPane.leftAnchor="0"
+                    AnchorPane.rightAnchor="0">
+            <content>
+                <FlowPane fx:id="favGrid" hgap="15" vgap="15"
+                          style="-fx-padding: 20; -fx-background-color: transparent;"/>
+            </content>
+        </ScrollPane>
     </children>
 </AnchorPane>

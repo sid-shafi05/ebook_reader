@@ -8,7 +8,6 @@ import java.util.List;
 public class Library {
     private static final String File_Name="LibraryData.json";
     private static final ObjectMapper mapper =new ObjectMapper();
-    //saving the full list to a file
     public static void saveBookList(List<Book>books){
         try{
             mapper.writeValue(new File(File_Name),books);
@@ -18,11 +17,9 @@ public class Library {
         }
 
     }
-    //loading the list from that file
     public static List<Book> loadBooks() {
         File f = new File(File_Name);
         if (!f.exists()) {
-//empty list if no file exists yet
             return new ArrayList<>();
         }
         try {
@@ -31,5 +28,31 @@ public class Library {
         }catch (Exception e){
             return new ArrayList<>();
         }
+    }
+
+    public static List<Book> getFavouriteBooks() {
+        List<Book> result = new ArrayList<>();
+        for (Book b : loadBooks()) {
+            if (b.isFavourite()) result.add(b);
+        }
+        return result;
+    }
+
+    public static List<String> getAllCategories() {
+        List<String> cats = new ArrayList<>();
+        for (Book b : loadBooks()) {
+            String c = b.getCategory();
+            if (c != null && !c.isEmpty() && !cats.contains(c))
+                cats.add(c);
+        }
+        return cats;
+    }
+
+    public static List<Book> getBooksByCategory(String category) {
+        List<Book> result = new ArrayList<>();
+        for (Book b : loadBooks()) {
+            if (category.equals(b.getCategory())) result.add(b);
+        }
+        return result;
     }
 }

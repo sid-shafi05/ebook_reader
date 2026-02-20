@@ -99,7 +99,7 @@
 
                         <HBox alignment="CENTER_RIGHT" spacing="12">
                            <children>
-                              <TextField prefWidth="350.0" promptText="Search in Library" styleClass="text-field" />
+                              <TextField fx:id="searchField" prefWidth="350.0" promptText="Search in Library" styleClass="text-field" />
                               <HBox style="-fx-border-color: #0f3460; -fx-border-radius: 5;">
                                  <children>
                                     <ToggleButton mnemonicParsing="false" selected="true" styleClass="toggle-button" text="Grid">
