@@ -3,12 +3,28 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="357.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="420.0" prefWidth="200.0" spacing="10.0" style="-fx-background-color: #ffffff; -fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ImageView fx:id="bookCoverView" fitHeight="310.0" fitWidth="357.0" pickOnBounds="true" preserveRatio="true" />
-      <Label fx:id="bookTitleLabel" alignment="CENTER" prefHeight="46.0" prefWidth="354.0" text="Boook Name" />
-      <ProgressBar fx:id="progBar" prefHeight="17.0" prefWidth="210.0" progress="0.0" translateX="75.0" translateY="22.0" />
+      <ImageView fx:id="bookCoverView" fitHeight="250.0" fitWidth="180.0" pickOnBounds="true" preserveRatio="true" style="-fx-border-radius: 4;" VBox.vgrow="NEVER" />
+      <Label fx:id="bookTitleLabel" alignment="TOP_LEFT" prefHeight="40.0" prefWidth="180.0" style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #333333; -fx-wrap-text: true;" text="Book Title" VBox.vgrow="NEVER">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Label>
+      <Label fx:id="bookAuthorLabel" style="-fx-font-size: 10; -fx-text-fill: #666666;" text="Author" VBox.vgrow="NEVER">
+         <font>
+            <Font size="10.0" />
+         </font>
+      </Label>
+      <Label fx:id="dateAddedLabel" style="-fx-font-size: 9; -fx-text-fill: #999999;" text="Added: Jan 1, 2024" VBox.vgrow="NEVER">
+         <font>
+            <Font size="9.0" />
+         </font>
+      </Label>
+      <ProgressBar fx:id="progBar" prefHeight="8.0" prefWidth="180.0" progress="0.0" style="-fx-accent: #2196F3;" VBox.vgrow="NEVER" />
    </children>
 </VBox>

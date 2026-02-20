@@ -2,56 +2,59 @@
 
 /* Root colors - Dark theme with accent colors */
 .root {
-    -fx-background-color: #1a1a2e;
+    -fx-background-color: #0f0f1a;
     -fx-font-family: "Segoe UI", "Arial", sans-serif;
 }
 
 /* BorderPane background */
 .border-pane {
-    -fx-background-color: #1a1a2e;
+    -fx-background-color: #0f0f1a;
 }
 
-/* Left Sidebar - Distinct dark background */
+/* Left Sidebar */
 .left-sidebar {
-    -fx-background-color: #0d1117;
-    -fx-border-color: #0f3460;
-    -fx-border-width: 0 2 0 0;
+    -fx-background-color: #13131f;
+    -fx-border-color: #1e1e35;
+    -fx-border-width: 0 1 0 0;
+    -fx-padding: 0 8 12 8;
 }
 
-/* Sidebar Buttons - DEFAULT STATE (lighter and more visible) */
+/* Sidebar Buttons - DEFAULT */
 .left-sidebar .button {
-    -fx-background-color: #1f2937;
-    -fx-text-fill: #d1d5db;
-    -fx-font-size: 16px;
+    -fx-background-color: transparent;
+    -fx-text-fill: #8b92a0;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
-    -fx-background-radius: 8;
+    -fx-background-radius: 10;
     -fx-border-width: 0;
-    -fx-padding: 15 20;
+    -fx-padding: 12 16;
     -fx-alignment: center-left;
+    -fx-pref-width: 145;
 }
 
-/* Sidebar Buttons - HOVER STATE (clearly visible) */
+/* Sidebar Buttons - HOVER */
 .left-sidebar .button:hover {
-    -fx-background-color: #374151;
-    -fx-text-fill: #ff6b9d;
+    -fx-background-color: #1e1e35;
+    -fx-text-fill: #e94560;
 }
 
-/* Sidebar Buttons - CLICKED/ACTIVE STATE (very different from default) */
-.left-sidebar .button:pressed,
-.left-sidebar .button:armed {
+/* Sidebar Buttons - PRESSED */
+.left-sidebar .button:pressed {
     -fx-background-color: #e94560;
     -fx-text-fill: #ffffff;
-    -fx-scale-y: 0.98;
-    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.97;
+    -fx-scale-x: 0.97;
 }
 
-/* For a "selected" button that stays highlighted */
+/* Active / selected sidebar button — pill highlight with left accent */
 .left-sidebar .button.active {
-    -fx-background-color: #533483;
+    -fx-background-color: rgba(233, 69, 96, 0.15);
     -fx-text-fill: #ffffff;
-    -fx-border-color: #e94560;
+    -fx-border-color: transparent transparent transparent #e94560;
     -fx-border-width: 0 0 0 3;
+    -fx-background-radius: 0 10 10 0;
+    -fx-border-radius: 0 10 10 0;
 }
 
 /* App Title/Logo */
@@ -167,23 +170,6 @@
     -fx-background-color: #0f3460;
 }
 
-/* Help and Settings buttons - SAME STYLE AS OTHER BUTTONS NOW */
-#helpBtn, #setBtn {
-    -fx-background-color: #1f2937;
-    -fx-text-fill: #d1d5db;
-    -fx-border-color: #374151;
-    -fx-border-width: 1 0 0 0;
-}
-
-#helpBtn:hover, #setBtn:hover {
-    -fx-background-color: #374151;
-    -fx-text-fill: #ff6b9d;
-}
-
-#helpBtn:pressed, #setBtn:pressed {
-    -fx-background-color: #e94560;
-    -fx-text-fill: #ffffff;
-}
 
 /* ImageView in buttons - make sure icons show up */
 .button .image-view {
@@ -220,12 +206,12 @@
     -fx-transition: 0.3s; /* Makes the glow/fade feel smooth */
 }
 
-/* Hover effect (FREE bonus for your UI) */
+/* Hover effect */
 .sort-label:hover {
     -fx-opacity: 0.9;
 }
 
-/* THE DYNAMIC PART: The class your Java code adds/removes */
+
 .label-color-active {
     -fx-opacity: 1.0;
     -fx-font-weight: bold;
@@ -263,6 +249,10 @@
     -fx-opacity: 0.6;
     -fx-cursor: hand;
 }
+.full-screen-root {
+    -fx-pref-width: INFINITY;
+    -fx-pref-height: INFINITY;
+}
 
 .sort-label:hover {
     -fx-opacity: 1.0;
@@ -276,4 +266,173 @@
 /* Sort container */
 .sort-container {
     -fx-padding: 10 0 0 10;
+}
+.delete-button {
+    -fx-background-color: #ff4444; /* Red color */
+    -fx-text-fill: white;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10; /* Makes the background circular */
+    -fx-cursor: hand; /* Changes the mouse to a pointer hand */
+}
+
+/* For the hover effect (when the mouse is over it) */
+.delete-button:hover {
+    -fx-background-color: #cc0000; /* A darker red on hover */
+    -fx-scale-x: 1.1; /* Makes it slightly bigger */
+    -fx-scale-y: 1.1; /* Makes it slightly bigger */
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 5, 0, 0, 2); /* Adds a subtle shadow */
+}
+
+/* Reader screen button styles */
+.nav-button {
+    -fx-background-color: #3a3a4a;
+    -fx-text-fill: #e0e0e0;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-border-color: #555566;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+.nav-button:hover {
+    -fx-background-color: #4e4e6a;
+    -fx-text-fill: #ffffff;
+    -fx-scale-x: 1.04;
+    -fx-scale-y: 1.04;
+    -fx-effect: dropshadow(gaussian, rgba(100,100,200,0.4), 8, 0, 0, 2);
+}
+
+.nav-button:pressed {
+    -fx-background-color: #6060aa;
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+}
+
+.back-button {
+    -fx-background-color: #1565C0;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-border-color: #1976D2;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+.back-button:hover {
+    -fx-background-color: #1976D2;
+    -fx-scale-x: 1.04;
+    -fx-scale-y: 1.04;
+    -fx-effect: dropshadow(gaussian, rgba(33,150,243,0.5), 8, 0, 0, 2);
+}
+
+.back-button:pressed {
+    -fx-background-color: #0d47a1;
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+}
+
+/* Bookmark toggle button — square, icon centered */
+.bookmark-button {
+    -fx-background-color: #FF9800;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+    -fx-font-size: 17;
+    -fx-alignment: center;
+    -fx-padding: 0;
+}
+
+.bookmark-button:hover {
+    -fx-background-color: #F57C00;
+    -fx-scale-x: 1.08;
+    -fx-scale-y: 1.08;
+    -fx-effect: dropshadow(gaussian, rgba(255,152,0,0.6), 10, 0, 0, 2);
+}
+
+.bookmark-button:pressed {
+    -fx-background-color: #E65100;
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+.view-bookmarks-button {
+    -fx-background-color: #6a1b9a;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #7b1fa2;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+}
+
+.view-bookmarks-button:hover {
+    -fx-background-color: #7b1fa2;
+    -fx-scale-x: 1.04;
+    -fx-scale-y: 1.04;
+    -fx-effect: dropshadow(gaussian, rgba(123,31,162,0.5), 8, 0, 0, 2);
+}
+
+.view-bookmarks-button:pressed {
+    -fx-background-color: #4a148c;
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+}
+
+/* ===== CHART STYLES ===== */
+
+/* Chart background should be transparent to blend with our dark panels */
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.chart {
+    -fx-background-color: transparent;
+    -fx-padding: 5;
+}
+
+/* Grid lines — make them slightly visible but not distracting */
+.chart-vertical-grid-lines {
+    -fx-stroke: rgba(255, 255, 255, 0.08);
+}
+.chart-horizontal-grid-lines {
+    -fx-stroke: rgba(255, 255, 255, 0.08);
+}
+
+/* Axis lines and tick marks */
+.axis {
+    -fx-tick-label-fill: white;
+}
+.axis-label {
+    -fx-text-fill: #c0c0e0;
+}
+
+/* Line chart — make the line bright and thick */
+.default-color0.chart-series-line {
+    -fx-stroke: #4fc3f7;
+    -fx-stroke-width: 2.5px;
+}
+
+/* Line chart dots */
+.default-color0.chart-line-symbol {
+    -fx-background-color: #4fc3f7, white;
+    -fx-background-radius: 5px;
+    -fx-padding: 5px;
+}
+
+/* Pie chart label text color */
+.chart-pie-label {
+    -fx-fill: white;
+    -fx-font-size: 12px;
+}
+
+/* Pie chart legend text */
+.chart-legend-item {
+    -fx-text-fill: #d0d0f0;
+}
+.chart-legend {
+    -fx-background-color: transparent;
 }

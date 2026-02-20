@@ -36,17 +36,16 @@ public class ComicEngine {
         }
     }
 
-public ComicEngine(String filePath){
-    loadComic(filePath);
-}
-public Image getPage(int pageNumber){
-    if(pageNumber>=0 && pageNumber<pages.size()){
-         return pages.get(pageNumber);
+    public ComicEngine(String filePath){
+        loadComic(filePath);
     }
-    return null;
-}
-public int getTotalPages(){
+    public Image getPage(int pageNumber){
+        if(pageNumber>=0 && pageNumber<pages.size()){
+            return pages.get(pageNumber);
+        }
+        return null;
+    }
+    public int getTotalPages(){
         return pages.size();
+    }
 }
-}
-

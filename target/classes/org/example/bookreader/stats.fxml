@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="600.0" prefWidth="750.0"
+            style="-fx-background-color: #1a1a2e;"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.bookreader.StatsController">
+   <children>
+      <VBox prefHeight="600.0" prefWidth="750.0" spacing="0.0"
+            AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+            AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+
+            <!-- HEADER -->
+            <HBox alignment="CENTER_LEFT" prefHeight="60.0"
+                  style="-fx-background-color: #16213e; -fx-border-color: #0f3460; -fx-border-width: 0 0 2 0; -fx-padding: 0 25 0 25;">
+               <children>
+                  <Label style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #e0e0ff;" text="📊  Reading Statistics">
+                     <font><Font name="Segoe UI" size="22.0" /></font>
+                  </Label>
+               </children>
+            </HBox>
+
+            <!-- SCROLLABLE CONTENT -->
+            <ScrollPane fitToWidth="true" style="-fx-background-color: #1a1a2e; -fx-background: #1a1a2e;" VBox.vgrow="ALWAYS">
+               <content>
+                  <VBox prefWidth="750.0" spacing="20.0">
+                     <padding><Insets top="20" bottom="20" left="20" right="20" /></padding>
+                     <children>
+
+                        <!-- STAT CARDS — 3 equal columns -->
+                        <GridPane hgap="15.0" prefWidth="710.0">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
+                              <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
+                              <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
+                           </columnConstraints>
+                           <children>
+                              <!-- Card 1 -->
+                              <VBox alignment="CENTER" spacing="6.0" GridPane.columnIndex="0"
+                                    style="-fx-background-color: #0f3460; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);">
+                                 <padding><Insets top="18" bottom="18" left="10" right="10" /></padding>
+                                 <children>
+                                    <Label style="-fx-font-size: 12; -fx-text-fill: #9090c0;" text="TOTAL TIME READ">
+                                       <font><Font name="Segoe UI" size="12.0" /></font>
+                                    </Label>
+                                    <Label fx:id="totalTimeLabel" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #4fc3f7;" text="0 min">
+                                       <font><Font name="Segoe UI" size="28.0" /></font>
+                                    </Label>
+                                 </children>
+                              </VBox>
+                              <!-- Card 2 -->
+                              <VBox alignment="CENTER" spacing="6.0" GridPane.columnIndex="1"
+                                    style="-fx-background-color: #0f3460; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);">
+                                 <padding><Insets top="18" bottom="18" left="10" right="10" /></padding>
+                                 <children>
+                                    <Label style="-fx-font-size: 12; -fx-text-fill: #9090c0;" text="AVG PER DAY">
+                                       <font><Font name="Segoe UI" size="12.0" /></font>
+                                    </Label>
+                                    <Label fx:id="avgTimePerDayLabel" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #ffb74d;" text="0 min">
+                                       <font><Font name="Segoe UI" size="28.0" /></font>
+                                    </Label>
+                                 </children>
+                              </VBox>
+                              <!-- Card 3 -->
+                              <VBox alignment="CENTER" spacing="6.0" GridPane.columnIndex="2"
+                                    style="-fx-background-color: #0f3460; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);">
+                                 <padding><Insets top="18" bottom="18" left="10" right="10" /></padding>
+                                 <children>
+                                    <Label style="-fx-font-size: 12; -fx-text-fill: #9090c0;" text="PAGES READ">
+                                       <font><Font name="Segoe UI" size="12.0" /></font>
+                                    </Label>
+                                    <Label fx:id="totalPagesReadLabel" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #a5d6a7;" text="0">
+                                       <font><Font name="Segoe UI" size="28.0" /></font>
+                                    </Label>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </GridPane>
+
+                        <!-- CHART 1: Time per Category — PIE CHART -->
+                        <VBox spacing="8.0"
+                              style="-fx-background-color: #16213e; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);">
+                           <padding><Insets top="15" bottom="15" left="15" right="15" /></padding>
+                           <children>
+                              <Label style="-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: #e0e0ff;" text="Top Categories by Time Spent">
+                                 <font><Font name="Segoe UI" size="15.0" /></font>
+                              </Label>
+                              <PieChart fx:id="timePerCategoryChart" animated="true" legendVisible="true"
+                                        prefHeight="280.0" prefWidth="680.0"
+                                        style="-fx-background-color: transparent;" />
+                           </children>
+                        </VBox>
+
+                        <!-- CHART 2: Time per Day — LINE CHART -->
+                        <VBox spacing="8.0"
+                              style="-fx-background-color: #16213e; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);">
+                           <padding><Insets top="15" bottom="15" left="15" right="15" /></padding>
+                           <children>
+                              <Label style="-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: #e0e0ff;" text="Reading Time per Day — last 14 days (minutes)">
+                                 <font><Font name="Segoe UI" size="15.0" /></font>
+                              </Label>
+                              <LineChart fx:id="timePerDayChart" animated="true" legendVisible="false"
+                                         prefHeight="250.0" prefWidth="680.0"
+                                         style="-fx-background-color: transparent;" createSymbols="true">
+                                 <xAxis><CategoryAxis side="BOTTOM" tickLabelFill="white" /></xAxis>
+                                 <yAxis><NumberAxis side="LEFT" tickLabelFill="white" label="Minutes" /></yAxis>
+                              </LineChart>
+                           </children>
+                        </VBox>
+
+                     </children>
+                  </VBox>
+               </content>
+            </ScrollPane>
+
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
+
+

@@ -1,0 +1,4 @@
+org\example\bookreader\Book.class
+org\example\bookreader\BookController.class
+org\example\bookreader\StatsController.class
+org\example\bookreader\PDFEngine.class

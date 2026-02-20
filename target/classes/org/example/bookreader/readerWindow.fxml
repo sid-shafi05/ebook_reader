@@ -3,43 +3,97 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="709.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.bookreader.BookController">
-   <center>
-      <ScrollPane prefHeight="524.0" prefWidth="986.0" BorderPane.alignment="CENTER">
-         <content>
-            <ImageView fx:id="pdfView" fitHeight="524.0" fitWidth="986.0" pickOnBounds="true" preserveRatio="true" x="100.0" y="50.0" />
-         </content>
-      </ScrollPane>
-   </center>
-   <bottom>
-      <HBox fx:id="navigationBar" alignment="CENTER" prefHeight="53.0" prefWidth="986.0" BorderPane.alignment="CENTER">
-         <children>
-            <Button mnemonicParsing="false" onAction="#prevButtonLogic" text="&lt;" textOverrun="CENTER_ELLIPSIS" translateX="-400.0">
-               <font>
-                  <Font size="18.0" />
-               </font></Button>
-            <Label fx:id="pageNumberLabel" />
-            <Button mnemonicParsing="false" onAction="#nextButtonLogic" text="&gt;" translateX="400.0">
-               <font>
-                  <Font size="18.0" />
-               </font></Button>
-         </children>
-      </HBox>
-   </bottom>
+<BorderPane prefHeight="750.0" prefWidth="1100.0"
+            style="-fx-background-color: #2b2b2b;"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.bookreader.BookController">
+
+   <!-- TOP BAR -->
    <top>
-      <HBox prefHeight="54.0" prefWidth="986.0" BorderPane.alignment="CENTER">
+      <HBox alignment="CENTER_LEFT" prefHeight="52.0" spacing="14.0"
+            style="-fx-background-color: #1e1e1e; -fx-border-color: #3a3a3a; -fx-border-width: 0 0 1 0; -fx-padding: 8 24 8 16;">
          <children>
-            <Button mnemonicParsing="false" onAction="#onBackButtonClick" text="Back" textFill="#100c0c">
-               <font>
-                  <Font size="14.0" />
-               </font>
+            <Button onAction="#onBackButtonClick" prefHeight="36.0" prefWidth="130.0"
+                    styleClass="back-button" text="← Library">
+               <font><Font name="Segoe UI" size="13.0" /></font>
             </Button>
+            <Separator orientation="VERTICAL" style="-fx-background-color: #3a3a3a;" />
+            <Label fx:id="bookTitleLabel"
+                   style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #e0e0e0;"
+                   text="Book Title">
+               <font><Font name="Segoe UI" size="14.0" /></font>
+            </Label>
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="pageNumberLabel"
+                   style="-fx-font-size: 13; -fx-text-fill: #9e9e9e;"
+                   text="Page 1 of 1">
+               <font><Font name="Segoe UI" size="13.0" /></font>
+            </Label>
          </children>
       </HBox>
    </top>
+
+   <!-- PAGE VIEW — ScrollPane lets user scroll tall pages -->
+   <center>
+      <ScrollPane fx:id="pageScrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                  style="-fx-background: #2b2b2b; -fx-background-color: #2b2b2b;">
+         <content>
+            <StackPane style="-fx-background-color: #2b2b2b; -fx-padding: 20;">
+               <!-- White page with drop shadow -->
+               <StackPane style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 24, 0, 0, 4); -fx-background-color: white;"
+                          StackPane.alignment="CENTER">
+                  <ImageView fx:id="pdfView"
+                             pickOnBounds="true"
+                             preserveRatio="true"
+                             smooth="true"
+                             fitWidth="900.0"
+                             StackPane.alignment="CENTER" />
+               </StackPane>
+            </StackPane>
+         </content>
+      </ScrollPane>
+   </center>
+
+   <!-- BOTTOM TOOLBAR -->
+   <bottom>
+      <HBox alignment="CENTER" spacing="20.0"
+            style="-fx-background-color: #1e1e1e; -fx-border-color: #3a3a3a; -fx-border-width: 1 0 0 0; -fx-padding: 12 30 12 30;">
+         <children>
+            <Button onAction="#prevButtonLogic" prefHeight="40.0" prefWidth="130.0"
+                    styleClass="nav-button" text="◄   Previous">
+               <font><Font name="Segoe UI" size="14.0" /></font>
+            </Button>
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <Button fx:id="bookmarkButton" onAction="#toggleBookmark"
+                    prefHeight="38.0" prefWidth="38.0"
+                    styleClass="bookmark-button" text="🔖">
+               <font><Font size="17.0" /></font>
+            </Button>
+
+            <Button onAction="#showBookmarksPanel" prefHeight="40.0" prefWidth="140.0"
+                    styleClass="view-bookmarks-button" text="📑   Bookmarks">
+               <font><Font name="Segoe UI" size="13.0" /></font>
+            </Button>
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <Button onAction="#nextButtonLogic" prefHeight="40.0" prefWidth="130.0"
+                    styleClass="nav-button" text="Next   ►">
+               <font><Font name="Segoe UI" size="14.0" /></font>
+            </Button>
+         </children>
+      </HBox>
+   </bottom>
+
 </BorderPane>

@@ -14,6 +14,8 @@ module org.example.bookreader {
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
     requires org.apache.pdfbox;
+    requires org.apache.fontbox;
+    requires org.apache.pdfbox.io;
     requires javafx.swing;
 
     opens org.example.bookreader to javafx.fxml, com.fasterxml.jackson.databind;

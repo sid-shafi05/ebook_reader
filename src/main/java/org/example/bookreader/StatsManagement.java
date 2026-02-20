@@ -25,6 +25,16 @@ public class StatsManagement {
         }
     }
     public static void saveNewEvent(SingleReadingEvent newEvent){
+        // clean up the category before saving
+        String cat = newEvent.getCategory();
+        if (cat == null || cat.trim().isEmpty()
+                || cat.equalsIgnoreCase("General")
+                || cat.equalsIgnoreCase("Other")
+                || cat.equalsIgnoreCase("Unknown")
+                || cat.equalsIgnoreCase("None")
+                || cat.equalsIgnoreCase("Uncategorized")) {
+            newEvent.setCategory("Uncategorized");
+        }
         List<SingleReadingEvent> history=loadHistory();
         history.add(newEvent);
         try{
@@ -66,5 +76,40 @@ public class StatsManagement {
             }
         }
         return timePerCategory;
+    }
+
+    //get total pages read across all books
+    public static int getTotalPagesRead(){
+        List<SingleReadingEvent> events=loadHistory();
+        int totalPages=0;
+        for(SingleReadingEvent event:events){
+            totalPages=totalPages+event.getPagesRead();
+        }
+        return totalPages;
+    }
+
+    //get total reading time in seconds
+    public static long getTotalTimeInSeconds(){
+        List<SingleReadingEvent> events=loadHistory();
+        long totalSeconds=0;
+        for(SingleReadingEvent event:events){
+            totalSeconds=totalSeconds+event.getSecondsRead();
+        }
+        return totalSeconds;
+    }
+
+    //get number of unique days read
+    public static int getTotalDaysRead(){
+        List<SingleReadingEvent> events=loadHistory();
+        Set<String> uniqueDays=new HashSet<>();
+        for(SingleReadingEvent event:events){
+            uniqueDays.add(event.getDate());
+        }
+        return uniqueDays.size();
+    }
+
+    //get all reading events (for displaying history)
+    public static List<SingleReadingEvent> getAllEvents(){
+        return loadHistory();
     }
 }
