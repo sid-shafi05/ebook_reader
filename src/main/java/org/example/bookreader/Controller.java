@@ -51,8 +51,6 @@ public class Controller {
     @FXML
     private Label progressLabel;
     @FXML
-    private Label authorLabel;
-    @FXML
     private Label dateLabel;
 
 
@@ -87,6 +85,7 @@ public class Controller {
 
             FXMLLoader l3 = new FXMLLoader(getClass().getResource("cat.fxml"));
             catPage = l3.load();
+            catPage.getProperties().put("controller", l3.getController());
             anchorFill(catPage);
 
             FXMLLoader l4 = new FXMLLoader(getClass().getResource("stats.fxml"));
@@ -94,6 +93,7 @@ public class Controller {
             anchorFill(statsPage);
 
             contentArea.getChildren().addAll(allbooksPage, favPage, catPage, statsPage);
+            sortByTitle();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -149,9 +149,14 @@ public class Controller {
         fillBookGrid(favGrid, true);
     }
 
+    @FXML
     public void changeToCategories() {
         showPage(catPage, false);
         setActiveStyle(catBtn);
+
+        // get the controller and reload every time
+        CatController catCtrl = (CatController) catPage.getProperties().get("controller");
+        if (catCtrl != null) catCtrl.loadCategories();
     }
 
     @FXML
@@ -225,32 +230,16 @@ public class Controller {
         setActiveSort(titleLabel);
         titleLabel.setText("Title ▼");
         dateLabel.setText("Date");
-        authorLabel.setText("Author");
         progressLabel.setText("Progress");
         bookList.sort((a, b) -> a.getTitle().compareToIgnoreCase(b.getTitle()));
         refreshBookGrid();
     }
 
-    public void sortByAuthor() {
-        // no author field in Book — sort by category as a stand-in
-        setActiveSort(authorLabel);
-        titleLabel.setText("Title");
-        dateLabel.setText("Date");
-        authorLabel.setText("Author ▼");
-        progressLabel.setText("Progress");
-        bookList.sort((a, b) -> {
-            String ca = a.getCategory() != null ? a.getCategory() : "";
-            String cb = b.getCategory() != null ? b.getCategory() : "";
-            return ca.compareToIgnoreCase(cb);
-        });
-        refreshBookGrid();
-    }
 
     public void sortByDate() {
         setActiveSort(dateLabel);
         titleLabel.setText("Title");
         dateLabel.setText("Date ▼");
-        authorLabel.setText("Author");
         progressLabel.setText("Progress");
         // newest first
         bookList.sort((a, b) -> Long.compare(b.getDateAdded(), a.getDateAdded()));
@@ -261,7 +250,6 @@ public class Controller {
         setActiveSort(progressLabel);
         titleLabel.setText("Title");
         dateLabel.setText("Date");
-        authorLabel.setText("Author");
         progressLabel.setText("Progress ▼");
         // highest progress first
         bookList.sort((a, b) -> Double.compare(b.getProgressValue(), a.getProgressValue()));
@@ -270,7 +258,6 @@ public class Controller {
 
     public void setActiveSort(Label active) {
         titleLabel.getStyleClass().remove("label-color-active");
-        authorLabel.getStyleClass().remove("label-color-active");
         progressLabel.getStyleClass().remove("label-color-active");
         dateLabel.getStyleClass().remove("label-color-active");
         active.getStyleClass().add("label-color-active");
@@ -352,6 +339,9 @@ public class Controller {
             bookList.add(newBook);
             Library.saveBookList(bookList);
             refreshBookGrid();
+
+            CatController catCtrl = (CatController) catPage.getProperties().get("controller");
+            if (catCtrl != null) catCtrl.loadCategories();
 
         } catch (IOException e) {
             e.printStackTrace();

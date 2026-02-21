@@ -13,9 +13,6 @@ public class CatController {
     // must match fx:id in cat.fxml
 
     @FXML
-    public void initialize() {
-        loadCategories();
-    }
 
     public void loadCategories() {
         if (categoryContainer == null) return;
