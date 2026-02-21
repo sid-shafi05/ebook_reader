@@ -55,7 +55,6 @@
                              pickOnBounds="true"
                              preserveRatio="true"
                              smooth="true"
-                             fitWidth="900.0"
                              StackPane.alignment="CENTER" />
                </StackPane>
             </StackPane>

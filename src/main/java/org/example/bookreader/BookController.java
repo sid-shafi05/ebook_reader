@@ -34,13 +34,14 @@ public class BookController {
             fileTypeManager = new FileTypeManager();
             fileTypeManager.fileType(book.getFilePath());
 
-            pdfView.sceneProperty().addListener((obs, oldScene, newScene) -> {
-                if(newScene != null){
-                    pdfView.fitWidthProperty().bind(newScene.widthProperty().multiply(0.95));
-                }
+            // bind width to the ScrollPane width, not scene width
+            pageScrollPane.widthProperty().addListener((obs, oldVal, newVal) -> {
+                pdfView.setFitWidth(newVal.doubleValue() * 0.92);
             });
-            if(pdfView.getScene() != null){
-                pdfView.fitWidthProperty().bind(pdfView.getScene().widthProperty().multiply(0.95));
+
+            // set initial width if ScrollPane already has a size
+            if (pageScrollPane.getWidth() > 0) {
+                pdfView.setFitWidth(pageScrollPane.getWidth() * 0.92);
             }
             renderCurrentPage();
         }catch(IOException e){

@@ -136,6 +136,7 @@ public class Controller {
 
     @FXML
     public void changeToAllBooks() {
+        bookList= Library.loadBooks();
         showPage(allbooksPage, true);
         setActiveStyle(allBtn);
         clearSearch();
@@ -167,7 +168,7 @@ public class Controller {
 
     // fills a FlowPane with book tiles. if favouriteOnly=true, only shows favourited books
     private void fillBookGrid(javafx.scene.layout.FlowPane grid, boolean favouriteOnly) {
-        bookList = Library.loadBooks();
+
         grid.getChildren().clear();
 
         int count = 0;
@@ -196,7 +197,9 @@ public class Controller {
 
     // called from Main.java on startup — bookGrid is already set in initialize()
     public void refreshBookGrid() {
-        if (bookGrid != null) fillBookGrid(bookGrid, false);
+
+        if (bookGrid != null)
+            fillBookGrid(bookGrid, false);
     }
 
     // clears the search field and resets the query
