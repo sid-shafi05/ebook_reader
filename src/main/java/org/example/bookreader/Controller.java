@@ -24,7 +24,7 @@ public class Controller {
 
     // Base folder on Desktop where books and covers are stored
     private static final String BASE_DATA_PATH =
-        System.getProperty("user.home") + "\\Desktop\\ebook_project_data";
+            System.getProperty("user.home") + "/Desktop/ebook_project_data";
 
     @FXML
     private AnchorPane contentArea;
@@ -532,7 +532,7 @@ public class Controller {
         tile.getChildren().addAll(coverView, titleLbl, pagesLbl, progBar);
         return tile;
     }*/
-   private VBox createBookTile(Book book) {
+   VBox createBookTile(Book book) {
        VBox tile = new VBox(6);
        tile.setAlignment(Pos.TOP_CENTER);
        tile.getStyleClass().add("book-card");

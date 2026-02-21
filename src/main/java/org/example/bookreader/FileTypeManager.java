@@ -19,19 +19,21 @@ public class FileTypeManager {
     }
 
     public Image getPage(int pageNumber) {
-        if ("pdf".equals(currentFileType)) {
+        if ("pdf".equals(currentFileType) && pdfEngine != null) {
             return pdfEngine.renderingPage(pageNumber);
-        } else {
+        } else if ("comic".equals(currentFileType) && comicEngine != null) {
             return comicEngine.getPage(pageNumber);
         }
+        return null;
     }
 
     public int getTotalPage() {
-        if ("pdf".equals(currentFileType)) {
+        if ("pdf".equals(currentFileType) && pdfEngine != null) {
             return pdfEngine.getPageCount();
-        } else {
+        } else if ("comic".equals(currentFileType) && comicEngine != null) {
             return comicEngine.getTotalPages();
         }
+        return 0; // safe fallback
     }
 
     // release PDF memory when the reader window closes

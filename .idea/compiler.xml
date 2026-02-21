@@ -9,5 +9,8 @@
         <module name="BookReader" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="untitled" target="21" />
+    </bytecodeTargetLevel>
   </component>
 </project>
