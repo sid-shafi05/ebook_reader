@@ -627,7 +627,7 @@ public class Controller {
        AnchorPane.setLeftAnchor(heartBtn, 3.0);
        coverWrapper.getChildren().addAll(coverBox, heartBtn, deleteButton);
 
-       // click anywhere on tile except delete/heart button → open book
+       // click anywhere on tile except delete/heart button to open book
        tile.setOnMouseClicked(event -> {
            if (!deleteButton.isHover() && !heartBtn.isHover()) {
                openBook(book);

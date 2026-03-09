@@ -21,7 +21,7 @@ public class BookController {
     @FXML private Label bookTitleLabel;
     @FXML private Button bookmarkButton;
 
-    // FileTypeManager handles both PDF and CBZ transparently
+    // FileTypeManager handles both PDF and CBZ rendering, so we can use it for both types of books without needing separate engines in this controller
     private FileTypeManager fileTypeManager;
 
     public void startSession(Book book){
