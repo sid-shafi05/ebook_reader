@@ -50,8 +50,7 @@ public class Controller {
     private Label titleLabel;
     @FXML
     private Label progressLabel;
-    @FXML
-    private Label authorLabel;
+
     @FXML
     private Label dateLabel;
 
@@ -124,10 +123,14 @@ public class Controller {
 
     // shows exactly one page, hides the other three
     private void showPage(Parent pageToShow, boolean showTopBarFlag) {
-        allbooksPage.setVisible(false);  allbooksPage.setManaged(false);
-        favPage.setVisible(false);       favPage.setManaged(false);
-        catPage.setVisible(false);       catPage.setManaged(false);
-        statsPage.setVisible(false);     statsPage.setManaged(false);
+        allbooksPage.setVisible(false);
+        allbooksPage.setManaged(false);
+        favPage.setVisible(false);
+        favPage.setManaged(false);
+        catPage.setVisible(false);
+        catPage.setManaged(false);
+        statsPage.setVisible(false);
+        statsPage.setManaged(false);
 
         pageToShow.setVisible(true);
         pageToShow.setManaged(true);
@@ -162,7 +165,7 @@ public class Controller {
 
     // fills a FlowPane with book tiles. if favouriteOnly=true, only shows favourited books
     private void fillBookGrid(javafx.scene.layout.FlowPane grid, boolean favouriteOnly) {
-        bookList = Library.loadBooks();
+       // bookList = Library.loadBooks();
         grid.getChildren().clear();
 
         int count = 0;
@@ -225,32 +228,17 @@ public class Controller {
         setActiveSort(titleLabel);
         titleLabel.setText("Title ▼");
         dateLabel.setText("Date");
-        authorLabel.setText("Author");
         progressLabel.setText("Progress");
         bookList.sort((a, b) -> a.getTitle().compareToIgnoreCase(b.getTitle()));
         refreshBookGrid();
     }
 
-    public void sortByAuthor() {
-        // no author field in Book — sort by category as a stand-in
-        setActiveSort(authorLabel);
-        titleLabel.setText("Title");
-        dateLabel.setText("Date");
-        authorLabel.setText("Author ▼");
-        progressLabel.setText("Progress");
-        bookList.sort((a, b) -> {
-            String ca = a.getCategory() != null ? a.getCategory() : "";
-            String cb = b.getCategory() != null ? b.getCategory() : "";
-            return ca.compareToIgnoreCase(cb);
-        });
-        refreshBookGrid();
-    }
 
     public void sortByDate() {
         setActiveSort(dateLabel);
         titleLabel.setText("Title");
         dateLabel.setText("Date ▼");
-        authorLabel.setText("Author");
+
         progressLabel.setText("Progress");
         // newest first
         bookList.sort((a, b) -> Long.compare(b.getDateAdded(), a.getDateAdded()));
@@ -261,7 +249,7 @@ public class Controller {
         setActiveSort(progressLabel);
         titleLabel.setText("Title");
         dateLabel.setText("Date");
-        authorLabel.setText("Author");
+
         progressLabel.setText("Progress ▼");
         // highest progress first
         bookList.sort((a, b) -> Double.compare(b.getProgressValue(), a.getProgressValue()));
@@ -270,7 +258,7 @@ public class Controller {
 
     public void setActiveSort(Label active) {
         titleLabel.getStyleClass().remove("label-color-active");
-        authorLabel.getStyleClass().remove("label-color-active");
+
         progressLabel.getStyleClass().remove("label-color-active");
         dateLabel.getStyleClass().remove("label-color-active");
         active.getStyleClass().add("label-color-active");
@@ -532,7 +520,7 @@ public class Controller {
         tile.getChildren().addAll(coverView, titleLbl, pagesLbl, progBar);
         return tile;
     }*/
-   private VBox createBookTile(Book book) {
+    VBox createBookTile(Book book) {
        VBox tile = new VBox(6);
        tile.setAlignment(Pos.TOP_CENTER);
        tile.getStyleClass().add("book-card");

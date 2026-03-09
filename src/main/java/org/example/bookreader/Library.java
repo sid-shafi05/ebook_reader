@@ -32,4 +32,29 @@ public class Library {
             return new ArrayList<>();
         }
     }
+    public static List<Book> getFavouriteBooks() {
+        List<Book> result = new ArrayList<>();
+        for (Book b : loadBooks()) {
+            if (b.isFavourite()) result.add(b);
+        }
+        return result;
+    }
+
+    public static List<String> getAllCategories() {
+        List<String> cats = new ArrayList<>();
+        for (Book b : loadBooks()) {
+            String c = b.getCategory();
+            if (c != null && !c.isEmpty() && !cats.contains(c))
+                cats.add(c);
+        }
+        return cats;
+    }
+
+    public static List<Book> getBooksByCategory(String category) {
+        List<Book> result = new ArrayList<>();
+        for (Book b : loadBooks()) {
+            if (category.equals(b.getCategory())) result.add(b);
+        }
+        return result;
+    }
 }
