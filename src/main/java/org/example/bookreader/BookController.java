@@ -4,6 +4,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Slider;
+import javafx.scene.layout.HBox;
 import javafx.fxml.FXML;
 import javafx.scene.image.ImageView;
 import java.io.IOException;
@@ -16,6 +17,7 @@ public class BookController {
     private Book currentBook;
     private int currentPage;
     private int highestPageReached;
+    private boolean focusModeActive = false; // track focus mode state
 
     @FXML private ScrollPane pageScrollPane;
     @FXML private ImageView pdfView;
@@ -26,6 +28,10 @@ public class BookController {
     @FXML private Slider pageSlider;
     @FXML private Label sliderMinLabel;
     @FXML private Label sliderMaxLabel;
+    @FXML private Label sliderCurrentPageLabel;
+    @FXML private Button focusModeButton;
+    @FXML private HBox sliderSection;
+    @FXML private HBox controlsSection;
 
     private boolean sliderDragging = false; // prevent feedback loops
 
@@ -49,6 +55,19 @@ public class BookController {
             pageSlider.setValue(currentPage + 1); // convert 0-indexed to 1-indexed for display
             sliderMinLabel.setText("1");
             sliderMaxLabel.setText(String.valueOf(totalPages));
+
+            // set initial label text
+            if (sliderCurrentPageLabel != null) {
+                sliderCurrentPageLabel.setText("Page " + (currentPage + 1));
+            }
+
+            // update current page label when slider value changes
+            pageSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+                int pageNum = newVal.intValue();
+                if (sliderCurrentPageLabel != null) {
+                    sliderCurrentPageLabel.setText("Page " + pageNum);
+                }
+            });
 
             // handle slider dragging
             pageSlider.setOnMousePressed(event -> sliderDragging = true);
@@ -313,5 +332,23 @@ public class BookController {
         // close the engine if it's a PDF
         fileTypeManager.close();
         pdfView.fitWidthProperty().unbind();
+    }
+
+    // FOCUS MODE - toggle between full UI and minimal UI for distraction-free reading
+    @FXML
+    public void toggleFocusMode() {
+        focusModeActive = !focusModeActive;
+
+        if (focusModeActive) {
+            // enter focus mode - hide slider and bookmark/jump controls
+            if (sliderSection != null) sliderSection.setVisible(false);
+            if (controlsSection != null) controlsSection.setVisible(false);
+            if (focusModeButton != null) focusModeButton.setStyle("-fx-background-color: #4f9eff; -fx-text-fill: white;");
+        } else {
+            // exit focus mode - show slider and bookmark/jump controls
+            if (sliderSection != null) sliderSection.setVisible(true);
+            if (controlsSection != null) controlsSection.setVisible(true);
+            if (focusModeButton != null) focusModeButton.setStyle("");
+        }
     }
 }
