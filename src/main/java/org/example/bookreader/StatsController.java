@@ -27,6 +27,11 @@ public class StatsController {
         loadAllStats();
     }
 
+    // called when stats page becomes visible to refresh data
+    public void onPageShown() {
+        loadAllStats();
+    }
+
     private void loadAllStats() {
         // total pages
         int totalPages = StatsManagement.getTotalPagesRead();
@@ -118,13 +123,14 @@ public class StatsController {
             } else {
                 timeLabel = (int) mins + " min";
             }
-            String sliceLabel = cat + " (" + timeLabel + ")";
-            slices.add(new PieChart.Data(sliceLabel, mins));
+            // legend will show category (time), pie slices show just category name
+            String legendLabel = cat + " (" + timeLabel + ")";
+            slices.add(new PieChart.Data(legendLabel, mins));
         }
 
         timePerCategoryChart.setData(slices);
         timePerCategoryChart.setTitle("");
-        timePerCategoryChart.setLabelsVisible(true);
+        timePerCategoryChart.setLabelsVisible(false); // hide labels on pie slices
         timePerCategoryChart.setLegendVisible(true);
     }
 
@@ -150,14 +156,37 @@ public class StatsController {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Minutes");
 
+        double maxMinutes = 0;
         for (String date : sortedDates) {
             double mins = timePerDay.get(date);
-            series.getData().add(new XYChart.Data<>(date, mins));
+            double displayValue = Math.round(mins * 100.0) / 100.0;
+            series.getData().add(new XYChart.Data<>(date, displayValue));
+            if (mins > maxMinutes) {
+                maxMinutes = mins;
+            }
         }
 
         timePerDayChart.getData().clear();
         timePerDayChart.getData().add(series);
         timePerDayChart.setLegendVisible(false);
+
+        // fix X-axis label overlap by rotating and setting proper spacing
+        javafx.scene.chart.CategoryAxis xAxis = (javafx.scene.chart.CategoryAxis) timePerDayChart.getXAxis();
+        if (xAxis != null) {
+            // explicitly set the categories to ensure alignment with data points
+            xAxis.setCategories(FXCollections.observableArrayList(sortedDates));
+            xAxis.setTickLabelRotation(45);
+        }
+
+        // set Y-axis bounds so small values are visible
+        javafx.scene.chart.NumberAxis yAxis = (javafx.scene.chart.NumberAxis) timePerDayChart.getYAxis();
+        if (yAxis != null) {
+            yAxis.setLowerBound(0);
+            // set upper bound to max value + 10% padding
+            yAxis.setUpperBound(Math.max(maxMinutes * 1.1, 5)); // at least 5 minutes visible
+            yAxis.setTickUnit(Math.max(1, Math.ceil(maxMinutes / 10))); // reasonable tick spacing
+            yAxis.setAutoRanging(false);
+        }
     }
 
     private String formatTime(double minutes) {

@@ -62,6 +62,7 @@ public class Controller {
     private Parent favPage;
     private Parent catPage;
     private Parent statsPage;
+    private StatsController statsCtrl;
 
     private List<Book> bookList;
 
@@ -86,10 +87,12 @@ public class Controller {
 
             FXMLLoader l3 = new FXMLLoader(getClass().getResource("cat.fxml"));
             catPage = l3.load();
+            catPage.getProperties().put("controller", l3.getController());
             anchorFill(catPage);
 
             FXMLLoader l4 = new FXMLLoader(getClass().getResource("stats.fxml"));
             statsPage = l4.load();
+            statsCtrl = l4.getController();
             anchorFill(statsPage);
 
             contentArea.getChildren().addAll(allbooksPage, favPage, catPage, statsPage);
@@ -151,14 +154,20 @@ public class Controller {
         setActiveStyle(favBtn);
         fillBookGrid(favGrid, true);
     }
-
+@FXML
     public void changeToCategories() {
         showPage(catPage, false);
         setActiveStyle(catBtn);
+    // get the controller and reload every time
+    CatController catCtrl = (CatController) catPage.getProperties().get("controller");
+    if (catCtrl != null) catCtrl.loadCategories();
     }
 
     @FXML
     public void changeToStats() {
+        if (statsCtrl != null) {
+            statsCtrl.onPageShown();
+        }
         showPage(statsPage, false);
         setActiveStyle(statsBtn);
     }
@@ -269,7 +278,7 @@ public class Controller {
     @FXML
     public void onAddBookButtonClick() {
         FileChooser filechooser = new FileChooser();
-        filechooser.setTitle("Select a book or comic:");
+        filechooser.setTitle("Select a book :");
         filechooser.getExtensionFilters().addAll(
             new FileChooser.ExtensionFilter("Supported Files (PDF, CBZ)", "*.pdf", "*.cbz"),
             new FileChooser.ExtensionFilter("PDF Books", "*.pdf"),
@@ -280,17 +289,8 @@ public class Controller {
         if (selectedFile == null) return;
 
         try {
-            File dir = new File(BASE_DATA_PATH + "\\booksdata");
-            if (!dir.exists()) dir.mkdirs();
-
-            //change this code so that instead of relative path, an absolute path is created .
-
-            File destination = new File(dir, selectedFile.getName());
-            java.nio.file.Files.copy(selectedFile.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
             String fileName = selectedFile.getName();
             boolean isComic = fileName.toLowerCase().endsWith(".cbz");
-            // strip extension for the title
             String bookTitle = fileName.replaceAll("(?i)\\.(pdf|cbz)$", "");
 
             // genre dropdown instead of typing manually
@@ -310,25 +310,38 @@ public class Controller {
                 // Misc
                 "Other"
             );
+
             ChoiceDialog<String> genreDialog = new ChoiceDialog<>("Textbook", genres);
             genreDialog.setTitle("Add to Library");
             genreDialog.setHeaderText("Select a genre for:  " + bookTitle);
             genreDialog.setContentText("Genre:");
-            // dark styling
+
             DialogPane dp = genreDialog.getDialogPane();
             dp.setStyle("-fx-background-color: #1e1e2e; -fx-font-family: 'Segoe UI'; -fx-font-size: 13px;");
-            String finalCategory = genreDialog.showAndWait().orElse("Other");
+            dp.lookupAll(".label").forEach(n -> n.setStyle("-fx-text-fill: #f5f5f5;"));
+
+            Optional<String> genreResult = genreDialog.showAndWait();
+            if (genreResult.isEmpty()) {
+                return;
+            }
+            String finalCategory = genreResult.get();
+
+            File dir = new File(BASE_DATA_PATH + "\\booksdata");
+            if (!dir.exists()) dir.mkdirs();
+
+            File destination = new File(dir, selectedFile.getName());
+            java.nio.file.Files.copy(selectedFile.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
             Image coverImage;
             int totalPages;
 
             if (isComic) {
-                // use ComicEngine for CBZ
+                // use comic engine for cbz
                 ComicEngine comicEng = new ComicEngine(destination.getAbsolutePath());
                 totalPages = comicEng.getTotalPages();
                 coverImage = comicEng.getPage(0); // first page is the cover
             } else {
-                // use PDFEngine for PDF
+                // use pdf engine for pdf
                 PDFEngine pdfEng = new PDFEngine(destination.getAbsolutePath());
                 totalPages = pdfEng.getPageCount();
                 coverImage = pdfEng.renderingPage(0);
