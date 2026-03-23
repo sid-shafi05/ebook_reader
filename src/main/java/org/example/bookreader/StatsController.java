@@ -5,6 +5,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
+import javafx.scene.control.Button;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -23,6 +24,14 @@ public class StatsController {
     @FXML private PieChart timePerCategoryChart;
     @FXML private LineChart<String, Number> timePerDayChart;
 
+    // time range buttons
+    @FXML private Button btn7Days;
+    @FXML private Button btn14Days;
+    @FXML private Button btn30Days;
+    @FXML private Button btnAllTime;
+
+    private int selectedDays = 14; // default
+
     public void initialize() {
         loadAllStats();
     }
@@ -30,6 +39,7 @@ public class StatsController {
     // called when stats page becomes visible to refresh data
     public void onPageShown() {
         loadAllStats();
+        updateButtonStyles();
     }
 
     private void loadAllStats() {
@@ -148,45 +158,53 @@ public class StatsController {
         List<String> sortedDates = new ArrayList<>(timePerDay.keySet());
         Collections.sort(sortedDates);
 
-        // only show last 14 days
-        if (sortedDates.size() > 14) {
-            sortedDates = sortedDates.subList(sortedDates.size() - 14, sortedDates.size());
+        // only show last N days (or all if selectedDays is very large)
+        if (sortedDates.size() > selectedDays) {
+            sortedDates = sortedDates.subList(sortedDates.size() - selectedDays, sortedDates.size());
         }
 
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Minutes");
+        // CLEAR everything first
+        timePerDayChart.getData().clear();
 
+        // rebuild X-axis with correct categories
+        javafx.scene.chart.CategoryAxis xAxis = (javafx.scene.chart.CategoryAxis) timePerDayChart.getXAxis();
+        if (xAxis != null) {
+            xAxis.getCategories().clear();
+            xAxis.setCategories(FXCollections.observableArrayList(sortedDates));
+            xAxis.setTickLabelRotation(45);
+        }
+
+        // rebuild Y-axis
+        javafx.scene.chart.NumberAxis yAxis = (javafx.scene.chart.NumberAxis) timePerDayChart.getYAxis();
         double maxMinutes = 0;
+
+        // calculate max to set Y-axis bounds
         for (String date : sortedDates) {
             double mins = timePerDay.get(date);
-            double displayValue = Math.round(mins * 100.0) / 100.0;
-            series.getData().add(new XYChart.Data<>(date, displayValue));
             if (mins > maxMinutes) {
                 maxMinutes = mins;
             }
         }
 
-        timePerDayChart.getData().clear();
-        timePerDayChart.getData().add(series);
-        timePerDayChart.setLegendVisible(false);
-
-        // fix X-axis label overlap by rotating and setting proper spacing
-        javafx.scene.chart.CategoryAxis xAxis = (javafx.scene.chart.CategoryAxis) timePerDayChart.getXAxis();
-        if (xAxis != null) {
-            // explicitly set the categories to ensure alignment with data points
-            xAxis.setCategories(FXCollections.observableArrayList(sortedDates));
-            xAxis.setTickLabelRotation(45);
-        }
-
-        // set Y-axis bounds so small values are visible
-        javafx.scene.chart.NumberAxis yAxis = (javafx.scene.chart.NumberAxis) timePerDayChart.getYAxis();
         if (yAxis != null) {
             yAxis.setLowerBound(0);
-            // set upper bound to max value + 10% padding
-            yAxis.setUpperBound(Math.max(maxMinutes * 1.1, 5)); // at least 5 minutes visible
-            yAxis.setTickUnit(Math.max(1, Math.ceil(maxMinutes / 10))); // reasonable tick spacing
+            yAxis.setUpperBound(Math.max(maxMinutes * 1.1, 5));
+            yAxis.setTickUnit(Math.max(1, Math.ceil(maxMinutes / 10)));
             yAxis.setAutoRanging(false);
         }
+
+        // NOW add the data series
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Minutes");
+
+        for (String date : sortedDates) {
+            double mins = timePerDay.get(date);
+            double displayValue = Math.round(mins * 100.0) / 100.0;
+            series.getData().add(new XYChart.Data<>(date, displayValue));
+        }
+
+        timePerDayChart.getData().add(series);
+        timePerDayChart.setLegendVisible(false);
     }
 
     private String formatTime(double minutes) {
@@ -195,6 +213,65 @@ public class StatsController {
         } else {
             double hours = minutes / 60.0;
             return String.format("%.1f hrs", hours);
+        }
+    }
+
+    // TIME RANGE BUTTON HANDLERS
+    @FXML
+    public void onTimeRange7Days() {
+        System.out.println("DEBUG: 7 Days button clicked");
+        selectedDays = 7;
+        loadDailyLineChart();
+        updateButtonStyles();
+    }
+
+    @FXML
+    public void onTimeRange14Days() {
+        System.out.println("DEBUG: 14 Days button clicked");
+        selectedDays = 14;
+        loadDailyLineChart();
+        updateButtonStyles();
+    }
+
+    @FXML
+    public void onTimeRange30Days() {
+        System.out.println("DEBUG: 30 Days button clicked");
+        selectedDays = 30;
+        loadDailyLineChart();
+        updateButtonStyles();
+    }
+
+    @FXML
+    public void onTimeRangeAllTime() {
+        System.out.println("DEBUG: All Time button clicked");
+        selectedDays = Integer.MAX_VALUE; // show all available data
+        loadDailyLineChart();
+        updateButtonStyles();
+    }
+
+    private void updateButtonStyles() {
+        // null check in case buttons aren't injected yet
+        if (btn7Days == null || btn14Days == null || btn30Days == null || btnAllTime == null) {
+            return;
+        }
+
+        // reset all buttons
+        btn7Days.setStyle("-fx-padding: 8 16; -fx-font-size: 11; -fx-background-color: #0f3460; -fx-text-fill: #e0e0ff; -fx-border-radius: 5; -fx-background-radius: 5; -fx-cursor: hand;");
+        btn14Days.setStyle("-fx-padding: 8 16; -fx-font-size: 11; -fx-background-color: #0f3460; -fx-text-fill: #e0e0ff; -fx-border-radius: 5; -fx-background-radius: 5; -fx-cursor: hand;");
+        btn30Days.setStyle("-fx-padding: 8 16; -fx-font-size: 11; -fx-background-color: #0f3460; -fx-text-fill: #e0e0ff; -fx-border-radius: 5; -fx-background-radius: 5; -fx-cursor: hand;");
+        btnAllTime.setStyle("-fx-padding: 8 16; -fx-font-size: 11; -fx-background-color: #0f3460; -fx-text-fill: #e0e0ff; -fx-border-radius: 5; -fx-background-radius: 5; -fx-cursor: hand;");
+
+        // highlight active button
+        String activeStyle = "-fx-padding: 8 16; -fx-font-size: 11; -fx-background-color: #4f6cff; -fx-text-fill: #ffffff; -fx-border-radius: 5; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;";
+
+        if (selectedDays == 7) {
+            btn7Days.setStyle(activeStyle);
+        } else if (selectedDays == 14) {
+            btn14Days.setStyle(activeStyle);
+        } else if (selectedDays == 30) {
+            btn30Days.setStyle(activeStyle);
+        } else {
+            btnAllTime.setStyle(activeStyle);
         }
     }
 

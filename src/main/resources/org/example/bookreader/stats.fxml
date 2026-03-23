@@ -111,9 +111,29 @@
                               style="-fx-background-color: #16213e; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);">
                            <padding><Insets top="15" bottom="15" left="15" right="15" /></padding>
                            <children>
-                              <Label style="-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: #e0e0ff;" text="Reading Time per Day — last 14 days (minutes)">
+                              <Label style="-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: #e0e0ff;" text="Reading Time per Day (minutes)">
                                  <font><Font name="Segoe UI" size="15.0" /></font>
                               </Label>
+
+                              <!-- TIME RANGE BUTTONS -->
+                              <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                 <children>
+                                    <Label style="-fx-font-size: 12; -fx-text-fill: #9090c0;" text="Time Range:" />
+                                    <javafx.scene.control.Button fx:id="btn7Days" onAction="#onTimeRange7Days"
+                                                                   style="-fx-padding: 8 16; -fx-font-size: 11; -fx-background-color: #0f3460; -fx-text-fill: #e0e0ff; -fx-border-radius: 5; -fx-background-radius: 5; -fx-cursor: hand;"
+                                                                   text="7 Days" />
+                                    <javafx.scene.control.Button fx:id="btn14Days" onAction="#onTimeRange14Days"
+                                                                   style="-fx-padding: 8 16; -fx-font-size: 11; -fx-background-color: #0f3460; -fx-text-fill: #e0e0ff; -fx-border-radius: 5; -fx-background-radius: 5; -fx-cursor: hand;"
+                                                                   text="14 Days" />
+                                    <javafx.scene.control.Button fx:id="btn30Days" onAction="#onTimeRange30Days"
+                                                                   style="-fx-padding: 8 16; -fx-font-size: 11; -fx-background-color: #0f3460; -fx-text-fill: #e0e0ff; -fx-border-radius: 5; -fx-background-radius: 5; -fx-cursor: hand;"
+                                                                   text="30 Days" />
+                                    <javafx.scene.control.Button fx:id="btnAllTime" onAction="#onTimeRangeAllTime"
+                                                                   style="-fx-padding: 8 16; -fx-font-size: 11; -fx-background-color: #0f3460; -fx-text-fill: #e0e0ff; -fx-border-radius: 5; -fx-background-radius: 5; -fx-cursor: hand;"
+                                                                   text="All Time" />
+                                 </children>
+                              </HBox>
+
                               <LineChart fx:id="timePerDayChart" animated="true" legendVisible="false"
                                          prefHeight="250.0" prefWidth="680.0"
                                          style="-fx-background-color: transparent;" createSymbols="true">

@@ -2,6 +2,8 @@ package org.example.bookreader;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Slider;
 import javafx.fxml.FXML;
 import javafx.scene.image.ImageView;
 import java.io.IOException;
@@ -20,6 +22,12 @@ public class BookController {
     @FXML private Label pageNumberLabel;
     @FXML private Label bookTitleLabel;
     @FXML private Button bookmarkButton;
+    @FXML private TextField pageJumpField;
+    @FXML private Slider pageSlider;
+    @FXML private Label sliderMinLabel;
+    @FXML private Label sliderMaxLabel;
+
+    private boolean sliderDragging = false; // prevent feedback loops
 
     // FileTypeManager handles both PDF and CBZ rendering, so we can use it for both types of books without needing separate engines in this controller
     private FileTypeManager fileTypeManager;
@@ -33,6 +41,28 @@ public class BookController {
         try{
             fileTypeManager = new FileTypeManager();
             fileTypeManager.fileType(book.getFilePath());
+
+            // initialize page slider
+            int totalPages = fileTypeManager.getTotalPage();
+            pageSlider.setMin(1);
+            pageSlider.setMax(totalPages);
+            pageSlider.setValue(currentPage + 1); // convert 0-indexed to 1-indexed for display
+            sliderMinLabel.setText("1");
+            sliderMaxLabel.setText(String.valueOf(totalPages));
+
+            // handle slider dragging
+            pageSlider.setOnMousePressed(event -> sliderDragging = true);
+            pageSlider.setOnMouseReleased(event -> {
+                sliderDragging = false;
+                int newPage = (int) pageSlider.getValue() - 1; // convert back to 0-indexed
+                if (newPage != currentPage && newPage >= 0 && newPage < totalPages) {
+                    currentPage = newPage;
+                    if (currentPage > highestPageReached) {
+                        highestPageReached = currentPage;
+                    }
+                    renderCurrentPage();
+                }
+            });
 
             pdfView.sceneProperty().addListener((obs, oldScene, newScene) -> {
                 if(newScene != null){
@@ -60,6 +90,12 @@ public class BookController {
             if(bookTitleLabel != null && currentBook != null){
                 bookTitleLabel.setText(currentBook.getTitle());
             }
+
+            // sync slider with current page (only if not dragging to prevent conflicts)
+            if (pageSlider != null && !sliderDragging) {
+                pageSlider.setValue(currentPage + 1);
+            }
+
             updateBookmarkButtonStyle();
             scrollToTop();
         }
@@ -88,6 +124,77 @@ public class BookController {
             currentPage--;
             renderCurrentPage();
         }
+    }
+
+    @FXML
+    public void onJumpToPageClick() {
+        if (pageJumpField == null || fileTypeManager == null) return;
+
+        String input = pageJumpField.getText().trim();
+
+        // validate input is not empty
+        if (input.isEmpty()) {
+            showPageJumpError("Enter a page number");
+            return;
+        }
+
+        try {
+            // parse input as page number
+            int pageNum = Integer.parseInt(input);
+            int totalPages = fileTypeManager.getTotalPage();
+
+            // validate page is in valid range (1-indexed for user, 0-indexed for code)
+            if (pageNum < 1 || pageNum > totalPages) {
+                showPageJumpError("Page must be 1-" + totalPages);
+                return;
+            }
+
+            // SUCCESS: jump to page
+            currentPage = pageNum - 1;
+
+            // only update highestPageReached if jumping forward
+            // this ensures progress bar shows furthest page reached, not current page
+            if (currentPage > highestPageReached) {
+                highestPageReached = currentPage;
+            }
+
+            renderCurrentPage();
+            clearPageJumpField();
+
+        } catch (NumberFormatException e) {
+            // invalid number format
+            showPageJumpError("Invalid number");
+        }
+    }
+
+    private void showPageJumpError(String message) {
+        if (pageJumpField == null) return;
+
+        // red border
+        pageJumpField.setStyle("-fx-border-color: #ff4444; -fx-border-width: 2; -fx-padding: 6;");
+
+        // show tooltip with error message
+        javafx.scene.control.Tooltip tooltip = new javafx.scene.control.Tooltip(message);
+        tooltip.setStyle("-fx-font-size: 10; -fx-text-fill: white; -fx-background-color: #cc0000;");
+        pageJumpField.setTooltip(tooltip);
+
+        // auto-hide tooltip after 3 seconds
+        javafx.animation.Timeline timeline = new javafx.animation.Timeline(
+            new javafx.animation.KeyFrame(
+                javafx.util.Duration.seconds(3),
+                event -> pageJumpField.setTooltip(null)
+            )
+        );
+        timeline.play();
+    }
+
+    private void clearPageJumpField() {
+        if (pageJumpField == null) return;
+
+        // remove red border and tooltip
+        pageJumpField.setStyle("-fx-padding: 8;");
+        pageJumpField.setTooltip(null);
+        pageJumpField.clear();
     }
 
     @FXML
@@ -144,6 +251,12 @@ public class BookController {
 
         if (selectedPage >= 0) {
             currentPage = selectedPage;
+
+            // only update highestPageReached if jumping forward
+            if (currentPage > highestPageReached) {
+                highestPageReached = currentPage;
+            }
+
             renderCurrentPage();
         }
     }
