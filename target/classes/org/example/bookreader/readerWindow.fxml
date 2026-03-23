@@ -5,6 +5,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -24,6 +25,7 @@
    <top>
       <VBox spacing="0.0">
          <children>
+            <!-- TOP BAR - Navigation -->
             <HBox alignment="CENTER_LEFT" prefHeight="52.0" spacing="14.0"
                   style="-fx-background-color: #1e1e1e; -fx-border-color: #3a3a3a; -fx-border-width: 0 0 1 0; -fx-padding: 8 24 8 16;">
                <children>
@@ -38,9 +40,15 @@
                      <font><Font name="Segoe UI" size="14.0" /></font>
                   </Label>
                   <Region HBox.hgrow="ALWAYS" />
+
                   <Button fx:id="focusModeButton" onAction="#toggleFocusMode" prefHeight="36.0" prefWidth="50.0"
                           styleClass="nav-button" text="🎯">
                      <font><Font name="Segoe UI" size="13.0" /></font>
+                  </Button>
+
+                  <Button fx:id="menuButton" prefHeight="36.0" prefWidth="50.0"
+                          styleClass="nav-button" text="⋮" onMousePressed="#showColorFilterMenu">
+                     <font><Font name="Segoe UI" size="16.0" /></font>
                   </Button>
                   <Label fx:id="pageNumberLabel"
                          style="-fx-font-size: 13; -fx-text-fill: #9e9e9e;"
@@ -68,25 +76,50 @@
       </VBox>
    </top>
 
-   <!-- PAGE VIEW — ScrollPane lets user scroll tall pages -->
+   <!-- PAGE VIEW WITH SLIDING NOTEBOOK PANEL -->
    <center>
-      <ScrollPane fx:id="pageScrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
-                  style="-fx-background: #2b2b2b; -fx-background-color: #2b2b2b;">
-         <content>
-            <StackPane style="-fx-background-color: #2b2b2b; -fx-padding: 20;">
-               <!-- White page with drop shadow -->
-               <StackPane style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 24, 0, 0, 4); -fx-background-color: white;"
-                          StackPane.alignment="CENTER">
-                  <ImageView fx:id="pdfView"
-                             pickOnBounds="true"
-                             preserveRatio="true"
-                             smooth="true"
-                             fitWidth="900.0"
-                             StackPane.alignment="CENTER" />
-               </StackPane>
-            </StackPane>
-         </content>
-      </ScrollPane>
+      <HBox spacing="0.0">
+         <children>
+            <!-- MAIN PAGE VIEW -->
+            <ScrollPane fx:id="pageScrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                        style="-fx-background: #2b2b2b; -fx-background-color: #2b2b2b;" HBox.hgrow="ALWAYS">
+               <content>
+                  <StackPane style="-fx-background-color: #2b2b2b; -fx-padding: 20;">
+                     <!-- White page with drop shadow -->
+                     <StackPane style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 24, 0, 0, 4); -fx-background-color: white;"
+                                StackPane.alignment="CENTER">
+                        <ImageView fx:id="pdfView"
+                                   pickOnBounds="true"
+                                   preserveRatio="true"
+                                   smooth="true"
+                                   fitWidth="900.0"
+                                   StackPane.alignment="CENTER" />
+                     </StackPane>
+                  </StackPane>
+               </content>
+            </ScrollPane>
+
+            <!-- SLIDING NOTEBOOK PANEL -->
+            <VBox fx:id="notebookPanel" spacing="8.0" style="-fx-background-color: #1a1a2e; -fx-border-color: #3a3a3a; -fx-border-width: 0 0 0 1; -fx-padding: 12;" prefWidth="280.0" minWidth="280.0" maxWidth="280.0" visible="false" managed="false">
+               <children>
+                  <HBox alignment="CENTER" spacing="8.0">
+                     <children>
+                        <Label style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #e0e0e0;" text="📝 Notes" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="closeNotebookButton" onAction="#toggleNotebookPanel" prefHeight="32.0" prefWidth="32.0"
+                                styleClass="nav-button" text="✕" style="-fx-font-size: 12;">
+                        </Button>
+                     </children>
+                  </HBox>
+                  <Separator style="-fx-background-color: #3a3a3a;" />
+                  <TextArea fx:id="notesTextArea" style="-fx-control-inner-background: #252525; -fx-font-family: 'Segoe UI'; -fx-font-size: 11; -fx-text-fill: #e0e0e0; -fx-padding: 8; -fx-text-fill: #e0e0e0;" wrapText="true" VBox.vgrow="ALWAYS" promptText="Write your notes here..." />
+                  <Button onAction="#saveNotesPanel" prefHeight="36.0" maxWidth="Infinity" style="-fx-background-color: #4f9eff; -fx-text-fill: white; -fx-font-size: 11; -fx-padding: 8;" text="💾 Save">
+                     <font><Font name="Segoe UI" size="11.0" /></font>
+                  </Button>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
    </center>
 
    <!-- BOTTOM TOOLBAR -->

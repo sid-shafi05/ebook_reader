@@ -44,6 +44,10 @@ public class Controller {
     private Button catBtn;
     @FXML
     private Button statsBtn;
+    @FXML
+    private Button addBtn;
+    @FXML
+    private Button dailyTargetBtn;
 
     //Sort Labels
     @FXML
@@ -113,6 +117,12 @@ public class Controller {
                 currentQuery = newVal.trim().toLowerCase();
                 filterBookGrid(currentQuery);
             });
+        }
+
+        // Initialize daily target button text
+        if (dailyTargetBtn != null) {
+            int target = getDailyTarget();
+            dailyTargetBtn.setText("🎯 " + target + "m/day");
         }
     }
 
@@ -776,6 +786,57 @@ public class Controller {
             System.err.println("Error opening reader: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    // Set daily reading target goal
+    @FXML
+    public void setDailyTarget() {
+        int currentTarget = getDailyTarget();
+
+        // Create a simple dialog to get user input
+        TextInputDialog dialog = new TextInputDialog(String.valueOf(currentTarget));
+        dialog.setTitle("Daily Reading Target");
+        dialog.setHeaderText("Set your daily reading goal");
+        dialog.setContentText("Minutes per day:");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(minutes -> {
+            try {
+                int target = Integer.parseInt(minutes);
+                if (target > 0) {
+                    // Save to settings file
+                    java.nio.file.Files.write(
+                        java.nio.file.Paths.get("daily_target.txt"),
+                        String.valueOf(target).getBytes()
+                    );
+                    // Update button text to show current target
+                    if (dailyTargetBtn != null) {
+                        dailyTargetBtn.setText("🎯 " + target + "m/day");
+                    }
+                    new Alert(Alert.AlertType.INFORMATION, "Daily target set to " + target + " minutes").showAndWait();
+                    System.out.println("Daily target set to: " + target + " minutes");
+                } else {
+                    new Alert(Alert.AlertType.WARNING, "Please enter a positive number").showAndWait();
+                }
+            } catch (NumberFormatException e) {
+                new Alert(Alert.AlertType.ERROR, "Please enter a valid number").showAndWait();
+            } catch (java.io.IOException e) {
+                System.out.println("Error saving daily target: " + e.getMessage());
+            }
+        });
+    }
+
+    // Get the daily target (used by BookController)
+    public static int getDailyTarget() {
+        try {
+            if (java.nio.file.Files.exists(java.nio.file.Paths.get("daily_target.txt"))) {
+                String content = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get("daily_target.txt")));
+                return Integer.parseInt(content.trim());
+            }
+        } catch (Exception e) {
+            System.out.println("Error reading daily target: " + e.getMessage());
+        }
+        return 60; // default 60 minutes
     }
 }
 

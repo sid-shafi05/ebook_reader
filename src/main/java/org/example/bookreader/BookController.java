@@ -4,10 +4,23 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.effect.ColorAdjust;
 import javafx.fxml.FXML;
 import javafx.scene.image.ImageView;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.util.Duration;
+import javafx.geometry.Bounds;
+import javafx.scene.Scene;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -18,6 +31,9 @@ public class BookController {
     private int currentPage;
     private int highestPageReached;
     private boolean focusModeActive = false; // track focus mode state
+    private Timeline readingTimer; // for reading time display
+    private int readingSeconds = 0; // accumulated reading time
+    private ContextMenu currentMenu; // track open menu for toggle
 
     @FXML private ScrollPane pageScrollPane;
     @FXML private ImageView pdfView;
@@ -30,10 +46,16 @@ public class BookController {
     @FXML private Label sliderMaxLabel;
     @FXML private Label sliderCurrentPageLabel;
     @FXML private Button focusModeButton;
+    @FXML private Button menuButton;
+    @FXML private Button closeNotebookButton;
     @FXML private HBox sliderSection;
     @FXML private HBox controlsSection;
+    @FXML private VBox notebookPanel;
+    @FXML private TextArea notesTextArea;
 
     private boolean sliderDragging = false; // prevent feedback loops
+    private ColorAdjust colorAdjust = new ColorAdjust(); // for color filters
+    private boolean notebookPanelVisible = false; // track notebook panel state
 
     // FileTypeManager handles both PDF and CBZ rendering, so we can use it for both types of books without needing separate engines in this controller
     private FileTypeManager fileTypeManager;
@@ -92,6 +114,7 @@ public class BookController {
                 pdfView.fitWidthProperty().bind(pdfView.getScene().widthProperty().multiply(0.95));
             }
             renderCurrentPage();
+            startReadingTimer(); // start reading time tracking
         }catch(IOException e){
             e.printStackTrace();
         }
@@ -330,6 +353,7 @@ public class BookController {
         Library.saveBookList(library);
 
         // close the engine if it's a PDF
+        stopReadingTimer(); // stop reading timer
         fileTypeManager.close();
         pdfView.fitWidthProperty().unbind();
     }
@@ -351,4 +375,181 @@ public class BookController {
             if (focusModeButton != null) focusModeButton.setStyle("");
         }
     }
+
+    // COLOR FILTERS
+    @FXML
+    public void setColorFilterNormal() {
+        colorAdjust.setHue(0);
+        colorAdjust.setBrightness(0);
+        colorAdjust.setContrast(0);
+        colorAdjust.setSaturation(0);
+        pdfView.setEffect(null);
+    }
+
+    @FXML
+    public void setColorFilterDark() {
+        colorAdjust.setHue(0);
+        colorAdjust.setBrightness(-0.2);
+        colorAdjust.setContrast(0.2);
+        colorAdjust.setSaturation(0);
+        pdfView.setEffect(colorAdjust);
+    }
+
+    @FXML
+    public void setColorFilterSepia() {
+        colorAdjust.setHue(-0.1);
+        colorAdjust.setBrightness(0.1);
+        colorAdjust.setContrast(0);
+        colorAdjust.setSaturation(-0.5);
+        pdfView.setEffect(colorAdjust);
+    }
+
+    @FXML
+    public void setColorFilterNight() {
+        colorAdjust.setHue(0.3);
+        colorAdjust.setBrightness(-0.4);
+        colorAdjust.setContrast(0.3);
+        colorAdjust.setSaturation(-0.7);
+        pdfView.setEffect(colorAdjust);
+    }
+
+    // Show color filter menu with notebook option - toggles on/off
+    @FXML
+    public void showColorFilterMenu() {
+        // If menu is already open, close it
+        if (currentMenu != null && currentMenu.isShowing()) {
+            currentMenu.hide();
+            currentMenu = null;
+            return;
+        }
+
+        ContextMenu menu = new ContextMenu();
+        menu.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0; -fx-background-color: #2b2b2b; -fx-border-color: #3a3a3a;");
+
+        // Color Modes Submenu
+        MenuItem colorModesItem = new MenuItem("🎨 Color Modes");
+        colorModesItem.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0;");
+
+        ContextMenu colorMenu = new ContextMenu();
+        colorMenu.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0; -fx-background-color: #2b2b2b; -fx-border-color: #3a3a3a;");
+
+        MenuItem normalMode = new MenuItem("Normal Mode");
+        normalMode.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0;");
+        normalMode.setOnAction(e -> setColorFilterNormal());
+
+        MenuItem darkMode = new MenuItem("Dark Mode");
+        darkMode.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0;");
+        darkMode.setOnAction(e -> setColorFilterDark());
+
+        MenuItem sepiaFilter = new MenuItem("Sepia Filter");
+        sepiaFilter.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0;");
+        sepiaFilter.setOnAction(e -> setColorFilterSepia());
+
+        MenuItem nightMode = new MenuItem("Night Mode");
+        nightMode.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0;");
+        nightMode.setOnAction(e -> setColorFilterNight());
+
+        colorMenu.getItems().addAll(normalMode, darkMode, sepiaFilter, nightMode);
+        colorModesItem.setOnAction(e -> {
+            // Show submenu at cursor position
+            Bounds bounds = menuButton.localToScreen(menuButton.getBoundsInLocal());
+            colorMenu.show(menuButton.getScene().getWindow(), bounds.getCenterX() + 100, bounds.getCenterY());
+        });
+
+        // Separator
+        SeparatorMenuItem sep = new SeparatorMenuItem();
+
+        // Notebook option
+        MenuItem notebookItem = new MenuItem("📝 Notebook");
+        notebookItem.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0;");
+        notebookItem.setOnAction(e -> {
+            menu.hide(); // Close the menu first
+            currentMenu = null;
+            toggleNotebookPanel();
+        });
+
+        menu.getItems().addAll(colorModesItem, sep, notebookItem);
+
+        // Show menu at the position of the button
+        if (menuButton != null) {
+            Bounds bounds = menuButton.localToScreen(menuButton.getBoundsInLocal());
+            menu.show(menuButton, bounds.getCenterX(), bounds.getCenterY() + 20);
+            currentMenu = menu;
+        }
+    }
+
+    // Toggle notebook panel visibility with slide animation
+    @FXML
+    public void toggleNotebookPanel() {
+        if (notebookPanel == null) return;
+
+        notebookPanelVisible = !notebookPanelVisible;
+
+        if (notebookPanelVisible) {
+            // Load notes when opening
+            loadNotesFromFile();
+            notebookPanel.setVisible(true);
+            notebookPanel.setManaged(true);
+        } else {
+            notebookPanel.setVisible(false);
+            notebookPanel.setManaged(false);
+        }
+    }
+
+    // Load notes for current book from file
+    private void loadNotesFromFile() {
+        if (currentBook == null || notesTextArea == null) return;
+
+        String notesFileName = "notes/" + currentBook.getTitle().replaceAll("[^a-zA-Z0-9]", "_") + "_notes.txt";
+        try {
+            if (java.nio.file.Files.exists(java.nio.file.Paths.get(notesFileName))) {
+                String content = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(notesFileName)));
+                notesTextArea.setText(content);
+            } else {
+                notesTextArea.setText("");
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading notes: " + e.getMessage());
+        }
+    }
+
+    // Save notes for current book to file
+    @FXML
+    public void saveNotesPanel() {
+        if (currentBook == null || notesTextArea == null) return;
+
+        String notes = notesTextArea.getText();
+        String notesFileName = "notes/" + currentBook.getTitle().replaceAll("[^a-zA-Z0-9]", "_") + "_notes.txt";
+
+        try {
+            java.nio.file.Files.createDirectories(java.nio.file.Paths.get("notes"));
+            java.nio.file.Files.write(java.nio.file.Paths.get(notesFileName), notes.getBytes());
+            System.out.println("Notes saved for: " + currentBook.getTitle());
+        } catch (IOException e) {
+            System.out.println("Error saving notes: " + e.getMessage());
+        }
+    }
+
+    // READING TIME TRACKING
+    private void startReadingTimer() {
+        readingSeconds = 0;
+        readingTimer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            readingSeconds++;
+            updateReadingTimeDisplay();
+        }));
+        readingTimer.setCycleCount(Timeline.INDEFINITE);
+        readingTimer.play();
+    }
+
+    private void updateReadingTimeDisplay() {
+        // Reading time tracker removed per user request
+    }
+
+    private void stopReadingTimer() {
+        if (readingTimer != null) {
+            readingTimer.stop();
+        }
+    }
 }
+
+

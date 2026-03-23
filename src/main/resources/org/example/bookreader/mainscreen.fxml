@@ -91,7 +91,7 @@
                   style="-fx-background-color: transparent; -fx-padding: 15 25 10 25;"
                   styleClass="top-bar">
                <children>
-                  <!-- Row 1: Add Book + Search -->
+                  <!-- Row 1: Add Book + Search + Daily Target -->
                   <HBox alignment="CENTER_LEFT" spacing="15">
                      <children>
                         <Button fx:id="addBtn" onAction="#onAddBookButtonClick"
@@ -100,6 +100,8 @@
                         <TextField fx:id="searchField" prefWidth="320.0"
                                    promptText="Search in Library"
                                    styleClass="text-field" />
+                        <Button fx:id="dailyTargetBtn" onAction="#setDailyTarget"
+                                styleClass="top-bar-button" text="🎯 Daily Target" />
                      </children>
                   </HBox>
 
