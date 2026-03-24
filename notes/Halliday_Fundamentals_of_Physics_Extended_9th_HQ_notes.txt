@@ -1,3 +1,7 @@
 imp formulas - 
 1)mu naught = 4pi x 10^-7 Tesla-meter/Ampere
 2)self induced emf=-Ldi/dt
+
+3)current density, J=i/A
+
+potential is NOT a vector,it is a scalar

@@ -148,14 +148,7 @@
                      <font><Font name="Segoe UI" size="13.0" /></font>
                   </Button>
 
-                  <!-- JUMP TO PAGE -->
-                  <Label style="-fx-font-size: 11; -fx-text-fill: #9e9e9e;" text="Go to:" />
-                  <TextField fx:id="pageJumpField" maxWidth="80.0" prefHeight="36.0" prefWidth="80.0"
-                             promptText="Page #" style="-fx-font-size: 11; -fx-padding: 8;" />
-                  <Button onAction="#onJumpToPageClick" prefHeight="36.0" prefWidth="50.0"
-                          styleClass="nav-button" text="Go">
-                     <font><Font name="Segoe UI" size="12.0" /></font>
-                  </Button>
+
                </children>
             </HBox>
 

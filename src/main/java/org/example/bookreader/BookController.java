@@ -10,7 +10,11 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.effect.ColorAdjust;
+import javafx.scene.effect.Blend;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.effect.ColorInput;
 import javafx.fxml.FXML;
 import javafx.scene.image.ImageView;
 import javafx.animation.Timeline;
@@ -18,6 +22,8 @@ import javafx.animation.KeyFrame;
 import javafx.util.Duration;
 import javafx.geometry.Bounds;
 import javafx.scene.Scene;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -40,7 +46,6 @@ public class BookController {
     @FXML private Label pageNumberLabel;
     @FXML private Label bookTitleLabel;
     @FXML private Button bookmarkButton;
-    @FXML private TextField pageJumpField;
     @FXML private Slider pageSlider;
     @FXML private Label sliderMinLabel;
     @FXML private Label sliderMaxLabel;
@@ -166,77 +171,6 @@ public class BookController {
             currentPage--;
             renderCurrentPage();
         }
-    }
-
-    @FXML
-    public void onJumpToPageClick() {
-        if (pageJumpField == null || fileTypeManager == null) return;
-
-        String input = pageJumpField.getText().trim();
-
-        // validate input is not empty
-        if (input.isEmpty()) {
-            showPageJumpError("Enter a page number");
-            return;
-        }
-
-        try {
-            // parse input as page number
-            int pageNum = Integer.parseInt(input);
-            int totalPages = fileTypeManager.getTotalPage();
-
-            // validate page is in valid range (1-indexed for user, 0-indexed for code)
-            if (pageNum < 1 || pageNum > totalPages) {
-                showPageJumpError("Page must be 1-" + totalPages);
-                return;
-            }
-
-            // SUCCESS: jump to page
-            currentPage = pageNum - 1;
-
-            // only update highestPageReached if jumping forward
-            // this ensures progress bar shows furthest page reached, not current page
-            if (currentPage > highestPageReached) {
-                highestPageReached = currentPage;
-            }
-
-            renderCurrentPage();
-            clearPageJumpField();
-
-        } catch (NumberFormatException e) {
-            // invalid number format
-            showPageJumpError("Invalid number");
-        }
-    }
-
-    private void showPageJumpError(String message) {
-        if (pageJumpField == null) return;
-
-        // red border
-        pageJumpField.setStyle("-fx-border-color: #ff4444; -fx-border-width: 2; -fx-padding: 6;");
-
-        // show tooltip with error message
-        javafx.scene.control.Tooltip tooltip = new javafx.scene.control.Tooltip(message);
-        tooltip.setStyle("-fx-font-size: 10; -fx-text-fill: white; -fx-background-color: #cc0000;");
-        pageJumpField.setTooltip(tooltip);
-
-        // auto-hide tooltip after 3 seconds
-        javafx.animation.Timeline timeline = new javafx.animation.Timeline(
-            new javafx.animation.KeyFrame(
-                javafx.util.Duration.seconds(3),
-                event -> pageJumpField.setTooltip(null)
-            )
-        );
-        timeline.play();
-    }
-
-    private void clearPageJumpField() {
-        if (pageJumpField == null) return;
-
-        // remove red border and tooltip
-        pageJumpField.setStyle("-fx-padding: 8;");
-        pageJumpField.setTooltip(null);
-        pageJumpField.clear();
     }
 
     @FXML
@@ -376,41 +310,41 @@ public class BookController {
         }
     }
 
-    // COLOR FILTERS
+    // COLOR FILTERS - Realistic smartphone-style reading modes
     @FXML
     public void setColorFilterNormal() {
-        colorAdjust.setHue(0);
-        colorAdjust.setBrightness(0);
-        colorAdjust.setContrast(0);
-        colorAdjust.setSaturation(0);
+        // Standard white background, black text - no effects
         pdfView.setEffect(null);
     }
 
     @FXML
     public void setColorFilterDark() {
+        // Dark mode - inverted with better contrast
         colorAdjust.setHue(0);
-        colorAdjust.setBrightness(-0.2);
-        colorAdjust.setContrast(0.2);
-        colorAdjust.setSaturation(0);
+        colorAdjust.setBrightness(-0.5);      // Very dark
+        colorAdjust.setContrast(0.6);         // Much higher contrast
+        colorAdjust.setSaturation(-0.3);
         pdfView.setEffect(colorAdjust);
     }
 
     @FXML
     public void setColorFilterSepia() {
-        colorAdjust.setHue(-0.1);
-        colorAdjust.setBrightness(0.1);
-        colorAdjust.setContrast(0);
-        colorAdjust.setSaturation(-0.5);
-        pdfView.setEffect(colorAdjust);
-    }
+        // Reading/Warm mode - REAL warm cream/sepia like Kindle, Kobo, Apple Books
+        // Creates a warm cream background while keeping text dark and readable
+        ColorAdjust sepiaAdjust = new ColorAdjust();
+        sepiaAdjust.setHue(-0.1);             // Warm shift towards yellow
+        sepiaAdjust.setBrightness(0.08);      // Slightly brighter (warm paper effect)
+        sepiaAdjust.setContrast(0.2);         // Good contrast for text
+        sepiaAdjust.setSaturation(-0.9);      // Heavy desaturation for warm tone
 
-    @FXML
-    public void setColorFilterNight() {
-        colorAdjust.setHue(0.3);
-        colorAdjust.setBrightness(-0.4);
-        colorAdjust.setContrast(0.3);
-        colorAdjust.setSaturation(-0.7);
-        pdfView.setEffect(colorAdjust);
+        // Apply a warm overlay using MULTIPLY blend mode (keeps text dark, adds warmth to background)
+        ColorInput warmOverlay = new ColorInput(
+            0, 0, 2000, 2000,
+            Color.web("#f5deb3")  // Warm wheat/cream color
+        );
+
+        Blend blendEffect = new Blend(BlendMode.MULTIPLY, sepiaAdjust, warmOverlay);
+        pdfView.setEffect(blendEffect);
     }
 
     // Show color filter menu with notebook option - toggles on/off
@@ -433,23 +367,19 @@ public class BookController {
         ContextMenu colorMenu = new ContextMenu();
         colorMenu.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0; -fx-background-color: #2b2b2b; -fx-border-color: #3a3a3a;");
 
-        MenuItem normalMode = new MenuItem("Normal Mode");
+        MenuItem normalMode = new MenuItem("☀️  Normal Mode");
         normalMode.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0;");
         normalMode.setOnAction(e -> setColorFilterNormal());
 
-        MenuItem darkMode = new MenuItem("Dark Mode");
+        MenuItem darkMode = new MenuItem("🌙 Dark Mode");
         darkMode.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0;");
         darkMode.setOnAction(e -> setColorFilterDark());
 
-        MenuItem sepiaFilter = new MenuItem("Sepia Filter");
+        MenuItem sepiaFilter = new MenuItem("📖 Reading Mode");
         sepiaFilter.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0;");
         sepiaFilter.setOnAction(e -> setColorFilterSepia());
 
-        MenuItem nightMode = new MenuItem("Night Mode");
-        nightMode.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0;");
-        nightMode.setOnAction(e -> setColorFilterNight());
-
-        colorMenu.getItems().addAll(normalMode, darkMode, sepiaFilter, nightMode);
+        colorMenu.getItems().addAll(normalMode, darkMode, sepiaFilter);
         colorModesItem.setOnAction(e -> {
             // Show submenu at cursor position
             Bounds bounds = menuButton.localToScreen(menuButton.getBoundsInLocal());

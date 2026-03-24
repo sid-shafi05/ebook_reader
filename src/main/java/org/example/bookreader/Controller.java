@@ -122,7 +122,12 @@ public class Controller {
         // Initialize daily target button text
         if (dailyTargetBtn != null) {
             int target = getDailyTarget();
-            dailyTargetBtn.setText("🎯 " + target + "m/day");
+            dailyTargetBtn.setText("Daily Target: " + target + " minutes");
+            dailyTargetBtn.setStyle("-fx-font-size: 13px; -fx-text-fill: white; -fx-padding: 8px;");
+
+            Tooltip tooltip = new Tooltip("Click to set your daily reading goal.\nYour progress is tracked in Statistics.");
+            tooltip.setStyle("-fx-font-size: 12px; -fx-text-fill: #e0e0e0; -fx-background-color: #2b2b2b;");
+            Tooltip.install(dailyTargetBtn, tooltip);
         }
     }
 
@@ -793,16 +798,17 @@ public class Controller {
     public void setDailyTarget() {
         int currentTarget = getDailyTarget();
 
-        // Create a simple dialog to get user input
+        // Create a dialog to get user input
         TextInputDialog dialog = new TextInputDialog(String.valueOf(currentTarget));
         dialog.setTitle("Daily Reading Target");
-        dialog.setHeaderText("Set your daily reading goal");
-        dialog.setContentText("Minutes per day:");
+        dialog.setHeaderText("Set Your Daily Reading Goal");
+        dialog.setContentText("How many minutes do you want to read every day?");
+        dialog.getEditor().setStyle("-fx-font-size: 14px; -fx-padding: 8px;");
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(minutes -> {
             try {
-                int target = Integer.parseInt(minutes);
+                int target = Integer.parseInt(minutes.trim());
                 if (target > 0) {
                     // Save to settings file
                     java.nio.file.Files.write(
@@ -811,17 +817,37 @@ public class Controller {
                     );
                     // Update button text to show current target
                     if (dailyTargetBtn != null) {
-                        dailyTargetBtn.setText("🎯 " + target + "m/day");
+                        dailyTargetBtn.setText("Daily Target: " + target + " minutes");
+                        dailyTargetBtn.setStyle("-fx-font-size: 13px; -fx-text-fill: white; -fx-padding: 8px;");
                     }
-                    new Alert(Alert.AlertType.INFORMATION, "Daily target set to " + target + " minutes").showAndWait();
+
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Daily Target Set");
+                    alert.setHeaderText("Success!");
+                    alert.setContentText("Your daily reading goal is now " + target + " minutes.\nKeep track of your reading in the Statistics page!");
+                    alert.showAndWait();
+
                     System.out.println("Daily target set to: " + target + " minutes");
                 } else {
-                    new Alert(Alert.AlertType.WARNING, "Please enter a positive number").showAndWait();
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Invalid Input");
+                    alert.setHeaderText("Please enter a positive number");
+                    alert.setContentText("Daily target must be greater than 0 minutes.");
+                    alert.showAndWait();
                 }
             } catch (NumberFormatException e) {
-                new Alert(Alert.AlertType.ERROR, "Please enter a valid number").showAndWait();
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Invalid Input");
+                alert.setHeaderText("Please enter a valid number");
+                alert.setContentText("Please enter only numbers (e.g., 30, 60, 120)");
+                alert.showAndWait();
             } catch (java.io.IOException e) {
                 System.out.println("Error saving daily target: " + e.getMessage());
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Could not save target");
+                alert.setContentText("Please try again later.");
+                alert.showAndWait();
             }
         });
     }

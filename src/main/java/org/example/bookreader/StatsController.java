@@ -20,6 +20,11 @@ public class StatsController {
     @FXML private Label totalTimeLabel;
     @FXML private Label avgTimePerDayLabel;
 
+    // Today's progress labels
+    @FXML private Label todayTimeLabel;
+    @FXML private Label targetLabel;
+    @FXML private Label progressStatusLabel;
+
     // fx:id in FXML must match exactly
     @FXML private PieChart timePerCategoryChart;
     @FXML private LineChart<String, Number> timePerDayChart;
@@ -28,7 +33,6 @@ public class StatsController {
     @FXML private Button btn7Days;
     @FXML private Button btn14Days;
     @FXML private Button btn30Days;
-    @FXML private Button btnAllTime;
 
     private int selectedDays = 14; // default
 
@@ -43,6 +47,9 @@ public class StatsController {
     }
 
     private void loadAllStats() {
+        // TODAY'S PROGRESS vs TARGET
+        loadTodayProgress();
+
         // total pages
         int totalPages = StatsManagement.getTotalPagesRead();
         if (totalPagesReadLabel != null) {
@@ -67,13 +74,42 @@ public class StatsController {
         loadDailyLineChart();
     }
 
-    // PIE CHART — only top 5 valid categories by total time
+    // PIE CHART — only top 5 valid categories by total time, filtered by selected time range
     private void loadCategoryPieChart() {
         if (timePerCategoryChart == null) return;
 
-        Map<String, Double> timePerCat = StatsManagement.getTimePerCategory();
+        // Get time per day data
+        Map<String, Double> timePerDay = StatsManagement.getTimeSpentPerDay();
 
-        if (timePerCat.isEmpty()) {
+        if (timePerDay.isEmpty()) {
+            return;
+        }
+
+        // Calculate time per category for the selected time range
+        String today = java.time.LocalDate.now().toString();
+        java.time.LocalDate todayDate = java.time.LocalDate.parse(today);
+        java.time.LocalDate startDate = todayDate.minusDays(selectedDays);
+
+        Map<String, Double> timePerCatFiltered = new java.util.HashMap<>();
+
+        // Go through all events and filter by date range and category
+        List<SingleReadingEvent> allEvents = StatsManagement.getAllEvents();
+        for (SingleReadingEvent event : allEvents) {
+            java.time.LocalDate eventDate = java.time.LocalDate.parse(event.getDate());
+
+            // Check if event is within selected time range
+            if (eventDate.isEqual(startDate) || eventDate.isAfter(startDate)) {
+                String category = event.getCategory();
+                double timeSpent = event.getSecondsRead() / 60.0; // convert to minutes
+
+                timePerCatFiltered.put(
+                    category,
+                    timePerCatFiltered.getOrDefault(category, 0.0) + timeSpent
+                );
+            }
+        }
+
+        if (timePerCatFiltered.isEmpty()) {
             return;
         }
 
@@ -87,7 +123,7 @@ public class StatsController {
 
         // put valid categories in a list
         List<String> allCats = new ArrayList<>();
-        for (String cat : timePerCat.keySet()) {
+        for (String cat : timePerCatFiltered.keySet()) {
             boolean isInvalid = false;
             for (String bad : invalidCats) {
                 if (cat.equalsIgnoreCase(bad)) {
@@ -104,11 +140,11 @@ public class StatsController {
             return;
         }
 
-        // bubble sort — descending by seconds (we store minutes as doubles from seconds/60)
+        // bubble sort — descending by minutes
         for (int i = 0; i < allCats.size() - 1; i++) {
             for (int j = 0; j < allCats.size() - 1 - i; j++) {
-                double a = timePerCat.get(allCats.get(j));
-                double b = timePerCat.get(allCats.get(j + 1));
+                double a = timePerCatFiltered.get(allCats.get(j));
+                double b = timePerCatFiltered.get(allCats.get(j + 1));
                 if (a < b) {
                     String temp = allCats.get(j);
                     allCats.set(j, allCats.get(j + 1));
@@ -124,7 +160,7 @@ public class StatsController {
 
         for (int i = 0; i < limit; i++) {
             String cat = allCats.get(i);
-            double mins = timePerCat.get(cat);
+            double mins = timePerCatFiltered.get(cat);
             // if less than 1 minute, show seconds instead so it doesn't say "0 min"
             String timeLabel;
             if (mins < 1.0) {
@@ -221,6 +257,7 @@ public class StatsController {
     public void onTimeRange7Days() {
         System.out.println("DEBUG: 7 Days button clicked");
         selectedDays = 7;
+        loadCategoryPieChart();
         loadDailyLineChart();
         updateButtonStyles();
     }
@@ -229,6 +266,7 @@ public class StatsController {
     public void onTimeRange14Days() {
         System.out.println("DEBUG: 14 Days button clicked");
         selectedDays = 14;
+        loadCategoryPieChart();
         loadDailyLineChart();
         updateButtonStyles();
     }
@@ -237,21 +275,14 @@ public class StatsController {
     public void onTimeRange30Days() {
         System.out.println("DEBUG: 30 Days button clicked");
         selectedDays = 30;
-        loadDailyLineChart();
-        updateButtonStyles();
-    }
-
-    @FXML
-    public void onTimeRangeAllTime() {
-        System.out.println("DEBUG: All Time button clicked");
-        selectedDays = Integer.MAX_VALUE; // show all available data
+        loadCategoryPieChart();
         loadDailyLineChart();
         updateButtonStyles();
     }
 
     private void updateButtonStyles() {
         // null check in case buttons aren't injected yet
-        if (btn7Days == null || btn14Days == null || btn30Days == null || btnAllTime == null) {
+        if (btn7Days == null || btn14Days == null || btn30Days == null) {
             return;
         }
 
@@ -259,7 +290,6 @@ public class StatsController {
         btn7Days.setStyle("-fx-padding: 8 16; -fx-font-size: 11; -fx-background-color: #0f3460; -fx-text-fill: #e0e0ff; -fx-border-radius: 5; -fx-background-radius: 5; -fx-cursor: hand;");
         btn14Days.setStyle("-fx-padding: 8 16; -fx-font-size: 11; -fx-background-color: #0f3460; -fx-text-fill: #e0e0ff; -fx-border-radius: 5; -fx-background-radius: 5; -fx-cursor: hand;");
         btn30Days.setStyle("-fx-padding: 8 16; -fx-font-size: 11; -fx-background-color: #0f3460; -fx-text-fill: #e0e0ff; -fx-border-radius: 5; -fx-background-radius: 5; -fx-cursor: hand;");
-        btnAllTime.setStyle("-fx-padding: 8 16; -fx-font-size: 11; -fx-background-color: #0f3460; -fx-text-fill: #e0e0ff; -fx-border-radius: 5; -fx-background-radius: 5; -fx-cursor: hand;");
 
         // highlight active button
         String activeStyle = "-fx-padding: 8 16; -fx-font-size: 11; -fx-background-color: #4f6cff; -fx-text-fill: #ffffff; -fx-border-radius: 5; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;";
@@ -270,8 +300,52 @@ public class StatsController {
             btn14Days.setStyle(activeStyle);
         } else if (selectedDays == 30) {
             btn30Days.setStyle(activeStyle);
-        } else {
-            btnAllTime.setStyle(activeStyle);
+        }
+    }
+
+    // Load today's progress and compare with daily target
+    private void loadTodayProgress() {
+        String today = java.time.LocalDate.now().toString();
+        Map<String, Double> timePerDay = StatsManagement.getTimeSpentPerDay();
+
+        // Get time read today in minutes
+        double todayMinutes = timePerDay.getOrDefault(today, 0.0);
+
+        // Get daily target in minutes
+        int dailyTarget = Controller.getDailyTarget();
+
+        // Calculate progress percentage
+        int progressPercent = (int) ((todayMinutes / dailyTarget) * 100);
+        if (progressPercent > 100) {
+            progressPercent = 100; // Cap at 100%
+        }
+
+        // Update UI labels
+        if (todayTimeLabel != null) {
+            if (todayMinutes < 1.0) {
+                int secs = (int) Math.round(todayMinutes * 60);
+                todayTimeLabel.setText(secs + " sec");
+            } else {
+                todayTimeLabel.setText((int) todayMinutes + " min");
+            }
+        }
+
+        if (targetLabel != null) {
+            targetLabel.setText(dailyTarget + " min");
+        }
+
+        if (progressStatusLabel != null) {
+            String statusText = progressPercent + "% Complete";
+            progressStatusLabel.setText(statusText);
+
+            // Change color based on progress
+            if (progressPercent >= 100) {
+                progressStatusLabel.setStyle("-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #4caf50;"); // Green
+            } else if (progressPercent >= 50) {
+                progressStatusLabel.setStyle("-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #ffb74d;"); // Orange
+            } else {
+                progressStatusLabel.setStyle("-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #ff6b6b;"); // Red
+            }
         }
     }
 
