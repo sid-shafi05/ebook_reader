@@ -218,6 +218,31 @@ public class StatsController {
             else
                 progressStatusLabel.getStyleClass().add("progress-status-low");
         }
+        if (todayProgressBar != null)
+            todayProgressBar.setProgress(progressPercent / 100.0);
+    }
+    @FXML private javafx.scene.control.ProgressBar todayProgressBar;
+
+    @FXML
+    public void onSetDailyTarget() {
+        javafx.scene.control.TextInputDialog dialog =
+                new javafx.scene.control.TextInputDialog(String.valueOf(Controller.getDailyTarget()));
+        dialog.setTitle("Daily Reading Target");
+        dialog.setHeaderText("Set Your Daily Reading Goal");
+        dialog.setContentText("Minutes per day:");
+        dialog.showAndWait().ifPresent(minutes -> {
+            try {
+                int target = Integer.parseInt(minutes.trim());
+                if (target > 0) {
+                    java.nio.file.Files.write(
+                            java.nio.file.Paths.get("daily_target.txt"),
+                            String.valueOf(target).getBytes());
+                    loadAllStats(); // refresh everything
+                }
+            } catch (Exception e) {
+                System.out.println("Invalid target: " + e.getMessage());
+            }
+        });
     }
 
     @FXML public void onBackButtonClick() {}
