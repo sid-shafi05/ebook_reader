@@ -18,12 +18,12 @@
             <!-- LOGO AREA -->
             <VBox alignment="CENTER" style="-fx-padding: 28 10 24 10; -fx-spacing: 5;">
                <children>
-                  <ImageView fx:id="iconImage" fitHeight="46.0" fitWidth="46.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="iconImage" fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../images/icon.png"/>
+                        <Image url="@../images/icon1.png"/>
                      </image>
                   </ImageView>
-                  <Label fx:id="iconText" alignment="CENTER" text="StackShelf" style="-fx-text-fill: #c8a96e; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 4 0 0 0; -fx-letter-spacing: 1px;"/>
+                  <Label fx:id="iconText" alignment="CENTER" text="PageVault" style="-fx-text-fill: #c8a96e; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 4 0 0 0; -fx-letter-spacing: 1px;"/>
                   <Label text="eBook Reader" style="-fx-text-fill: #202030; -fx-font-size: 10px; -fx-letter-spacing: 0.5px;"/>
                </children>
             </VBox>

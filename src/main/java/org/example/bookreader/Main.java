@@ -19,9 +19,9 @@ public class Main extends Application {
         mainControllerInstance = fxmlLoader.getController();
         String css = this.getClass().getResource("/org/example/bookreader/application.css").toExternalForm();
         scene.getStylesheets().add(css);
-        Image icon = new Image(Main.class.getResourceAsStream("/org/example/images/icon.png"));
+        Image icon = new Image(Main.class.getResourceAsStream("/org/example/images/pagevault_icon.png"));
         stage.getIcons().add(icon);
-        stage.setTitle("StackShelf - eBook Reader");
+        stage.setTitle("PageVault - an Ebook Reader");
         stage.setScene(scene);
 
         stage.setOnCloseRequest(event -> {
