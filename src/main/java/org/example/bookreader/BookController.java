@@ -1,4 +1,6 @@
 package org.example.bookreader;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
@@ -21,12 +23,12 @@ import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 import javafx.util.Duration;
 import javafx.geometry.Bounds;
-import javafx.scene.Scene;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -36,10 +38,10 @@ public class BookController {
     private Book currentBook;
     private int currentPage;
     private int highestPageReached;
-    private boolean focusModeActive = false; // track focus mode state
-    private Timeline readingTimer; // for reading time display
-    private int readingSeconds = 0; // accumulated reading time
-    private ContextMenu currentMenu; // track open menu for toggle
+    private boolean focusModeActive = false;
+    private Timeline readingTimer;
+    private int readingSeconds = 0;
+    private ContextMenu currentMenu;
 
     @FXML private ScrollPane pageScrollPane;
     @FXML private ImageView pdfView;
@@ -58,37 +60,46 @@ public class BookController {
     @FXML private VBox notebookPanel;
     @FXML private TextArea notesTextArea;
 
-    private boolean sliderDragging = false; // prevent feedback loops
-    private ColorAdjust colorAdjust = new ColorAdjust(); // for color filters
-    private boolean notebookPanelVisible = false; // track notebook panel state
+    // highlight fields
+    @FXML private javafx.scene.canvas.Canvas highlightCanvas;
+    private double dragStartX, dragStartY;
+    private java.util.Map<Integer, java.util.List<double[]>> highlights = new java.util.HashMap<>();
 
-    // FileTypeManager handles both PDF and CBZ rendering, so we can use it for both types of books without needing separate engines in this controller
+    // chat fields
+    @FXML private VBox chatPanel;
+    @FXML private VBox chatMessages;
+    @FXML private TextField chatInput;
+    private List<java.util.Map<String, String>> chatHistory = new ArrayList<>();
+    private static final String API_KEY = "AIzaSyCFuWvlFl81_584ErqzLESRjc6LXFl8r1M";
+
+    private boolean sliderDragging = false;
+    private ColorAdjust colorAdjust = new ColorAdjust();
+    private boolean notebookPanelVisible = false;
+    private boolean chatPanelVisible = false;
+
     private FileTypeManager fileTypeManager;
 
-    public void startSession(Book book){
+    public void startSession(Book book) {
         this.currentBook = book;
         this.currentPage = book.getLastReadPageNumber();
         this.sessionStartTime = System.currentTimeMillis();
         this.sessionStartPage = currentPage;
         this.highestPageReached = currentPage;
-        try{
+        try {
             fileTypeManager = new FileTypeManager();
             fileTypeManager.fileType(book.getFilePath());
 
-            // initialize page slider
             int totalPages = fileTypeManager.getTotalPage();
             pageSlider.setMin(1);
             pageSlider.setMax(totalPages);
-            pageSlider.setValue(currentPage + 1); // convert 0-indexed to 1-indexed for display
+            pageSlider.setValue(currentPage + 1);
             sliderMinLabel.setText("1");
             sliderMaxLabel.setText(String.valueOf(totalPages));
 
-            // set initial label text
             if (sliderCurrentPageLabel != null) {
                 sliderCurrentPageLabel.setText("Page " + (currentPage + 1));
             }
 
-            // update current page label when slider value changes
             pageSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
                 int pageNum = newVal.intValue();
                 if (sliderCurrentPageLabel != null) {
@@ -96,11 +107,10 @@ public class BookController {
                 }
             });
 
-            // handle slider dragging
             pageSlider.setOnMousePressed(event -> sliderDragging = true);
             pageSlider.setOnMouseReleased(event -> {
                 sliderDragging = false;
-                int newPage = (int) pageSlider.getValue() - 1; // convert back to 0-indexed
+                int newPage = (int) pageSlider.getValue() - 1;
                 if (newPage != currentPage && newPage >= 0 && newPage < totalPages) {
                     currentPage = newPage;
                     if (currentPage > highestPageReached) {
@@ -111,36 +121,46 @@ public class BookController {
             });
 
             pdfView.sceneProperty().addListener((obs, oldScene, newScene) -> {
-                if(newScene != null){
+                if (newScene != null) {
                     pdfView.fitWidthProperty().bind(newScene.widthProperty().multiply(0.95));
                 }
             });
-            if(pdfView.getScene() != null){
+            if (pdfView.getScene() != null) {
                 pdfView.fitWidthProperty().bind(pdfView.getScene().widthProperty().multiply(0.95));
             }
             renderCurrentPage();
-            startReadingTimer(); // start reading time tracking
-        }catch(IOException e){
+            startReadingTimer();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @FXML
-    private void renderCurrentPage(){
-        if(fileTypeManager != null){
+    private void renderCurrentPage() {
+        if (fileTypeManager != null) {
             pdfView.setImage(null);
             System.gc();
             pdfView.setImage(fileTypeManager.getPage(currentPage));
-            if(pageNumberLabel != null){
+            if (pageNumberLabel != null) {
                 pageNumberLabel.setText("Page " + (currentPage + 1) + " of " + fileTypeManager.getTotalPage());
             }
-            if(bookTitleLabel != null && currentBook != null){
+            if (bookTitleLabel != null && currentBook != null) {
                 bookTitleLabel.setText(currentBook.getTitle());
             }
-
-            // sync slider with current page (only if not dragging to prevent conflicts)
             if (pageSlider != null && !sliderDragging) {
                 pageSlider.setValue(currentPage + 1);
+            }
+
+            if (highlightCanvas != null) {
+                javafx.scene.canvas.GraphicsContext gc = highlightCanvas.getGraphicsContext2D();
+                gc.clearRect(0, 0, highlightCanvas.getWidth(), highlightCanvas.getHeight());
+                java.util.List<double[]> pageHighlights = highlights.get(currentPage);
+                if (pageHighlights != null) {
+                    gc.setFill(javafx.scene.paint.Color.rgb(255, 255, 0, 0.35));
+                    for (double[] r : pageHighlights) {
+                        gc.fillRect(r[0], r[1], r[2], r[3]);
+                    }
+                }
             }
 
             updateBookmarkButtonStyle();
@@ -148,17 +168,17 @@ public class BookController {
         }
     }
 
-    private void scrollToTop(){
-        if(pageScrollPane != null){
+    private void scrollToTop() {
+        if (pageScrollPane != null) {
             javafx.application.Platform.runLater(() -> pageScrollPane.setVvalue(0));
         }
     }
 
     @FXML
-    public void nextButtonLogic(){
-        if(currentPage < fileTypeManager.getTotalPage() - 1){
+    public void nextButtonLogic() {
+        if (currentPage < fileTypeManager.getTotalPage() - 1) {
             currentPage++;
-            if(currentPage > highestPageReached){
+            if (currentPage > highestPageReached) {
                 highestPageReached = currentPage;
             }
             renderCurrentPage();
@@ -166,8 +186,8 @@ public class BookController {
     }
 
     @FXML
-    public void prevButtonLogic(){
-        if(currentPage > 0){
+    public void prevButtonLogic() {
+        if (currentPage > 0) {
             currentPage--;
             renderCurrentPage();
         }
@@ -180,12 +200,9 @@ public class BookController {
         stage.close();
     }
 
-    // set bookmark on the current page.
-
     @FXML
     public void toggleBookmark() {
         if (currentBook == null) return;
-
         if (BookmarkManager.isBookmarked(currentBook.getFilePath(), currentPage)) {
             BookmarkManager.removeBookmark(currentBook.getFilePath(), currentPage);
         } else {
@@ -194,18 +211,12 @@ public class BookController {
         updateBookmarkButtonStyle();
     }
 
-    /**
-     * Update bookmark button style based on whether current page is bookmarked.
-     */
     private void updateBookmarkButtonStyle() {
         if (bookmarkButton == null || currentBook == null) return;
-
         if (BookmarkManager.isBookmarked(currentBook.getFilePath(), currentPage)) {
-            // Page is bookmarked - show filled bookmark with red color
             bookmarkButton.setText("🔖");
             bookmarkButton.setStyle("-fx-font-size: 20; -fx-background-color: #FF5722; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;");
         } else {
-            // Page not bookmarked - use default CSS class
             bookmarkButton.setText("🔖");
             bookmarkButton.setStyle("");
             bookmarkButton.getStyleClass().clear();
@@ -213,64 +224,49 @@ public class BookController {
         }
     }
 
-    /**
-     * Show a panel/dialog with all bookmarks for current book.
-     */
     @FXML
     public void showBookmarksPanel() {
         if (currentBook == null) return;
-
         List<Bookmark> bookmarks = BookmarkManager.getBookmarksForBook(currentBook.getFilePath());
-
-        // Use BookmarkManager's modern dialog method
         int selectedPage = BookmarkManager.showBookmarkDialog(currentBook.getTitle(), bookmarks);
-
         if (selectedPage >= 0) {
             currentPage = selectedPage;
-
-            // only update highestPageReached if jumping forward
             if (currentPage > highestPageReached) {
                 highestPageReached = currentPage;
             }
-
             renderCurrentPage();
         }
     }
-
-    // Check if current page is bookmarked.
 
     public boolean isCurrentPageBookmarked() {
         if (currentBook == null) return false;
         return BookmarkManager.isBookmarked(currentBook.getFilePath(), currentPage);
     }
 
-    //Get all bookmarks for the current book.
-
     public List<Bookmark> getCurrentBookBookmarks() {
         if (currentBook == null) return new ArrayList<>();
         return BookmarkManager.getBookmarksForBook(currentBook.getFilePath());
     }
 
-    //when user closes the book or goes back to the library
-    public void stopSession(){
+    public void stopSession() {
         long endTime = System.currentTimeMillis();
         long seconds = (endTime - sessionStartTime) / 1000;
         int pagesReadThisSession = highestPageReached - sessionStartPage;
 
         int totalPages = fileTypeManager.getTotalPage();
         double newProgress;
-        if(highestPageReached >= totalPages - 1){
+        if (highestPageReached >= totalPages - 1) {
             newProgress = 1.0;
         } else {
             newProgress = (double) highestPageReached / (totalPages - 1);
         }
 
         SingleReadingEvent event = new SingleReadingEvent(
-            java.time.LocalDate.now().toString(),
-            currentBook.getTitle(),
-            pagesReadThisSession,
-            seconds,
-            currentBook.getCategory()
+                java.time.LocalDate.now().toString(),
+                currentBook.getTitle(),
+                pagesReadThisSession,
+                seconds,
+                currentBook.getCategory()
         );
         StatsManagement.saveNewEvent(event);
 
@@ -278,79 +274,224 @@ public class BookController {
         currentBook.setProgressValue(newProgress);
 
         List<Book> library = Library.loadBooks();
-        for(Book b : library){
-            if(b.getFilePath().equals(currentBook.getFilePath())){
+        for (Book b : library) {
+            if (b.getFilePath().equals(currentBook.getFilePath())) {
                 b.setLastReadPageNumber(currentPage);
                 b.setProgressValue(newProgress);
             }
         }
         Library.saveBookList(library);
 
-        // close the engine if it's a PDF
-        stopReadingTimer(); // stop reading timer
+        stopReadingTimer();
         fileTypeManager.close();
         pdfView.fitWidthProperty().unbind();
     }
 
-    // FOCUS MODE - toggle between full UI and minimal UI for distraction-free reading
+    // ===== HIGHLIGHT =====
+    @FXML
+    public void enableHighlight() {
+        if (highlightCanvas == null) return;
+        javafx.scene.canvas.GraphicsContext gc = highlightCanvas.getGraphicsContext2D();
+        highlightCanvas.setCursor(javafx.scene.Cursor.CROSSHAIR);
+
+        highlightCanvas.setOnMousePressed(e -> {
+            dragStartX = e.getX();
+            dragStartY = e.getY();
+        });
+
+        highlightCanvas.setOnMouseDragged(e -> {
+            gc.clearRect(0, 0, highlightCanvas.getWidth(), highlightCanvas.getHeight());
+            java.util.List<double[]> saved = highlights.get(currentPage);
+            if (saved != null) {
+                gc.setFill(javafx.scene.paint.Color.rgb(255, 255, 0, 0.35));
+                for (double[] r : saved) gc.fillRect(r[0], r[1], r[2], r[3]);
+            }
+            double x = Math.min(dragStartX, e.getX());
+            double y = Math.min(dragStartY, e.getY());
+            double w = Math.abs(e.getX() - dragStartX);
+            double h = Math.abs(e.getY() - dragStartY);
+            gc.setFill(javafx.scene.paint.Color.rgb(255, 255, 0, 0.35));
+            gc.fillRect(x, y, w, h);
+        });
+
+        highlightCanvas.setOnMouseReleased(e -> {
+            double x = Math.min(dragStartX, e.getX());
+            double y = Math.min(dragStartY, e.getY());
+            double w = Math.abs(e.getX() - dragStartX);
+            double h = Math.abs(e.getY() - dragStartY);
+            if (w > 5 && h > 5) {
+                highlights.computeIfAbsent(currentPage, k -> new java.util.ArrayList<>())
+                        .add(new double[]{x, y, w, h});
+            }
+        });
+    }
+
+    // ===== AI CHAT =====
+    @FXML
+    public void toggleChatPanel() {
+        chatPanelVisible = !chatPanelVisible;
+        chatPanel.setVisible(chatPanelVisible);
+        chatPanel.setManaged(chatPanelVisible);
+    }
+
+    @FXML
+    public void sendChatMessage() {
+        if (chatInput == null) return;
+        String userMessage = chatInput.getText().trim();
+        if (userMessage.isEmpty()) return;
+
+        addChatBubble("You", userMessage, "#0f3460", "#4fc3f7");
+        chatInput.clear();
+
+        // 1. Setup the context
+        String bookContext = "You are a helpful reading assistant. The user is reading '" +
+                (currentBook != null ? currentBook.getTitle() : "a book") +
+                "' and is currently on page " + (currentPage + 1) +
+                ". Answer their questions helpfully and concisely.";
+
+        // Add user message to history
+        java.util.Map<String, String> userMsg = new java.util.HashMap<>();
+        userMsg.put("role", "user");
+        userMsg.put("content", userMessage);
+        chatHistory.add(userMsg);
+
+        Label loading = new Label("AI is thinking...");
+        loading.setStyle("-fx-text-fill: #666; -fx-font-size: 10; -fx-padding: 4;");
+        chatMessages.getChildren().add(loading);
+
+        new Thread(() -> {
+            // 2. PASS BOTH: Send the context AND the history
+            // If your callAPI only takes one String, use: callAPI(bookContext + "\n\nUser says: " + userMessage)
+            String reply = callAPI(bookContext, userMessage);
+
+            javafx.application.Platform.runLater(() -> {
+                chatMessages.getChildren().remove(loading);
+                addChatBubble("AI", reply, "#1a1a2e", "#e0e0e0");
+
+                java.util.Map<String, String> assistantMsg = new java.util.HashMap<>();
+                assistantMsg.put("role", "assistant");
+                assistantMsg.put("content", reply);
+                chatHistory.add(assistantMsg);
+            });
+        }).start();
+    }
+    private void addChatBubble(String sender, String text, String bgColor, String textColor) {
+        VBox bubble = new VBox(3);
+        bubble.setStyle("-fx-background-color: " + bgColor + "; -fx-background-radius: 10; -fx-padding: 8 12;");
+        bubble.setMaxWidth(240);
+
+        Label senderLabel = new Label(sender);
+        senderLabel.setStyle("-fx-font-size: 9; -fx-font-weight: bold; -fx-text-fill: #888;");
+
+        Label messageLabel = new Label(text);
+        messageLabel.setWrapText(true);
+        messageLabel.setMaxWidth(220);
+        messageLabel.setStyle("-fx-font-size: 11; -fx-text-fill: " + textColor + ";");
+
+        bubble.getChildren().addAll(senderLabel, messageLabel);
+        chatMessages.getChildren().add(bubble);
+    }
+
+    private String callAPI(String context, String userPrompt) {
+        try {
+            // 1. Ensure the URL is v1 (stable 2026)
+            String url = "https://generativelanguage.googleapis.com/v1/gemini-1.5-flash:generateContent?key=" + API_KEY;
+
+            // 2. Prepare the combined prompt
+            String fullPrompt = context + "\n\nUser Question: " + userPrompt;
+            String escapedPrompt = fullPrompt.replace("\"", "\\\"").replace("\n", "\\n");
+
+            String jsonBody = "{" +
+                    "\"contents\": [{\"parts\":[{\"text\": \"" + escapedPrompt + "\"}]}], " +
+                    "\"safetySettings\": [" +
+                    "{\"category\": \"HARM_CATEGORY_HARASSMENT\", \"threshold\": \"BLOCK_NONE\"}," +
+                    "{\"category\": \"HARM_CATEGORY_HATE_SPEECH\", \"threshold\": \"BLOCK_NONE\"}," +
+                    "{\"category\": \"HARM_CATEGORY_SEXUALLY_EXPLICIT\", \"threshold\": \"BLOCK_NONE\"}," +
+                    "{\"category\": \"HARM_CATEGORY_DANGEROUS_CONTENT\", \"threshold\": \"BLOCK_NONE\"}" +
+                    "]" +
+                    "}";
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(response.body());
+
+            // 3. Handle Errors from the API side
+            if (root.has("error")) {
+                return "API Error: " + root.path("error").path("message").asText();
+            }
+
+            // 4. THE FIX: Precise path navigation for Gemini 1.5
+            // Path: candidates -> [0] -> content -> parts -> [0] -> text
+            JsonNode candidates = root.path("candidates");
+            if (candidates.isArray() && !candidates.isEmpty()) {
+                JsonNode firstCandidate = candidates.get(0);
+                JsonNode parts = firstCandidate.path("content").path("parts");
+
+                if (parts.isArray() && !parts.isEmpty()) {
+                    return parts.get(0).path("text").asText();
+                }
+            }
+
+            // Helpful debugging if it still fails
+            System.err.println("Unexpected JSON: " + response.body());
+            return "AI Error: The API responded but the message content was hidden.";
+
+        } catch (Exception e) {
+            return "System Error: " + e.getMessage();
+        }
+    }
+
+    // ===== FOCUS MODE =====
     @FXML
     public void toggleFocusMode() {
         focusModeActive = !focusModeActive;
-
         if (focusModeActive) {
-            // enter focus mode - hide slider and bookmark/jump controls
             if (sliderSection != null) sliderSection.setVisible(false);
             if (controlsSection != null) controlsSection.setVisible(false);
             if (focusModeButton != null) focusModeButton.setStyle("-fx-background-color: #4f9eff; -fx-text-fill: white;");
         } else {
-            // exit focus mode - show slider and bookmark/jump controls
             if (sliderSection != null) sliderSection.setVisible(true);
             if (controlsSection != null) controlsSection.setVisible(true);
             if (focusModeButton != null) focusModeButton.setStyle("");
         }
     }
 
-    // COLOR FILTERS - Realistic smartphone-style reading modes
+    // ===== COLOR FILTERS =====
     @FXML
     public void setColorFilterNormal() {
-        // Standard white background, black text - no effects
         pdfView.setEffect(null);
     }
 
     @FXML
     public void setColorFilterDark() {
-        // Dark mode - inverted with better contrast
         colorAdjust.setHue(0);
-        colorAdjust.setBrightness(-0.5);      // Very dark
-        colorAdjust.setContrast(0.6);         // Much higher contrast
+        colorAdjust.setBrightness(-0.5);
+        colorAdjust.setContrast(0.6);
         colorAdjust.setSaturation(-0.3);
         pdfView.setEffect(colorAdjust);
     }
 
     @FXML
     public void setColorFilterSepia() {
-        // Reading/Warm mode - REAL warm cream/sepia like Kindle, Kobo, Apple Books
-        // Creates a warm cream background while keeping text dark and readable
         ColorAdjust sepiaAdjust = new ColorAdjust();
-        sepiaAdjust.setHue(-0.1);             // Warm shift towards yellow
-        sepiaAdjust.setBrightness(0.08);      // Slightly brighter (warm paper effect)
-        sepiaAdjust.setContrast(0.2);         // Good contrast for text
-        sepiaAdjust.setSaturation(-0.9);      // Heavy desaturation for warm tone
-
-        // Apply a warm overlay using MULTIPLY blend mode (keeps text dark, adds warmth to background)
-        ColorInput warmOverlay = new ColorInput(
-            0, 0, 2000, 2000,
-            Color.web("#f5deb3")  // Warm wheat/cream color
-        );
-
+        sepiaAdjust.setHue(-0.1);
+        sepiaAdjust.setBrightness(0.08);
+        sepiaAdjust.setContrast(0.2);
+        sepiaAdjust.setSaturation(-0.9);
+        ColorInput warmOverlay = new ColorInput(0, 0, 2000, 2000, Color.web("#f5deb3"));
         Blend blendEffect = new Blend(BlendMode.MULTIPLY, sepiaAdjust, warmOverlay);
         pdfView.setEffect(blendEffect);
     }
 
-    // Show color filter menu with notebook option - toggles on/off
     @FXML
     public void showColorFilterMenu() {
-        // If menu is already open, close it
         if (currentMenu != null && currentMenu.isShowing()) {
             currentMenu.hide();
             currentMenu = null;
@@ -358,49 +499,35 @@ public class BookController {
         }
 
         ContextMenu menu = new ContextMenu();
-        menu.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0; -fx-background-color: #2b2b2b; -fx-border-color: #3a3a3a;");
+        menu.setStyle("-fx-font-size: 13px; -fx-background-color: #2b2b2b; -fx-border-color: #3a3a3a;");
 
-        // Color Modes Submenu
-        MenuItem colorModesItem = new MenuItem("🎨 Color Modes");
-        colorModesItem.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0;");
-
+        MenuItem colorModesItem = new MenuItem("Color Modes");
         ContextMenu colorMenu = new ContextMenu();
-        colorMenu.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0; -fx-background-color: #2b2b2b; -fx-border-color: #3a3a3a;");
 
-        MenuItem normalMode = new MenuItem("☀️  Normal Mode");
-        normalMode.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0;");
+        MenuItem normalMode = new MenuItem("Normal Mode");
         normalMode.setOnAction(e -> setColorFilterNormal());
-
-        MenuItem darkMode = new MenuItem("🌙 Dark Mode");
-        darkMode.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0;");
+        MenuItem darkMode = new MenuItem("Dark Mode");
         darkMode.setOnAction(e -> setColorFilterDark());
-
-        MenuItem sepiaFilter = new MenuItem("📖 Reading Mode");
-        sepiaFilter.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0;");
+        MenuItem sepiaFilter = new MenuItem("Reading Mode");
         sepiaFilter.setOnAction(e -> setColorFilterSepia());
-
         colorMenu.getItems().addAll(normalMode, darkMode, sepiaFilter);
+
         colorModesItem.setOnAction(e -> {
-            // Show submenu at cursor position
             Bounds bounds = menuButton.localToScreen(menuButton.getBoundsInLocal());
             colorMenu.show(menuButton.getScene().getWindow(), bounds.getCenterX() + 100, bounds.getCenterY());
         });
 
-        // Separator
         SeparatorMenuItem sep = new SeparatorMenuItem();
 
-        // Notebook option
-        MenuItem notebookItem = new MenuItem("📝 Notebook");
-        notebookItem.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0e0e0;");
+        MenuItem notebookItem = new MenuItem("Notebook");
         notebookItem.setOnAction(e -> {
-            menu.hide(); // Close the menu first
+            menu.hide();
             currentMenu = null;
             toggleNotebookPanel();
         });
 
         menu.getItems().addAll(colorModesItem, sep, notebookItem);
 
-        // Show menu at the position of the button
         if (menuButton != null) {
             Bounds bounds = menuButton.localToScreen(menuButton.getBoundsInLocal());
             menu.show(menuButton, bounds.getCenterX(), bounds.getCenterY() + 20);
@@ -408,15 +535,12 @@ public class BookController {
         }
     }
 
-    // Toggle notebook panel visibility with slide animation
+    // ===== NOTEBOOK =====
     @FXML
     public void toggleNotebookPanel() {
         if (notebookPanel == null) return;
-
         notebookPanelVisible = !notebookPanelVisible;
-
         if (notebookPanelVisible) {
-            // Load notes when opening
             loadNotesFromFile();
             notebookPanel.setVisible(true);
             notebookPanel.setManaged(true);
@@ -426,10 +550,8 @@ public class BookController {
         }
     }
 
-    // Load notes for current book from file
     private void loadNotesFromFile() {
         if (currentBook == null || notesTextArea == null) return;
-
         String notesFileName = "notes/" + currentBook.getTitle().replaceAll("[^a-zA-Z0-9]", "_") + "_notes.txt";
         try {
             if (java.nio.file.Files.exists(java.nio.file.Paths.get(notesFileName))) {
@@ -443,43 +565,28 @@ public class BookController {
         }
     }
 
-    // Save notes for current book to file
     @FXML
     public void saveNotesPanel() {
         if (currentBook == null || notesTextArea == null) return;
-
         String notes = notesTextArea.getText();
         String notesFileName = "notes/" + currentBook.getTitle().replaceAll("[^a-zA-Z0-9]", "_") + "_notes.txt";
-
         try {
             java.nio.file.Files.createDirectories(java.nio.file.Paths.get("notes"));
             java.nio.file.Files.write(java.nio.file.Paths.get(notesFileName), notes.getBytes());
-            System.out.println("Notes saved for: " + currentBook.getTitle());
         } catch (IOException e) {
             System.out.println("Error saving notes: " + e.getMessage());
         }
     }
 
-    // READING TIME TRACKING
+    // ===== READING TIMER =====
     private void startReadingTimer() {
         readingSeconds = 0;
-        readingTimer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
-            readingSeconds++;
-            updateReadingTimeDisplay();
-        }));
+        readingTimer = new Timeline(new KeyFrame(Duration.seconds(1), event -> readingSeconds++));
         readingTimer.setCycleCount(Timeline.INDEFINITE);
         readingTimer.play();
     }
 
-    private void updateReadingTimeDisplay() {
-        // Reading time tracker removed per user request
-    }
-
     private void stopReadingTimer() {
-        if (readingTimer != null) {
-            readingTimer.stop();
-        }
+        if (readingTimer != null) readingTimer.stop();
     }
 }
-
-

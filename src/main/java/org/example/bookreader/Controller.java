@@ -24,7 +24,7 @@ public class Controller {
 
     // Base folder on Desktop where books and covers are stored
     private static final String BASE_DATA_PATH =
-        System.getProperty("user.home") + "\\Desktop\\ebook_project_data";
+        System.getProperty("user.home") + File.separator+ "\\Desktop\\ebook_project_data";
 
     @FXML
     private AnchorPane contentArea;
@@ -75,6 +75,10 @@ public class Controller {
 
     @FXML
     public void initialize() {
+        // Create required folders if they don't exist on this machine
+        new File(BASE_DATA_PATH + File.separator + "booksdata").mkdirs();
+        new File(BASE_DATA_PATH + File.separator + "covers").mkdirs();
+
         bookList = Library.loadBooks();
 
         // --- load all 4 pages ONCE ---
@@ -341,7 +345,7 @@ public class Controller {
             }
             String finalCategory = genreResult.get();
 
-            File dir = new File(BASE_DATA_PATH + "\\booksdata");
+            File dir = new File(BASE_DATA_PATH + File.separator+"\\booksdata");
             if (!dir.exists()) dir.mkdirs();
 
             File destination = new File(dir, selectedFile.getName());
@@ -378,7 +382,7 @@ public class Controller {
     // Helper method to save the JavaFX Image to a file
     private String saveCover(Image image, String title) {
         String safeTitle = title.replaceAll("[^a-zA-Z0-9]", "_");
-        String path = BASE_DATA_PATH + "\\covers\\" + safeTitle + ".png";
+        String path = BASE_DATA_PATH + File.separator+"\\covers\\"+File.separator + safeTitle + ".png";
         File file = new File(path);
         file.getParentFile().mkdirs(); // Create the 'covers' folder if it doesn't exist
         try {

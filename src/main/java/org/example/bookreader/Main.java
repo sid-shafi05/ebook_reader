@@ -23,6 +23,13 @@ public class Main extends Application {
         stage.getIcons().add(icon);
         stage.setTitle("StackShelf - eBook Reader");
         stage.setScene(scene);
+
+        stage.setOnCloseRequest(event -> {
+            javafx.application.Platform.exit();
+            System.exit(0);
+        });
+
+
         stage.show();
         mainControllerInstance.refreshBookGrid();
 
