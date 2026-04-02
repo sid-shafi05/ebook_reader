@@ -1,9 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.effect.Glow?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -13,120 +10,90 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-            prefHeight="600.0" prefWidth="900.0"
-            xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.example.bookreader.Controller">
-
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.bookreader.Controller">
    <!-- LEFT SIDEBAR -->
    <left>
-      <VBox prefWidth="162.0" styleClass="left-sidebar" BorderPane.alignment="CENTER"
-            style="-fx-min-height: 600;">
+      <VBox prefWidth="162.0" styleClass="left-sidebar" BorderPane.alignment="CENTER" style="-fx-min-height: 600;">
          <children>
-
             <!-- LOGO AREA -->
-            <VBox alignment="CENTER" style="-fx-padding: 24 10 20 10; -fx-spacing: 4;">
+            <VBox alignment="CENTER" style="-fx-padding: 28 10 24 10; -fx-spacing: 5;">
                <children>
-                  <ImageView fx:id="iconImage" fitHeight="52.0" fitWidth="52.0"
-                             pickOnBounds="true" preserveRatio="true">
-                     <effect><Glow /></effect>
-                     <image><Image url="@../images/icon.png" /></image>
+                  <ImageView fx:id="iconImage" fitHeight="46.0" fitWidth="46.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/icon.png"/>
+                     </image>
                   </ImageView>
-                  <Label fx:id="iconText" alignment="CENTER" text="StackShelf"
-                         style="-fx-text-fill: #e94560; -fx-font-size: 15px; -fx-font-weight: bold; -fx-padding: 4 0 0 0;" />
-                  <Label text="eBook Reader"
-                         style="-fx-text-fill: #555577; -fx-font-size: 10px;" />
+                  <Label fx:id="iconText" alignment="CENTER" text="StackShelf" style="-fx-text-fill: #c8a96e; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 4 0 0 0; -fx-letter-spacing: 1px;"/>
+                  <Label text="eBook Reader" style="-fx-text-fill: #202030; -fx-font-size: 10px; -fx-letter-spacing: 0.5px;"/>
                </children>
             </VBox>
-
             <!-- DIVIDER -->
-            <Region prefHeight="1" prefWidth="140"
-                    style="-fx-background-color: #1e1e35; -fx-margin: 0 10;" />
-
+            <Region prefHeight="1" prefWidth="140" style="-fx-background-color: #0d0d18; -fx-margin: 0 10;"/>
             <!-- NAV BUTTONS -->
-            <VBox spacing="4" style="-fx-padding: 12 0 0 0;">
+            <VBox spacing="2" style="-fx-padding: 14 0 0 0;">
                <children>
-                  <Button fx:id="allBtn" mnemonicParsing="false"
-                          onAction="#changeToAllBooks"
-                          text="📚   Library"
-                          prefHeight="44.0">
-                     <font><Font name="Segoe UI" size="13.0" /></font>
+                  <Button fx:id="allBtn" mnemonicParsing="false" onAction="#changeToAllBooks" text="📚 Library" prefHeight="44.0">
+                     <font>
+                        <Font name="Segoe UI" size="12.5"/>
+                     </font>
                   </Button>
-                  <Button fx:id="favBtn" mnemonicParsing="false"
-                          onAction="#changetoFavourites"
-                          text="❤   Favourites"
-                          prefHeight="44.0">
-                     <font><Font name="Segoe UI" size="13.0" /></font>
+                  <Button fx:id="favBtn" mnemonicParsing="false" onAction="#changetoFavourites" text="♡ Favourites" prefHeight="44.0">
+                     <font>
+                        <Font name="Segoe UI" size="12.5"/>
+                     </font>
                   </Button>
-                  <Button fx:id="catBtn" mnemonicParsing="false"
-                          onAction="#changeToCategories"
-                          text="🗂   Categories"
-                          prefHeight="44.0">
-                     <font><Font name="Segoe UI" size="13.0" /></font>
+                  <Button fx:id="catBtn" mnemonicParsing="false" onAction="#changeToCategories" text="⊞ Categories" prefHeight="44.0">
+                     <font>
+                        <Font name="Segoe UI" size="12.5"/>
+                     </font>
                   </Button>
-                  <Button fx:id="statsBtn" mnemonicParsing="false"
-                          onAction="#changeToStats"
-                          text="📊   Statistics"
-                          prefHeight="44.0">
-                     <font><Font name="Segoe UI" size="13.0" /></font>
+                  <Button fx:id="statsBtn" mnemonicParsing="false" onAction="#changeToStats" text="◈ Statistics" prefHeight="44.0">
+                     <font>
+                        <Font name="Segoe UI" size="12.5"/>
+                     </font>
                   </Button>
                </children>
             </VBox>
-
-            <Region VBox.vgrow="ALWAYS" />
-
+            <Region VBox.vgrow="ALWAYS"/>
+            <!-- Bottom version label -->
+            <Label text="v1.0" style="-fx-text-fill: #151525; -fx-font-size: 10px; -fx-padding: 0 0 6 16;"/>
          </children>
       </VBox>
    </left>
-
    <!-- CENTER CONTENT -->
    <center>
-      <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-
-         <!-- TOP BAR: Add Book + Search + Sort labels -->
+      <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" style="-fx-background-color: #050508;">
+         <!-- TOP BAR -->
          <top>
-            <VBox fx:id="topBar" spacing="10"
-                  style="-fx-background-color: transparent; -fx-padding: 15 25 10 25;"
-                  styleClass="top-bar">
+            <VBox fx:id="topBar" spacing="8" style="-fx-background-color: #050508; -fx-padding: 16 24 10 24; -fx-border-color: #0d0d18; -fx-border-width: 0 0 1 0;" styleClass="top-bar">
                <children>
-                  <!-- Row 1: Add Book + Search + Daily Target -->
-                  <HBox alignment="CENTER_LEFT" spacing="15">
+                  <!-- Row 1: Add Book + Search -->
+                  <HBox alignment="CENTER_LEFT" spacing="12">
                      <children>
-                        <Button fx:id="addBtn" onAction="#onAddBookButtonClick"
-                                styleClass="top-bar-button" text="+ Add Book" />
-                        <Region HBox.hgrow="ALWAYS" />
-                        <TextField fx:id="searchField" prefWidth="320.0"
-                                   promptText="Search in Library"
-                                   styleClass="text-field" />
-                        <Button fx:id="dailyTargetBtn" onAction="#setDailyTarget"
-                                styleClass="top-bar-button" text="🎯 Daily Target" />
+                        <Button fx:id="addBtn" onAction="#onAddBookButtonClick" styleClass="top-bar-button" text="+ Add Book"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="searchField" prefWidth="300.0" promptText="Search library..." styleClass="text-field"/>
                      </children>
                   </HBox>
-
                   <!-- Row 2: Sort labels -->
-                  <HBox alignment="CENTER_LEFT" spacing="30" styleClass="sort-container">
+                  <HBox alignment="CENTER_LEFT" spacing="24" styleClass="sort-container">
                      <children>
-                        <Label fx:id="titleLabel" onMouseClicked="#sortByTitle" styleClass="sort-label" text="Title" />
-                        <Label fx:id="dateLabel" onMouseClicked="#sortByDate" styleClass="sort-label" text="Date" />
-                        <Label fx:id="progressLabel" onMouseClicked="#sortByProgress" styleClass="sort-label" text="Progress" />
+                        <Label fx:id="titleLabel" onMouseClicked="#sortByTitle" styleClass="sort-label" text="Title"/>
+                        <Label fx:id="dateLabel" onMouseClicked="#sortByDate" styleClass="sort-label" text="Date"/>
+                        <Label fx:id="progressLabel" onMouseClicked="#sortByProgress" styleClass="sort-label" text="Progress"/>
                      </children>
                   </HBox>
                </children>
             </VBox>
          </top>
-
-         <!-- CONTENT AREA: pages load here -->
+         <!-- CONTENT AREA -->
          <center>
-            <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER" style="-fx-background-color: #050508;">
                <children>
-                  <AnchorPane fx:id="contentArea" prefHeight="200.0" prefWidth="200.0" />
+                  <AnchorPane fx:id="contentArea" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #050508;"/>
                </children>
             </StackPane>
          </center>
-
       </BorderPane>
    </center>
-
 </BorderPane>

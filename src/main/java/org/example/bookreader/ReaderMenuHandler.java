@@ -40,28 +40,27 @@ public class ReaderMenuHandler {
     public void toggleFocusMode() {
         focusModeActive = !focusModeActive;
         if (focusModeActive) {
-            if (sliderSection != null) sliderSection.setVisible(false);
+            if (sliderSection != null)  sliderSection.setVisible(false);
             if (controlsSection != null) controlsSection.setVisible(false);
             if (focusModeButton != null)
-                focusModeButton.setStyle("-fx-background-color: #4f9eff; -fx-text-fill: white;");
+                focusModeButton.setStyle(
+                        "-fx-background-color: #1a1508; -fx-text-fill: #c8a96e;" +
+                                "-fx-border-color: #c8a96e; -fx-border-width: 1;" +
+                                "-fx-background-radius: 7; -fx-border-radius: 7;"
+                );
         } else {
-            if (sliderSection != null) sliderSection.setVisible(true);
+            if (sliderSection != null)  sliderSection.setVisible(true);
             if (controlsSection != null) controlsSection.setVisible(true);
             if (focusModeButton != null) focusModeButton.setStyle("");
         }
     }
 
     public void setColorFilterNormal() {
-        pdfView.setEffect(null);
+        if (pdfView != null) pdfView.setEffect(null);
     }
 
-    public void setColorFilterDark() {
-        colorAdjust.setHue(0);
-        colorAdjust.setBrightness(-0.5);
-        colorAdjust.setContrast(0.6);
-        colorAdjust.setSaturation(-0.3);
-        pdfView.setEffect(colorAdjust);
-    }
+    // Dark mode removed — kept as no-op so FXML bindings don't break
+    public void setColorFilterDark() { }
 
     public void setColorFilterSepia() {
         ColorAdjust sepia = new ColorAdjust();
@@ -70,7 +69,7 @@ public class ReaderMenuHandler {
         sepia.setContrast(0.2);
         sepia.setSaturation(-0.9);
         ColorInput warm = new ColorInput(0, 0, 2000, 2000, Color.web("#f5deb3"));
-        pdfView.setEffect(new Blend(BlendMode.MULTIPLY, sepia, warm));
+        if (pdfView != null) pdfView.setEffect(new Blend(BlendMode.MULTIPLY, sepia, warm));
     }
 
     public void showColorFilterMenu() {
@@ -81,32 +80,23 @@ public class ReaderMenuHandler {
         }
 
         ContextMenu menu = new ContextMenu();
-        menu.setStyle("-fx-font-size: 13px; -fx-background-color: #2b2b2b; -fx-border-color: #3a3a3a;");
 
-        MenuItem colorModesItem = new MenuItem("Color Modes");
-        ContextMenu colorMenu = new ContextMenu();
-        MenuItem normalMode = new MenuItem("Normal Mode");
+        // ── Color modes (Normal + Reading/Sepia only; Dark removed) ──
+        MenuItem normalMode = new MenuItem("○  Normal");
         normalMode.setOnAction(e -> setColorFilterNormal());
-        MenuItem darkMode = new MenuItem("Dark Mode");
-        darkMode.setOnAction(e -> setColorFilterDark());
-        MenuItem sepiaMode = new MenuItem("Reading Mode");
+
+        MenuItem sepiaMode = new MenuItem("☕  Reading Mode (Sepia)");
         sepiaMode.setOnAction(e -> setColorFilterSepia());
-        colorMenu.getItems().addAll(normalMode, darkMode, sepiaMode);
 
-        colorModesItem.setOnAction(e -> {
-            Bounds bounds = menuButton.localToScreen(menuButton.getBoundsInLocal());
-            colorMenu.show(menuButton.getScene().getWindow(),
-                    bounds.getCenterX() + 100, bounds.getCenterY());
-        });
-
-        MenuItem notebookItem = new MenuItem("Notebook");
+        // ── Notebook ──────────────────────────────────────────────────
+        MenuItem notebookItem = new MenuItem("✎  Notebook");
         notebookItem.setOnAction(e -> {
             menu.hide();
             currentMenu = null;
             if (onNotebookToggle != null) onNotebookToggle.run();
         });
 
-        menu.getItems().addAll(colorModesItem, new SeparatorMenuItem(), notebookItem);
+        menu.getItems().addAll(normalMode, sepiaMode, new SeparatorMenuItem(), notebookItem);
 
         if (menuButton != null) {
             Bounds bounds = menuButton.localToScreen(menuButton.getBoundsInLocal());

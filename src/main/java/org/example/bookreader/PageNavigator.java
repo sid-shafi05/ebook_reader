@@ -4,6 +4,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.StackPane;
 
 public class PageNavigator {
     private int currentPage;
@@ -19,7 +20,6 @@ public class PageNavigator {
     private boolean sliderDragging = false;
     private double zoomLevel = 1.0;
 
-    // Callback so BookController can run extra logic after page change
     private Runnable onPageChanged;
 
     public PageNavigator(ImageView pdfView, Label pageNumberLabel, Label bookTitleLabel,
@@ -53,11 +53,16 @@ public class PageNavigator {
             sliderCurrentPageLabel.setText("Page " + (currentPage + 1));
         }
 
+        // FIX 3: update slider track fill whenever value changes
         pageSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (sliderCurrentPageLabel != null) {
                 sliderCurrentPageLabel.setText("Page " + newVal.intValue());
             }
+            updateSliderTrackFill();
         });
+
+        // Initial fill paint
+        updateSliderTrackFill();
 
         pageSlider.setOnMousePressed(e -> sliderDragging = true);
         pageSlider.setOnMouseReleased(e -> {
@@ -78,6 +83,29 @@ public class PageNavigator {
         if (pdfView.getScene() != null) {
             pdfView.fitWidthProperty().bind(pdfView.getScene().widthProperty().multiply(0.95));
         }
+    }
+
+    /**
+     * FIX 3: Paints the slider track so the portion left of the thumb is gold
+     * and the right portion is dark. JavaFX CSS alone cannot do this dynamically,
+     * so we apply a two-color background via inline style on the track node.
+     */
+    private void updateSliderTrackFill() {
+        if (pageSlider == null) return;
+        double pct = (pageSlider.getValue() - pageSlider.getMin())
+                / (pageSlider.getMax() - pageSlider.getMin()) * 100.0;
+
+        // Find the .track node inside the slider and style it
+        pageSlider.lookupAll(".track").forEach(node -> {
+            node.setStyle(
+                    "-fx-background-color: linear-gradient(to right, " +
+                            "#c8a96e " + pct + "%, " +
+                            "#181828 " + pct + "%" +
+                            "); " +
+                            "-fx-background-radius: 3; " +
+                            "-fx-pref-height: 4px;"
+            );
+        });
     }
 
     public void renderCurrentPage(Book book) {
@@ -148,6 +176,6 @@ public class PageNavigator {
         }
     }
 
-    public int getCurrentPage() { return currentPage; }
+    public int getCurrentPage()          { return currentPage; }
     public void setCurrentPage(int page) { this.currentPage = page; }
 }
