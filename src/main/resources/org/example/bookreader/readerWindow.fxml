@@ -30,44 +30,33 @@
                   style="-fx-background-color: #1e1e1e; -fx-border-color: #3a3a3a; -fx-border-width: 0 0 1 0; -fx-padding: 8 24 8 16;">
                <children>
                   <Button onAction="#onBackButtonClick" prefHeight="36.0" prefWidth="130.0"
-                          styleClass="back-button" text="← Library">
-                     <font><Font name="Segoe UI" size="13.0" /></font>
-                  </Button>
+                          styleClass="back-button" text="← Library"/>
                   <Separator orientation="VERTICAL" style="-fx-background-color: #3a3a3a;" />
                   <Label fx:id="bookTitleLabel"
                          style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #e0e0e0;"
-                         text="Book Title">
-                     <font><Font name="Segoe UI" size="14.0" /></font>
-                  </Label>
+                         text="Book Title"/>
                   <Region HBox.hgrow="ALWAYS" />
 
                   <!-- HIGHLIGHT BUTTON -->
                   <Button onAction="#enableHighlight" prefHeight="36.0" prefWidth="50.0"
-                          style="-fx-background-color: #f9a825; -fx-background-radius: 8; -fx-font-size: 16; -fx-cursor: hand;"
-                          text="🖊">
-                     <font><Font size="16.0" /></font>
-                  </Button>
+                          style="-fx-background-color: #f9a825; -fx-background-radius: 8; -fx-font-size: 16; -fx-cursor: hand; -fx-text-fill: white; -fx-font-weight: bold;"
+                          text="✎"/>
 
                   <!-- AI CHAT BUTTON -->
                   <Button onAction="#toggleChatPanel" prefHeight="36.0" prefWidth="50.0"
-                          styleClass="nav-button" text="🤖">
-                     <font><Font name="Segoe UI" size="14.0" /></font>
-                  </Button>
+                          styleClass="nav-button" text="AI"/>
 
+                  <!-- FOCUS MODE BUTTON -->
                   <Button fx:id="focusModeButton" onAction="#toggleFocusMode" prefHeight="36.0" prefWidth="50.0"
-                          styleClass="nav-button" text="🎯">
-                     <font><Font name="Segoe UI" size="13.0" /></font>
-                  </Button>
+                          styleClass="nav-button" text="◎"/>
 
+                  <!-- MENU BUTTON -->
                   <Button fx:id="menuButton" prefHeight="36.0" prefWidth="50.0"
-                          styleClass="nav-button" text="⋮" onMousePressed="#showColorFilterMenu">
-                     <font><Font name="Segoe UI" size="16.0" /></font>
-                  </Button>
+                          styleClass="nav-button" text="•••" onMousePressed="#showColorFilterMenu"/>
+
                   <Label fx:id="pageNumberLabel"
                          style="-fx-font-size: 13; -fx-text-fill: #9e9e9e;"
-                         text="Page 1 of 1">
-                     <font><Font name="Segoe UI" size="13.0" /></font>
-                  </Label>
+                         text="Page 1 of 1"/>
                </children>
             </HBox>
 
@@ -106,7 +95,6 @@
                                    smooth="true"
                                    fitWidth="900.0"
                                    StackPane.alignment="CENTER" />
-                        <!-- HIGHLIGHT CANVAS ON TOP OF PDF -->
                         <Canvas fx:id="highlightCanvas" width="900" height="1200"
                                 StackPane.alignment="CENTER" />
                      </StackPane>
@@ -121,7 +109,7 @@
                <children>
                   <HBox alignment="CENTER" spacing="8.0">
                      <children>
-                        <Label style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #e0e0e0;" text="📝 Notes" />
+                        <Label style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #e0e0e0;" text="✎  Notes" />
                         <Region HBox.hgrow="ALWAYS" />
                         <Button fx:id="closeNotebookButton" onAction="#toggleNotebookPanel" prefHeight="32.0" prefWidth="32.0"
                                 styleClass="nav-button" text="✕" />
@@ -133,7 +121,7 @@
                             wrapText="true" VBox.vgrow="ALWAYS" promptText="Write your notes here..." />
                   <Button onAction="#saveNotesPanel" prefHeight="36.0" maxWidth="Infinity"
                           style="-fx-background-color: #4f9eff; -fx-text-fill: white; -fx-font-size: 11; -fx-padding: 8; -fx-background-radius: 8; -fx-cursor: hand;"
-                          text="💾 Save" />
+                          text="Save" />
                </children>
             </VBox>
 
@@ -144,7 +132,7 @@
                <children>
                   <HBox alignment="CENTER_LEFT" spacing="8.0">
                      <children>
-                        <Label style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #e0e0e0;" text="🤖 Ask Claude" />
+                        <Label style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #e0e0e0;" text="AI  Ask" />
                         <Region HBox.hgrow="ALWAYS" />
                         <Button onAction="#toggleChatPanel" prefHeight="32.0" prefWidth="32.0"
                                 styleClass="nav-button" text="✕" />
@@ -162,7 +150,7 @@
                              promptText="Ask about this page..."
                              onAction="#sendChatMessage"
                              style="-fx-background-color: #0f3460; -fx-text-fill: white; -fx-prompt-text-fill: #555; -fx-background-radius: 8; -fx-padding: 8;" />
-                  <Button onAction="#sendChatMessage" text="Send 🚀" maxWidth="Infinity" prefHeight="36.0"
+                  <Button onAction="#sendChatMessage" text="Send →" maxWidth="Infinity" prefHeight="36.0"
                           style="-fx-background-color: #e94560; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-weight: bold;" />
                </children>
             </VBox>
@@ -173,36 +161,49 @@
 
    <!-- BOTTOM TOOLBAR -->
    <bottom>
-      <HBox alignment="CENTER" spacing="20.0"
+      <HBox alignment="CENTER" spacing="16.0"
             style="-fx-background-color: #1e1e1e; -fx-border-color: #3a3a3a; -fx-border-width: 1 0 0 0; -fx-padding: 12 30 12 30;">
          <children>
+
+            <!-- PREV BUTTON -->
             <Button onAction="#prevButtonLogic" prefHeight="40.0" prefWidth="130.0"
-                    styleClass="nav-button" text="◄   Previous">
-               <font><Font name="Segoe UI" size="14.0" /></font>
-            </Button>
+                    styleClass="nav-button" text="◄  Previous"/>
 
             <Region HBox.hgrow="ALWAYS" />
 
+            <!-- BOOKMARK CONTROLS -->
             <HBox fx:id="controlsSection" alignment="CENTER" spacing="15.0">
                <children>
                   <Button fx:id="bookmarkButton" onAction="#toggleBookmark"
                           prefHeight="38.0" prefWidth="38.0"
-                          styleClass="bookmark-button" text="🔖">
-                     <font><Font size="17.0" /></font>
-                  </Button>
+                          styleClass="bookmark-button" text="❐"/>
                   <Button onAction="#showBookmarksPanel" prefHeight="40.0" prefWidth="140.0"
-                          styleClass="view-bookmarks-button" text="📑   Bookmarks">
-                     <font><Font name="Segoe UI" size="13.0" /></font>
-                  </Button>
+                          styleClass="view-bookmarks-button" text="❐  Bookmarks"/>
+               </children>
+            </HBox>
+
+            <!-- ZOOM CONTROLS -->
+            <HBox alignment="CENTER" spacing="6.0"
+                  style="-fx-background-color: #2a2a2a; -fx-background-radius: 8; -fx-padding: 4 8 4 8; -fx-border-color: #3a3a3a; -fx-border-width: 1; -fx-border-radius: 8;">
+               <children>
+                  <Button onAction="#zoomOut" prefHeight="32.0" prefWidth="32.0"
+                          style="-fx-background-color: #3a3a4a; -fx-text-fill: #e0e0e0; -fx-background-radius: 6; -fx-cursor: hand; -fx-font-size: 16; -fx-font-weight: bold;"
+                          text="−"/>
+                  <Button fx:id="zoomResetBtn" onAction="#zoomReset" prefHeight="32.0" prefWidth="52.0"
+                          style="-fx-background-color: #3a3a4a; -fx-text-fill: #4f9eff; -fx-background-radius: 6; -fx-cursor: hand; -fx-font-size: 11; -fx-font-weight: bold;"
+                          text="100%"/>
+                  <Button onAction="#zoomIn" prefHeight="32.0" prefWidth="32.0"
+                          style="-fx-background-color: #3a3a4a; -fx-text-fill: #e0e0e0; -fx-background-radius: 6; -fx-cursor: hand; -fx-font-size: 16; -fx-font-weight: bold;"
+                          text="+"/>
                </children>
             </HBox>
 
             <Region HBox.hgrow="ALWAYS" />
 
+            <!-- NEXT BUTTON -->
             <Button onAction="#nextButtonLogic" prefHeight="40.0" prefWidth="130.0"
-                    styleClass="nav-button" text="Next   ►">
-               <font><Font name="Segoe UI" size="14.0" /></font>
-            </Button>
+                    styleClass="nav-button" text="Next  ►"/>
+
          </children>
       </HBox>
    </bottom>

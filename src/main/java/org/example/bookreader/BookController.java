@@ -43,34 +43,53 @@ public class BookController {
     private int readingSeconds = 0;
     private ContextMenu currentMenu;
 
-    @FXML private ScrollPane pageScrollPane;
-    @FXML private ImageView pdfView;
-    @FXML private Label pageNumberLabel;
-    @FXML private Label bookTitleLabel;
-    @FXML private Button bookmarkButton;
-    @FXML private Slider pageSlider;
-    @FXML private Label sliderMinLabel;
-    @FXML private Label sliderMaxLabel;
-    @FXML private Label sliderCurrentPageLabel;
-    @FXML private Button focusModeButton;
-    @FXML private Button menuButton;
-    @FXML private Button closeNotebookButton;
-    @FXML private HBox sliderSection;
-    @FXML private HBox controlsSection;
-    @FXML private VBox notebookPanel;
-    @FXML private TextArea notesTextArea;
+    @FXML
+    private ScrollPane pageScrollPane;
+    @FXML
+    private ImageView pdfView;
+    @FXML
+    private Label pageNumberLabel;
+    @FXML
+    private Label bookTitleLabel;
+    @FXML
+    private Button bookmarkButton;
+    @FXML
+    private Slider pageSlider;
+    @FXML
+    private Label sliderMinLabel;
+    @FXML
+    private Label sliderMaxLabel;
+    @FXML
+    private Label sliderCurrentPageLabel;
+    @FXML
+    private Button focusModeButton;
+    @FXML
+    private Button menuButton;
+    @FXML
+    private Button closeNotebookButton;
+    @FXML
+    private HBox sliderSection;
+    @FXML
+    private HBox controlsSection;
+    @FXML
+    private VBox notebookPanel;
+    @FXML
+    private TextArea notesTextArea;
 
     // highlight fields
-    @FXML private javafx.scene.canvas.Canvas highlightCanvas;
+    @FXML
+    private javafx.scene.canvas.Canvas highlightCanvas;
     private double dragStartX, dragStartY;
     private java.util.Map<Integer, java.util.List<double[]>> highlights = new java.util.HashMap<>();
 
     // chat fields
-    @FXML private VBox chatPanel;
-    @FXML private VBox chatMessages;
-    @FXML private TextField chatInput;
+    @FXML
+    private VBox chatPanel;
+    @FXML
+    private VBox chatMessages;
+    @FXML
+    private TextField chatInput;
     private List<java.util.Map<String, String>> chatHistory = new ArrayList<>();
-    private static final String API_KEY = "AIzaSyCFuWvlFl81_584ErqzLESRjc6LXFl8r1M";
 
     private boolean sliderDragging = false;
     private ColorAdjust colorAdjust = new ColorAdjust();
@@ -78,6 +97,10 @@ public class BookController {
     private boolean chatPanelVisible = false;
 
     private FileTypeManager fileTypeManager;
+
+
+    private double zoomLevel = 1.0;
+
 
     public void startSession(Book book) {
         this.currentBook = book;
@@ -375,6 +398,7 @@ public class BookController {
             });
         }).start();
     }
+
     private void addChatBubble(String sender, String text, String bgColor, String textColor) {
         VBox bubble = new VBox(3);
         bubble.setStyle("-fx-background-color: " + bgColor + "; -fx-background-radius: 10; -fx-padding: 8 12;");
@@ -394,26 +418,27 @@ public class BookController {
 
     private String callAPI(String context, String userPrompt) {
         try {
-            // 1. Ensure the URL is v1 (stable 2026)
-            String url = "https://generativelanguage.googleapis.com/v1/gemini-1.5-flash:generateContent?key=" + API_KEY;
+            java.util.Properties props = new java.util.Properties();
+            props.load(new java.io.FileInputStream("src/config.properties"));
+            String API_KEY = props.getProperty("groq.api.key");
 
-            // 2. Prepare the combined prompt
+
+            String url = "https://api.groq.com/openai/v1/chat/completions";
+
             String fullPrompt = context + "\n\nUser Question: " + userPrompt;
-            String escapedPrompt = fullPrompt.replace("\"", "\\\"").replace("\n", "\\n");
+            String escaped = fullPrompt.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n");
 
-            String jsonBody = "{" +
-                    "\"contents\": [{\"parts\":[{\"text\": \"" + escapedPrompt + "\"}]}], " +
-                    "\"safetySettings\": [" +
-                    "{\"category\": \"HARM_CATEGORY_HARASSMENT\", \"threshold\": \"BLOCK_NONE\"}," +
-                    "{\"category\": \"HARM_CATEGORY_HATE_SPEECH\", \"threshold\": \"BLOCK_NONE\"}," +
-                    "{\"category\": \"HARM_CATEGORY_SEXUALLY_EXPLICIT\", \"threshold\": \"BLOCK_NONE\"}," +
-                    "{\"category\": \"HARM_CATEGORY_DANGEROUS_CONTENT\", \"threshold\": \"BLOCK_NONE\"}" +
-                    "]" +
-                    "}";
+            String jsonBody = "{"
+                    + "\"model\": \"llama-3.1-8b-instant\","
+                    + "\"max_tokens\": 512,"
+                    + "\"messages\": [{\"role\": \"user\", \"content\": \"" + escaped + "\"}]"
+                    + "}";
+
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + API_KEY)
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .build();
 
@@ -422,29 +447,20 @@ public class BookController {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(response.body());
 
-            // 3. Handle Errors from the API side
             if (root.has("error")) {
-                return "API Error: " + root.path("error").path("message").asText();
+                return "Error: " + root.path("error").path("message").asText();
             }
 
-            // 4. THE FIX: Precise path navigation for Gemini 1.5
-            // Path: candidates -> [0] -> content -> parts -> [0] -> text
-            JsonNode candidates = root.path("candidates");
-            if (candidates.isArray() && !candidates.isEmpty()) {
-                JsonNode firstCandidate = candidates.get(0);
-                JsonNode parts = firstCandidate.path("content").path("parts");
-
-                if (parts.isArray() && !parts.isEmpty()) {
-                    return parts.get(0).path("text").asText();
-                }
+            // Groq uses OpenAI format: choices[0].message.content
+            JsonNode choices = root.path("choices");
+            if (choices.isArray() && !choices.isEmpty()) {
+                return choices.get(0).path("message").path("content").asText();
             }
 
-            // Helpful debugging if it still fails
-            System.err.println("Unexpected JSON: " + response.body());
-            return "AI Error: The API responded but the message content was hidden.";
+            return "No reply from AI.";
 
         } catch (Exception e) {
-            return "System Error: " + e.getMessage();
+            return "Error: " + e.getMessage();
         }
     }
 
@@ -455,7 +471,8 @@ public class BookController {
         if (focusModeActive) {
             if (sliderSection != null) sliderSection.setVisible(false);
             if (controlsSection != null) controlsSection.setVisible(false);
-            if (focusModeButton != null) focusModeButton.setStyle("-fx-background-color: #4f9eff; -fx-text-fill: white;");
+            if (focusModeButton != null)
+                focusModeButton.setStyle("-fx-background-color: #4f9eff; -fx-text-fill: white;");
         } else {
             if (sliderSection != null) sliderSection.setVisible(true);
             if (controlsSection != null) controlsSection.setVisible(true);
@@ -588,5 +605,35 @@ public class BookController {
 
     private void stopReadingTimer() {
         if (readingTimer != null) readingTimer.stop();
+    }
+
+    @FXML
+    Button zoomResetBtn;
+
+    @FXML
+    public void zoomIn() {
+        zoomLevel = Math.min(zoomLevel + 0.2, 3.0);
+        applyZoom();
+    }
+
+    @FXML
+    public void zoomOut() {
+        zoomLevel = Math.max(zoomLevel - 0.2, 0.3);
+        applyZoom();
+    }
+
+    @FXML
+    public void zoomReset() {
+        zoomLevel = 1.0;
+        applyZoom();
+    }
+
+    private void applyZoom() {
+        if (pdfView == null || pdfView.getScene() == null) return;
+        pdfView.fitWidthProperty().unbind();
+        pdfView.setFitWidth(pdfView.getScene().getWidth() * 0.95 * zoomLevel);
+        if (zoomResetBtn != null) {
+            zoomResetBtn.setText((int) (zoomLevel * 100) + "%");
+        }
     }
 }
