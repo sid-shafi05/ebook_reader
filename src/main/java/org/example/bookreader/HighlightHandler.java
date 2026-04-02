@@ -2,18 +2,59 @@ package org.example.bookreader;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class HighlightHandler {
     private Canvas highlightCanvas;
+    private ImageView pdfView;
     private Map<Integer, List<double[]>> highlights = new HashMap<>();
     private double dragStartX, dragStartY;
+    private int currentPage = 0;
 
     public HighlightHandler(Canvas highlightCanvas) {
         this.highlightCanvas = highlightCanvas;
+    }
+
+    /**
+     * Pass the ImageView so the canvas can stay in sync with its rendered size.
+     * Call this right after constructing the handler (BookController.startSession).
+     */
+    public void setPdfView(ImageView pdfView) {
+        this.pdfView = pdfView;
+        bindCanvasToImageView();
+    }
+
+    /**
+     * Keeps the canvas width/height equal to the ImageView's actual rendered
+     * image bounds (not its fitWidth — those may differ when preserveRatio=true).
+     * We listen to both boundsInParent changes so we react to zoom and page flips.
+     */
+    private void bindCanvasToImageView() {
+        if (pdfView == null || highlightCanvas == null) return;
+
+        pdfView.boundsInParentProperty().addListener((obs, oldB, newB) -> syncCanvasSize());
+        // also sync immediately in case the image is already loaded
+        syncCanvasSize();
+    }
+
+    private void syncCanvasSize() {
+        if (pdfView == null || highlightCanvas == null) return;
+        double w = pdfView.getBoundsInParent().getWidth();
+        double h = pdfView.getBoundsInParent().getHeight();
+        if (w > 0 && h > 0) {
+            highlightCanvas.setWidth(w);
+            highlightCanvas.setHeight(h);
+            // Reposition: canvas must overlay the ImageView exactly.
+            // Both live inside the same StackPane so no offset is needed —
+            // but we do need to redraw after a resize.
+            drawHighlightsForPage(currentPage);
+        }
     }
 
     public void enableHighlight() {
@@ -28,7 +69,7 @@ public class HighlightHandler {
 
         highlightCanvas.setOnMouseDragged(e -> {
             gc.clearRect(0, 0, highlightCanvas.getWidth(), highlightCanvas.getHeight());
-            redrawSaved(gc, getCurrentPageFromCanvas());
+            redrawSaved(gc, currentPage);
             double x = Math.min(dragStartX, e.getX());
             double y = Math.min(dragStartY, e.getY());
             double w = Math.abs(e.getX() - dragStartX);
@@ -43,8 +84,7 @@ public class HighlightHandler {
             double w = Math.abs(e.getX() - dragStartX);
             double h = Math.abs(e.getY() - dragStartY);
             if (w > 5 && h > 5) {
-                int page = getCurrentPageFromCanvas();
-                highlights.computeIfAbsent(page, k -> new java.util.ArrayList<>())
+                highlights.computeIfAbsent(currentPage, k -> new ArrayList<>())
                         .add(new double[]{x, y, w, h});
             }
         });
@@ -65,9 +105,7 @@ public class HighlightHandler {
         }
     }
 
-    // Canvas doesn't know the current page — BookController passes it via drawHighlightsForPage
-    // This is a fallback for internal use during drag
-    private int currentPage = 0;
-    public void setCurrentPage(int page) { this.currentPage = page; }
-    private int getCurrentPageFromCanvas() { return currentPage; }
+    public void setCurrentPage(int page) {
+        this.currentPage = page;
+    }
 }

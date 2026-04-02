@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   StackShelf — Obsidian Premium Theme  (fixed)
+   StackShelf — Obsidian Premium Theme  (legibility + toggle fix)
    ═══════════════════════════════════════════════════════════════ */
 
 /* ─── Root & Global ─────────────────────────────────────────── */
@@ -23,10 +23,9 @@
     -fx-padding: 0 8 20 8;
 }
 
-/* FIX 1: sidebar text readable — was #383850 (invisible on dark) */
 .left-sidebar .button {
     -fx-background-color: transparent;
-    -fx-text-fill: #707090;
+    -fx-text-fill: #9090b0;
     -fx-font-size: 12.5px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
@@ -39,7 +38,7 @@
 
 .left-sidebar .button:hover {
     -fx-background-color: #0f0f1a;
-    -fx-text-fill: #c0c0d8;
+    -fx-text-fill: #d0d0e8;
 }
 
 .left-sidebar .button:pressed {
@@ -49,7 +48,7 @@
 
 .left-sidebar .button.active {
     -fx-background-color: #0e0e18;
-    -fx-text-fill: #e8e8f0;
+    -fx-text-fill: #f0f0ff;
     -fx-border-color: transparent transparent transparent #c8a96e;
     -fx-border-width: 0 0 0 2;
     -fx-background-radius: 0 8 8 0;
@@ -81,8 +80,8 @@
 /* ─── Search Field ────────────────────────────────────────────── */
 .text-field {
     -fx-background-color: #0a0a12;
-    -fx-text-fill: #d0d2e0;
-    -fx-prompt-text-fill: #353550;
+    -fx-text-fill: #e0e2f0;
+    -fx-prompt-text-fill: #505068;
     -fx-font-size: 13px;
     -fx-background-radius: 8;
     -fx-border-radius: 8;
@@ -98,7 +97,7 @@
 
 /* ─── Sort Labels ─────────────────────────────────────────────── */
 .sort-label {
-    -fx-text-fill: #505068;
+    -fx-text-fill: #8080a0;
     -fx-cursor: hand;
     -fx-font-size: 11.5px;
     -fx-font-weight: bold;
@@ -120,8 +119,8 @@
 
 .sort-container { -fx-padding: 10 0 0 10; }
 
-/* ─── Global Label — readable ─────────────────────────────────── */
-.label { -fx-text-fill: #b0b0c8; }
+/* ─── Global Label ────────────────────────────────────────────── */
+.label { -fx-text-fill: #c8c8e0; }
 
 /* ═══════════════════════════════════════════════════════════════
    BOOK CARD
@@ -151,20 +150,19 @@
 
 .book-cover-placeholder { -fx-font-size: 36px; }
 
-/* FIX 1: card text legible */
 .book-card-title {
-    -fx-text-fill: #d0d2e0;
+    -fx-text-fill: #e8eaf8;
     -fx-font-size: 11px;
     -fx-font-weight: bold;
 }
 
 .book-card-date {
-    -fx-text-fill: #505068;
+    -fx-text-fill: #7878a0;
     -fx-font-size: 9px;
 }
 
 .book-card-pages {
-    -fx-text-fill: #606078;
+    -fx-text-fill: #9090b8;
     -fx-font-size: 10px;
 }
 
@@ -203,12 +201,12 @@
     -fx-font-size: 11px;
     -fx-cursor: hand;
     -fx-padding: 2 5 2 5;
-    -fx-text-fill: #606078;
+    -fx-text-fill: #9090b0;
     -fx-font-weight: bold;
 }
 
 .heart-btn-active:hover   { -fx-background-color: #aa2040; }
-.heart-btn-inactive:hover { -fx-background-color: #141420; -fx-text-fill: #aaaacc; }
+.heart-btn-inactive:hover { -fx-background-color: #141420; -fx-text-fill: #c0c0e0; }
 
 /* Delete button */
 .delete-button {
@@ -228,8 +226,8 @@
    CATEGORY PAGE
    ═══════════════════════════════════════════════════════════════ */
 
-.cat-arrow  { -fx-text-fill: #404058; -fx-font-size: 11px; }
-.cat-title  { -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #606080; }
+.cat-arrow  { -fx-text-fill: #7070a0; -fx-font-size: 11px; }
+.cat-title  { -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #a0a0c8; }
 
 .cat-header {
     -fx-padding: 12 20 8 20;
@@ -265,9 +263,9 @@
     -fx-padding: 8 12;
 }
 
-.chat-sender-label { -fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: #404058; }
-.chat-text-user    { -fx-font-size: 11px; -fx-text-fill: #8ab4d8; }
-.chat-text-ai      { -fx-font-size: 11px; -fx-text-fill: #c0c0d8; }
+.chat-sender-label { -fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: #7070a0; }
+.chat-text-user    { -fx-font-size: 11px; -fx-text-fill: #a0cce8; }
+.chat-text-ai      { -fx-font-size: 11px; -fx-text-fill: #d0d0f0; }
 
 /* ═══════════════════════════════════════════════════════════════
    STATS PAGE
@@ -277,7 +275,7 @@
     -fx-padding: 7 15;
     -fx-font-size: 11px;
     -fx-background-color: #0a0a14;
-    -fx-text-fill: #606078;
+    -fx-text-fill: #9090b8;
     -fx-border-radius: 5;
     -fx-background-radius: 5;
     -fx-cursor: hand;
@@ -322,7 +320,7 @@
 }
 
 .bookmark-dialog-title    { -fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #c8a96e; }
-.bookmark-dialog-subtitle { -fx-font-size: 12px; -fx-text-fill: #505068; }
+.bookmark-dialog-subtitle { -fx-font-size: 12px; -fx-text-fill: #8888a8; }
 
 .bookmark-empty-box {
     -fx-background-color: #0a0a14;
@@ -330,9 +328,9 @@
     -fx-padding: 30 20 30 20;
 }
 
-.bookmark-empty-title { -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #505068; }
-.bookmark-empty-hint  { -fx-font-size: 11px; -fx-text-fill: #383850; }
-.bookmark-instruction { -fx-font-size: 12px; -fx-text-fill: #707090; }
+.bookmark-empty-title { -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8888a8; }
+.bookmark-empty-hint  { -fx-font-size: 11px; -fx-text-fill: #6868a0; }
+.bookmark-instruction { -fx-font-size: 12px; -fx-text-fill: #a0a0c8; }
 
 .bookmark-list {
     -fx-background-color: #080812;
@@ -342,7 +340,7 @@
     -fx-border-radius: 7;
 }
 
-.bookmark-list .list-cell              { -fx-background-color: transparent; -fx-text-fill: #707090; -fx-padding: 8 14; }
+.bookmark-list .list-cell              { -fx-background-color: transparent; -fx-text-fill: #a0a0c8; -fx-padding: 8 14; }
 .bookmark-list .list-cell:hover        { -fx-background-color: #0e0e1c; -fx-text-fill: #c8a96e; }
 .bookmark-list .list-cell:selected     { -fx-background-color: #141420; -fx-text-fill: #e8d9b8; }
 
@@ -365,7 +363,7 @@
 
 .bookmark-cancel-btn {
     -fx-background-color: #080810;
-    -fx-text-fill: #505068;
+    -fx-text-fill: #9090b8;
     -fx-background-radius: 7;
     -fx-border-radius: 7;
     -fx-border-color: #141424;
@@ -377,7 +375,7 @@
     -fx-pref-height: 38;
 }
 
-.bookmark-cancel-btn:hover { -fx-background-color: #0c0c18; -fx-text-fill: #a0a0c0; }
+.bookmark-cancel-btn:hover { -fx-background-color: #0c0c18; -fx-text-fill: #c0c0e0; }
 
 /* ═══════════════════════════════════════════════════════════════
    BOOK-ADDER DIALOG
@@ -393,7 +391,7 @@
     -fx-background-radius: 12;
 }
 
-.choice-dialog > .dialog-pane .label { -fx-text-fill: #c0c0d8; }
+.choice-dialog > .dialog-pane .label { -fx-text-fill: #d8d8f0; }
 
 /* ═══════════════════════════════════════════════════════════════
    READER WINDOW
@@ -401,7 +399,7 @@
 
 .nav-button {
     -fx-background-color: #0a0a14;
-    -fx-text-fill: #707090;
+    -fx-text-fill: #a0a0c8;
     -fx-background-radius: 7;
     -fx-cursor: hand;
     -fx-font-weight: bold;
@@ -412,15 +410,27 @@
 
 .nav-button:hover {
     -fx-background-color: #0e0e1c;
-    -fx-text-fill: #e0e0f0;
+    -fx-text-fill: #f0f0ff;
     -fx-border-color: #c8a96e;
 }
 
 .nav-button:pressed { -fx-scale-x: 0.96; -fx-scale-y: 0.96; }
 
+/* Active state for color-filter menu items (Normal / Sepia toggle) */
+.nav-button-active {
+    -fx-background-color: #1a1508;
+    -fx-text-fill: #c8a96e;
+    -fx-background-radius: 7;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-border-color: #c8a96e;
+    -fx-border-width: 1;
+    -fx-border-radius: 7;
+}
+
 .back-button {
     -fx-background-color: #0c0c16;
-    -fx-text-fill: #707090;
+    -fx-text-fill: #a0a0c8;
     -fx-background-radius: 7;
     -fx-cursor: hand;
     -fx-font-weight: bold;
@@ -437,7 +447,7 @@
 
 .back-button:pressed { -fx-scale-x: 0.97; -fx-scale-y: 0.97; }
 
-/* BOOKMARK BUTTON — gold star, always visible */
+/* BOOKMARK BUTTON */
 .bookmark-button {
     -fx-background-color: #14100a;
     -fx-text-fill: #c8a96e;
@@ -464,7 +474,7 @@
 
 .view-bookmarks-button {
     -fx-background-color: #0c0c18;
-    -fx-text-fill: #707090;
+    -fx-text-fill: #a0a0c8;
     -fx-background-radius: 7;
     -fx-border-radius: 7;
     -fx-border-color: #181828;
@@ -481,38 +491,17 @@
 
 .view-bookmarks-button:pressed { -fx-scale-x: 0.97; -fx-scale-y: 0.97; }
 
-/* ─── Slider — FIX 3: filled track left of thumb ──────────────── */
-/*
-   JavaFX's Modena skin renders the slider track as a single rect.
-   To get the "filled left portion" effect we layer TWO background
-   colors on the track using -fx-background-color with two values:
-     1st = accent color  (painted at full width, underneath)
-     2nd = dark color    (inset from the left by 0px — covers the
-           right portion dynamically via the thumb's clip)
-   This does NOT work purely in CSS because JavaFX doesn't expose
-   the fill ratio to CSS. The proper fix is done in PageNavigator.java
-   by adding a ChangeListener that updates a style on the slider.
-   See the companion PageNavigator patch below for the Java fix.
+/* ─── Color-filter menu item active states ────────────────────── */
+.color-filter-active {
+    -fx-background-color: #1a1508;
+    -fx-text-fill: #c8a96e;
+    -fx-font-weight: bold;
+}
 
-   CSS side: we just style the track and thumb cleanly.
-*/
+/* ─── Slider ──────────────────────────────────────────────────── */
 .slider .track {
     -fx-background-color: #181828;
     -fx-background-radius: 3;
-    -fx-pref-height: 4px;
-}
-
-/* Filled-track look: JavaFX exposes .slider .track with a
-   -fx-background-color that accepts multiple layers.
-   Layer 0 = filled (gold), layer 1 = empty (dark).
-   We use background-insets to clip layer 1 from the left.
-   The thumb position in % drives the inset — set via inline
-   style from Java (see PageNavigator patch). Default shows full
-   gold until Java sets it. */
-.slider-filled-track-base {
-    -fx-background-color: #c8a96e, #181828;
-    -fx-background-insets: 0, 0 0 0 0;
-    -fx-background-radius: 3, 3;
     -fx-pref-height: 4px;
 }
 
@@ -540,13 +529,13 @@
 /* ─── TextArea ────────────────────────────────────────────────── */
 .text-area {
     -fx-background-color: #060610;
-    -fx-text-fill: #b0b0c8;
+    -fx-text-fill: #d0d0e8;
     -fx-font-size: 12px;
     -fx-background-radius: 7;
     -fx-border-color: #101020;
     -fx-border-width: 1;
     -fx-border-radius: 7;
-    -fx-prompt-text-fill: #252538;
+    -fx-prompt-text-fill: #404060;
 }
 
 .text-area:focused { -fx-border-color: #c8a96e; }
@@ -562,9 +551,16 @@
     -fx-padding: 4;
 }
 
-.menu-item { -fx-background-color: transparent; -fx-text-fill: #707090; -fx-padding: 8 16; -fx-background-radius: 6; }
+.menu-item { -fx-background-color: transparent; -fx-text-fill: #a0a0c8; -fx-padding: 8 16; -fx-background-radius: 6; }
 .menu-item:hover, .menu-item:focused { -fx-background-color: #0c0c18; -fx-text-fill: #c8a96e; }
 .separator > .line, .separator .line { -fx-border-color: #101018; -fx-border-width: 1 0 0 0; }
+
+/* active menu item (checked/selected filter mode) */
+.menu-item-active {
+    -fx-background-color: #141408;
+    -fx-text-fill: #c8a96e;
+    -fx-font-weight: bold;
+}
 
 /* ─── Alert / Dialog ──────────────────────────────────────────── */
 .dialog-pane {
@@ -583,8 +579,8 @@
     -fx-padding: 18 24;
 }
 
-.dialog-pane .header-panel .label { -fx-text-fill: #d0d2e0; -fx-font-size: 14px; -fx-font-weight: bold; }
-.dialog-pane .content.label       { -fx-text-fill: #707090; -fx-padding: 20 24; }
+.dialog-pane .header-panel .label { -fx-text-fill: #e8e8f8; -fx-font-size: 14px; -fx-font-weight: bold; }
+.dialog-pane .content.label       { -fx-text-fill: #a0a0c8; -fx-padding: 20 24; }
 .dialog-pane .button-bar          { -fx-background-color: transparent; -fx-padding: 0 24 18 24; }
 
 .dialog-pane .button-bar .button {
@@ -603,17 +599,17 @@
 
 .dialog-pane .button-bar .button:cancel-button {
     -fx-background-color: #080810;
-    -fx-text-fill: #505068;
+    -fx-text-fill: #9090b8;
     -fx-border-color: #141424;
     -fx-border-width: 1;
 }
 
-.dialog-pane .button-bar .button:cancel-button:hover { -fx-background-color: #0c0c18; -fx-text-fill: #a0a0c0; }
+.dialog-pane .button-bar .button:cancel-button:hover { -fx-background-color: #0c0c18; -fx-text-fill: #c0c0e0; }
 
 /* ─── ComboBox ────────────────────────────────────────────────── */
 .combo-box {
     -fx-background-color: #08080f;
-    -fx-text-fill: #b0b0c8;
+    -fx-text-fill: #d0d0e8;
     -fx-border-color: #141424;
     -fx-border-width: 1;
     -fx-border-radius: 7;
@@ -622,16 +618,16 @@
 }
 
 .combo-box:hover { -fx-border-color: #c8a96e; }
-.combo-box .list-cell { -fx-background-color: transparent; -fx-text-fill: #b0b0c8; }
+.combo-box .list-cell { -fx-background-color: transparent; -fx-text-fill: #d0d0e8; }
 .combo-box-popup .list-view { -fx-background-color: #08080f; -fx-border-color: #141424; -fx-border-width: 1; }
-.combo-box-popup .list-cell { -fx-background-color: transparent; -fx-text-fill: #707090; -fx-padding: 6 12; }
+.combo-box-popup .list-cell { -fx-background-color: transparent; -fx-text-fill: #a0a0c8; -fx-padding: 6 12; }
 .combo-box-popup .list-cell:hover    { -fx-background-color: #0c0c18; -fx-text-fill: #c8a96e; }
 .combo-box-popup .list-cell:selected { -fx-background-color: #141420; -fx-text-fill: #e8d9b8; }
 
 /* ─── ListView (generic) ──────────────────────────────────────── */
 .list-view { -fx-background-color: #060610; -fx-border-color: #101020; -fx-border-width: 1; -fx-border-radius: 7; -fx-background-radius: 7; }
-.list-cell              { -fx-background-color: transparent; -fx-text-fill: #707090; -fx-padding: 8 14; }
-.list-cell:hover        { -fx-background-color: #0c0c18; -fx-text-fill: #d0d0e8; }
+.list-cell              { -fx-background-color: transparent; -fx-text-fill: #a0a0c8; -fx-padding: 8 14; }
+.list-cell:hover        { -fx-background-color: #0c0c18; -fx-text-fill: #d8d8f0; }
 .list-cell:selected     { -fx-background-color: #141420; -fx-text-fill: #c8a96e; }
 
 /* ─── Scrollbar ───────────────────────────────────────────────── */
@@ -645,22 +641,22 @@
 .scroll-pane > .viewport       { -fx-background-color: transparent; }
 
 /* ─── Toggle Button ───────────────────────────────────────────── */
-.toggle-button { -fx-background-color: #08080f; -fx-text-fill: #505068; -fx-border-color: #101020; -fx-border-width: 1; -fx-cursor: hand; -fx-padding: 7 14; -fx-background-radius: 6; }
+.toggle-button { -fx-background-color: #08080f; -fx-text-fill: #9090b8; -fx-border-color: #101020; -fx-border-width: 1; -fx-cursor: hand; -fx-padding: 7 14; -fx-background-radius: 6; }
 .toggle-button:hover    { -fx-background-color: #0c0c18; -fx-text-fill: #c8a96e; }
 .toggle-button:selected { -fx-background-color: #1a1508; -fx-text-fill: #c8a96e; -fx-border-color: #c8a96e; }
 
 /* ─── Tooltip ─────────────────────────────────────────────────── */
-.tooltip { -fx-background-color: #08080f; -fx-text-fill: #b0b0c8; -fx-border-color: #141424; -fx-border-width: 1; -fx-background-radius: 6; -fx-border-radius: 6; -fx-font-size: 11px; }
+.tooltip { -fx-background-color: #08080f; -fx-text-fill: #d0d0e8; -fx-border-color: #141424; -fx-border-width: 1; -fx-background-radius: 6; -fx-border-radius: 6; -fx-font-size: 11px; }
 
 /* ─── Charts ──────────────────────────────────────────────────── */
 .chart-plot-background       { -fx-background-color: transparent; }
 .chart                       { -fx-background-color: transparent; -fx-padding: 5; }
 .chart-vertical-grid-lines   { -fx-stroke: rgba(255,255,255,0.02); }
 .chart-horizontal-grid-lines { -fx-stroke: rgba(255,255,255,0.04); }
-.axis                        { -fx-tick-label-fill: #505068; }
-.axis-label                  { -fx-text-fill: #505068; }
-.chart-pie-label             { -fx-fill: #a0a0b8; -fx-font-size: 11px; }
-.chart-legend-item           { -fx-text-fill: #707090; }
+.axis                        { -fx-tick-label-fill: #8080a8; }
+.axis-label                  { -fx-text-fill: #8080a8; }
+.chart-pie-label             { -fx-fill: #c0c0d8; -fx-font-size: 11px; }
+.chart-legend-item           { -fx-text-fill: #a0a0c8; }
 .chart-legend                { -fx-background-color: transparent; }
 
 .default-color0.chart-series-line { -fx-stroke: #c8a96e; -fx-stroke-width: 2px; }
@@ -669,7 +665,7 @@
 /* ─── Misc ────────────────────────────────────────────────────── */
 .blue-button {
     -fx-background-color: #0a0a14;
-    -fx-text-fill: #707090;
+    -fx-text-fill: #a0a0c8;
     -fx-background-radius: 6;
     -fx-font-weight: bold;
     -fx-padding: 7 14;

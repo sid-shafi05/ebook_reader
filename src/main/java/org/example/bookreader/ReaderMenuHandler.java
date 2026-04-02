@@ -3,7 +3,6 @@ package org.example.bookreader;
 import javafx.geometry.Bounds;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Button;
 import javafx.scene.effect.Blend;
 import javafx.scene.effect.BlendMode;
@@ -20,7 +19,6 @@ public class ReaderMenuHandler {
     private HBox sliderSection;
     private HBox controlsSection;
     private boolean focusModeActive = false;
-    private ColorAdjust colorAdjust = new ColorAdjust();
     private ContextMenu currentMenu;
     private Runnable onNotebookToggle;
 
@@ -40,7 +38,7 @@ public class ReaderMenuHandler {
     public void toggleFocusMode() {
         focusModeActive = !focusModeActive;
         if (focusModeActive) {
-            if (sliderSection != null)  sliderSection.setVisible(false);
+            if (sliderSection != null)   sliderSection.setVisible(false);
             if (controlsSection != null) controlsSection.setVisible(false);
             if (focusModeButton != null)
                 focusModeButton.setStyle(
@@ -49,20 +47,16 @@ public class ReaderMenuHandler {
                                 "-fx-background-radius: 7; -fx-border-radius: 7;"
                 );
         } else {
-            if (sliderSection != null)  sliderSection.setVisible(true);
+            if (sliderSection != null)   sliderSection.setVisible(true);
             if (controlsSection != null) controlsSection.setVisible(true);
             if (focusModeButton != null) focusModeButton.setStyle("");
         }
     }
 
-    public void setColorFilterNormal() {
-        if (pdfView != null) pdfView.setEffect(null);
-    }
-
-    // Dark mode removed — kept as no-op so FXML bindings don't break
-    public void setColorFilterDark() { }
-
-    public void setColorFilterSepia() {
+    // Kept as no-ops so any existing FXML action bindings don't break
+    public void setColorFilterNormal() { if (pdfView != null) pdfView.setEffect(null); }
+    public void setColorFilterDark()   { }
+    public void setColorFilterSepia()  {
         ColorAdjust sepia = new ColorAdjust();
         sepia.setHue(-0.1);
         sepia.setBrightness(0.08);
@@ -81,14 +75,6 @@ public class ReaderMenuHandler {
 
         ContextMenu menu = new ContextMenu();
 
-        // ── Color modes (Normal + Reading/Sepia only; Dark removed) ──
-        MenuItem normalMode = new MenuItem("○  Normal");
-        normalMode.setOnAction(e -> setColorFilterNormal());
-
-        MenuItem sepiaMode = new MenuItem("☕  Reading Mode (Sepia)");
-        sepiaMode.setOnAction(e -> setColorFilterSepia());
-
-        // ── Notebook ──────────────────────────────────────────────────
         MenuItem notebookItem = new MenuItem("✎  Notebook");
         notebookItem.setOnAction(e -> {
             menu.hide();
@@ -96,9 +82,17 @@ public class ReaderMenuHandler {
             if (onNotebookToggle != null) onNotebookToggle.run();
         });
 
-        menu.getItems().addAll(normalMode, sepiaMode, new SeparatorMenuItem(), notebookItem);
+        menu.getItems().add(notebookItem);
 
         if (menuButton != null) {
+            javafx.scene.Scene scene = menuButton.getScene();
+            if (scene != null) {
+                String css = getClass()
+                        .getResource("/org/example/bookreader/application.css")
+                        .toExternalForm();
+                if (!scene.getStylesheets().contains(css))
+                    scene.getStylesheets().add(css);
+            }
             Bounds bounds = menuButton.localToScreen(menuButton.getBoundsInLocal());
             menu.show(menuButton, bounds.getCenterX(), bounds.getCenterY() + 20);
             currentMenu = menu;

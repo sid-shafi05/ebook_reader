@@ -1,7 +1,6 @@
 package org.example.bookreader;
 
 import javafx.fxml.FXML;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -25,7 +24,6 @@ public class BookController {
     @FXML private HBox controlsSection;
     @FXML private VBox notebookPanel;
     @FXML private TextArea notesTextArea;
-    @FXML private Canvas highlightCanvas;
     @FXML private VBox chatPanel;
     @FXML private VBox chatMessages;
     @FXML private TextField chatInput;
@@ -33,11 +31,9 @@ public class BookController {
 
     private FileTypeManager fileTypeManager;
 
-    // Handlers
     private SessionManager sessionManager;
     private PageNavigator navigator;
     private BookmarkHandler bookmarkHandler;
-    private HighlightHandler highlightHandler;
     private ChatHandler chatHandler;
     private ReaderMenuHandler menuHandler;
     private NotebookHandler notebookHandler;
@@ -53,21 +49,18 @@ public class BookController {
 
         int startPage = book.getLastReadPageNumber();
 
-        // Init all handlers
         navigator = new PageNavigator(pdfView, pageNumberLabel, bookTitleLabel,
                 pageSlider, sliderMinLabel, sliderMaxLabel,
                 sliderCurrentPageLabel, pageScrollPane);
         navigator.setOnPageChanged(() -> afterPageChange(book));
         navigator.init(book, startPage, fileTypeManager);
+        navigator.setZoomResetBtn(zoomResetBtn);
 
         sessionManager = new SessionManager();
         sessionManager.startSession(book, startPage);
 
         bookmarkHandler = new BookmarkHandler(bookmarkButton, navigator);
         bookmarkHandler.setCurrentBook(book);
-
-        highlightHandler = new HighlightHandler(highlightCanvas);
-        highlightHandler.setCurrentPage(startPage);
 
         chatHandler = new ChatHandler(chatPanel, chatMessages, chatInput, navigator);
         chatHandler.setCurrentBook(book);
@@ -79,19 +72,14 @@ public class BookController {
         notebookHandler = new NotebookHandler(notebookPanel, notesTextArea);
         notebookHandler.setCurrentBook(book);
 
-        // First render
         navigator.renderCurrentPage(book);
         bookmarkHandler.updateBookmarkButtonStyle();
-        highlightHandler.drawHighlightsForPage(startPage);
     }
 
-    // Called after every page change to sync dependent handlers
     private void afterPageChange(Book book) {
         int page = navigator.getCurrentPage();
         sessionManager.updateHighestPage(page);
         bookmarkHandler.updateBookmarkButtonStyle();
-        highlightHandler.setCurrentPage(page);
-        highlightHandler.drawHighlightsForPage(page);
     }
 
     @FXML public void nextButtonLogic() {
@@ -122,10 +110,6 @@ public class BookController {
         bookmarkHandler.showBookmarksPanel();
         navigator.renderCurrentPage(sessionManager.getCurrentBook());
         afterPageChange(sessionManager.getCurrentBook());
-    }
-
-    @FXML public void enableHighlight() {
-        highlightHandler.enableHighlight();
     }
 
     @FXML public void toggleChatPanel() {
