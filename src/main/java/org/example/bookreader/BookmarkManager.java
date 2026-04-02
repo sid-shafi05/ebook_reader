@@ -20,9 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Manager for bookmark operations. Persists to JSON file.
- */
 public class BookmarkManager {
     private static final String BOOKMARKS_FILE = "bookmarks.json";
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -34,8 +31,8 @@ public class BookmarkManager {
     public static void addBookmark(Bookmark bookmark) {
         try {
             List<Bookmark> bookmarks = loadBookmarks();
-            bookmarks.removeIf(b -> b.getBookPath().equals(bookmark.getBookPath()) &&
-                                     b.getPageNumber() == bookmark.getPageNumber());
+            bookmarks.removeIf(b -> b.getBookPath().equals(bookmark.getBookPath())
+                    && b.getPageNumber() == bookmark.getPageNumber());
             bookmarks.add(bookmark);
             saveBookmarks(bookmarks);
         } catch (Exception e) {
@@ -46,8 +43,8 @@ public class BookmarkManager {
     public static void removeBookmark(String bookPath, int pageNumber) {
         try {
             List<Bookmark> bookmarks = loadBookmarks();
-            bookmarks.removeIf(b -> b.getBookPath().equals(bookPath) &&
-                                    b.getPageNumber() == pageNumber);
+            bookmarks.removeIf(b -> b.getBookPath().equals(bookPath)
+                    && b.getPageNumber() == pageNumber);
             saveBookmarks(bookmarks);
         } catch (Exception e) {
             System.err.println("Error removing bookmark: " + e.getMessage());
@@ -56,8 +53,7 @@ public class BookmarkManager {
 
     public static List<Bookmark> getBookmarksForBook(String bookPath) {
         try {
-            List<Bookmark> allBookmarks = loadBookmarks();
-            return allBookmarks.stream()
+            return loadBookmarks().stream()
                     .filter(b -> b.getBookPath().equals(bookPath))
                     .sorted((b1, b2) -> Integer.compare(b1.getPageNumber(), b2.getPageNumber()))
                     .collect(Collectors.toList());
@@ -68,13 +64,12 @@ public class BookmarkManager {
     }
 
     public static boolean isBookmarked(String bookPath, int pageNumber) {
-        List<Bookmark> bookmarks = getBookmarksForBook(bookPath);
-        return bookmarks.stream().anyMatch(b -> b.getPageNumber() == pageNumber);
+        return getBookmarksForBook(bookPath).stream()
+                .anyMatch(b -> b.getPageNumber() == pageNumber);
     }
 
     public static Bookmark getBookmark(String bookPath, int pageNumber) {
-        List<Bookmark> bookmarks = getBookmarksForBook(bookPath);
-        return bookmarks.stream()
+        return getBookmarksForBook(bookPath).stream()
                 .filter(b -> b.getPageNumber() == pageNumber)
                 .findFirst().orElse(null);
     }
@@ -109,8 +104,8 @@ public class BookmarkManager {
     }
 
     /**
-     * Show modern bookmark dialog and return selected page number.
-     * Returns -1 if no page selected.
+     * Show the bookmark dialog. Returns the selected page number, or -1 if none.
+     * All visual styling is done via CSS classes — no inline setStyle() calls.
      */
     public static int showBookmarkDialog(String bookTitle, List<Bookmark> bookmarks) {
         Stage dialog = new Stage();
@@ -120,74 +115,64 @@ public class BookmarkManager {
 
         final int[] selectedPage = {-1};
 
-        // Main container
+        // ── Root container ───────────────────────────────────────────────
         VBox root = new VBox(0);
-        root.setStyle("-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 20, 0, 0, 5);");
+        root.getStyleClass().add("bookmark-dialog-root");
         root.setPrefWidth(450);
         root.setMaxWidth(450);
 
-        // Header
+        // ── Header ───────────────────────────────────────────────────────
         HBox header = new HBox();
         header.setAlignment(Pos.CENTER);
-        header.setStyle("-fx-background-color: linear-gradient(to right, #9C27B0, #673AB7); -fx-background-radius: 15 15 0 0;");
-        header.setPadding(new Insets(25, 20, 25, 20));
+        header.getStyleClass().add("bookmark-dialog-header");
+        header.setPadding(new Insets(22, 20, 22, 20));
 
         Label titleLabel = new Label("🔖 Bookmarks");
-        titleLabel.setFont(Font.font("Segoe UI", 26));
-        titleLabel.setTextFill(Color.WHITE);
-        titleLabel.setStyle("-fx-font-weight: bold;");
+        titleLabel.getStyleClass().add("bookmark-dialog-title");
         header.getChildren().add(titleLabel);
 
-        // Subtitle
+        // ── Subtitle ──────────────────────────────────────────────────────
         HBox subtitleBox = new HBox();
         subtitleBox.setAlignment(Pos.CENTER);
-        subtitleBox.setPadding(new Insets(15, 20, 10, 20));
+        subtitleBox.setPadding(new Insets(14, 20, 10, 20));
 
         Label bookLabel = new Label(bookTitle);
-        bookLabel.setFont(Font.font("Segoe UI", 14));
-        bookLabel.setTextFill(Color.rgb(100, 100, 100));
+        bookLabel.getStyleClass().add("bookmark-dialog-subtitle");
         subtitleBox.getChildren().add(bookLabel);
 
-        // Content area
+        // ── Content ───────────────────────────────────────────────────────
         VBox content = new VBox(15);
         content.setPadding(new Insets(20, 25, 25, 25));
         content.setAlignment(Pos.TOP_CENTER);
 
         if (bookmarks.isEmpty()) {
-            // No bookmarks message
             VBox emptyBox = new VBox(15);
             emptyBox.setAlignment(Pos.CENTER);
             emptyBox.setPadding(new Insets(30, 20, 30, 20));
-            emptyBox.setStyle("-fx-background-color: #f5f5f5; -fx-background-radius: 10;");
+            emptyBox.getStyleClass().add("bookmark-empty-box");
 
             Label emptyIcon = new Label("📑");
-            emptyIcon.setFont(Font.font(48));
+            emptyIcon.setStyle("-fx-font-size: 48px;");
 
             Label emptyLabel = new Label("No Bookmarks Yet");
-            emptyLabel.setFont(Font.font("Segoe UI", 16));
-            emptyLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #666666;");
+            emptyLabel.getStyleClass().add("bookmark-empty-title");
 
             Label emptyHint = new Label("Click the 🔖 button while reading\nto bookmark a page!");
-            emptyHint.setFont(Font.font("Segoe UI", 12));
-            emptyHint.setTextFill(Color.rgb(120, 120, 120));
+            emptyHint.getStyleClass().add("bookmark-empty-hint");
 
             emptyBox.getChildren().addAll(emptyIcon, emptyLabel, emptyHint);
             content.getChildren().add(emptyBox);
         } else {
-            // Bookmarks list
             Label instructionLabel = new Label("Select a page to jump to:");
-            instructionLabel.setFont(Font.font("Segoe UI", 13));
-            instructionLabel.setTextFill(Color.rgb(80, 80, 80));
+            instructionLabel.getStyleClass().add("bookmark-instruction");
 
             ListView<String> listView = new ListView<>();
+            listView.getStyleClass().add("bookmark-list");
             listView.setPrefHeight(200);
-            listView.setStyle("-fx-background-radius: 8; -fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-border-radius: 8;");
 
-            for (Bookmark bookmark : bookmarks) {
+            for (Bookmark bookmark : bookmarks)
                 listView.getItems().add("📄 Page " + (bookmark.getPageNumber() + 1));
-            }
 
-            // Double-click to select
             listView.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2) {
                     int index = listView.getSelectionModel().getSelectedIndex();
@@ -201,20 +186,14 @@ public class BookmarkManager {
             content.getChildren().addAll(instructionLabel, listView);
         }
 
-        // Buttons
+        // ── Buttons ───────────────────────────────────────────────────────
         HBox buttonBox = new HBox(15);
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.setPadding(new Insets(0, 25, 25, 25));
 
         if (!bookmarks.isEmpty()) {
             Button okButton = new Button("Jump to Page");
-            okButton.setFont(Font.font("Segoe UI", 13));
-            okButton.setPrefWidth(140);
-            okButton.setPrefHeight(40);
-            okButton.setStyle("-fx-background-color: #9C27B0; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand;");
-            okButton.setOnMouseEntered(e -> okButton.setStyle("-fx-background-color: #7B1FA2; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand;"));
-            okButton.setOnMouseExited(e -> okButton.setStyle("-fx-background-color: #9C27B0; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand;"));
-
+            okButton.getStyleClass().add("bookmark-ok-btn");
             okButton.setOnAction(e -> {
                 ListView<String> lv = (ListView<String>) content.getChildren().get(1);
                 int index = lv.getSelectionModel().getSelectedIndex();
@@ -223,28 +202,26 @@ public class BookmarkManager {
                     dialog.close();
                 }
             });
-
             buttonBox.getChildren().add(okButton);
         }
 
         Button cancelButton = new Button(bookmarks.isEmpty() ? "Close" : "Cancel");
-        cancelButton.setFont(Font.font("Segoe UI", 13));
-        cancelButton.setPrefWidth(140);
-        cancelButton.setPrefHeight(40);
-        cancelButton.setStyle("-fx-background-color: #f5f5f5; -fx-text-fill: #666666; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand; -fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-border-radius: 8;");
-        cancelButton.setOnMouseEntered(e -> cancelButton.setStyle("-fx-background-color: #e0e0e0; -fx-text-fill: #666666; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand; -fx-border-color: #cccccc; -fx-border-width: 1; -fx-border-radius: 8;"));
-        cancelButton.setOnMouseExited(e -> cancelButton.setStyle("-fx-background-color: #f5f5f5; -fx-text-fill: #666666; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand; -fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-border-radius: 8;"));
+        cancelButton.getStyleClass().add("bookmark-cancel-btn");
         cancelButton.setOnAction(e -> dialog.close());
-
         buttonBox.getChildren().add(cancelButton);
 
-        // Assemble everything
+        // ── Assemble ──────────────────────────────────────────────────────
         root.getChildren().addAll(header, subtitleBox, content, buttonBox);
 
         Scene scene = new Scene(root);
         scene.setFill(Color.TRANSPARENT);
-        dialog.setScene(scene);
 
+        // Load the app stylesheet so CSS classes resolve
+        String css = BookmarkManager.class.getResource(
+                "/org/example/bookreader/application.css").toExternalForm();
+        scene.getStylesheets().add(css);
+
+        dialog.setScene(scene);
         dialog.showAndWait();
         return selectedPage[0];
     }

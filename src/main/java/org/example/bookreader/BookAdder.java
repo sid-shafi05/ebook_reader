@@ -53,9 +53,13 @@ public class BookAdder {
             genreDialog.setTitle("Add to Library");
             genreDialog.setHeaderText("Select a genre for: " + bookTitle);
             genreDialog.setContentText("Genre:");
-            DialogPane dp = genreDialog.getDialogPane();
-            dp.setStyle("-fx-background-color: #1e1e2e; -fx-font-family: 'Segoe UI'; -fx-font-size: 13px;");
-            dp.lookupAll(".label").forEach(n -> n.setStyle("-fx-text-fill: #f5f5f5;"));
+
+            // Use CSS class instead of inline setStyle()
+            // "choice-dialog" class is defined in application.css
+            genreDialog.getDialogPane().getStylesheets().add(
+                    getClass().getResource("/org/example/bookreader/application.css").toExternalForm()
+            );
+            genreDialog.getDialogPane().getStyleClass().add("choice-dialog");
 
             Optional<String> genreResult = genreDialog.showAndWait();
             if (genreResult.isEmpty()) return;

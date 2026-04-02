@@ -130,9 +130,7 @@ public class Controller {
         setActiveStyle(statsBtn);
     }
 
-    @FXML public void onAddBookButtonClick() {
-        bookAdder.addBook();
-    }
+    @FXML public void onAddBookButtonClick() { bookAdder.addBook(); }
 
     @FXML public void sortByTitle() {
         setActiveSort(titleLabel);
@@ -158,9 +156,7 @@ public class Controller {
         libraryManager.sortByProgress();
     }
 
-    public void refreshBookGrid() {
-        libraryManager.refreshBookGrid();
-    }
+    public void refreshBookGrid() { libraryManager.refreshBookGrid(); }
 
     private void clearSearch() {
         suppressSearch = true;
@@ -221,10 +217,7 @@ public class Controller {
         }
     }
 
-    // Called by LibraryManager/CatController to open a book
-    public void openBook(Book book) {
-        loadReaderScreen(book);
-    }
+    public void openBook(Book book) { loadReaderScreen(book); }
 
     @FXML public void setDailyTarget() {
         int current = getDailyTarget();
@@ -262,17 +255,18 @@ public class Controller {
         return 60;
     }
 
-    // ---- Book tile creation (kept here since it touches UI + Controller state) ----
+    // ── Book tile (all inline styles removed — CSS classes used instead) ──
     VBox createBookTile(Book book) {
         VBox tile = new VBox(6);
         tile.setAlignment(Pos.TOP_CENTER);
         tile.getStyleClass().add("book-card");
-        tile.setStyle("-fx-padding: 10; -fx-background-color: #2d2d2d; -fx-background-radius: 8;");
         tile.setPrefSize(180, 270);
 
         ImageView coverView = new ImageView();
-        coverView.setFitWidth(150); coverView.setFitHeight(130);
-        coverView.setPreserveRatio(true); coverView.setSmooth(true);
+        coverView.setFitWidth(150);
+        coverView.setFitHeight(130);
+        coverView.setPreserveRatio(true);
+        coverView.setSmooth(true);
 
         boolean coverLoaded = false;
         if (book.getCoverPath() != null) {
@@ -284,39 +278,38 @@ public class Controller {
         }
 
         StackPane coverBox = new StackPane();
-        coverBox.setPrefWidth(158); coverBox.setPrefHeight(135);
-        coverBox.setStyle("-fx-background-color: #1a1a2e; -fx-background-radius: 5;");
+        coverBox.setPrefWidth(158);
+        coverBox.setPrefHeight(135);
+        coverBox.getStyleClass().add("book-cover-box");
+
         if (coverLoaded) {
             coverBox.getChildren().add(coverView);
             StackPane.setAlignment(coverView, javafx.geometry.Pos.CENTER);
         } else {
             Label placeholder = new Label("📄");
-            placeholder.setStyle("-fx-font-size: 40;");
+            placeholder.getStyleClass().add("book-cover-placeholder");
             coverBox.getChildren().add(placeholder);
             StackPane.setAlignment(placeholder, javafx.geometry.Pos.CENTER);
         }
 
+        // Delete button
         StackPane deleteButton = new StackPane();
         deleteButton.setPrefSize(20, 20);
         deleteButton.getStyleClass().add("delete-button");
         Label deleteText = new Label("✕");
-        deleteText.setTextFill(javafx.scene.paint.Color.WHITE);
-        deleteText.setStyle("-fx-font-size: 9pt; -fx-font-weight: bold;");
+        deleteText.setStyle("-fx-text-fill: white; -fx-font-size: 9pt; -fx-font-weight: bold;");
         deleteButton.getChildren().add(deleteText);
         deleteButton.setOnMouseClicked(event -> { deleteBook(book); event.consume(); });
 
+        // Heart button — swap CSS classes on toggle
         Button heartBtn = new Button(book.isFavourite() ? "❤" : "♡");
-        String heartActiveStyle = "-fx-background-color: #e8174a; -fx-background-radius: 12;" +
-                "-fx-font-size: 12px; -fx-cursor: hand; -fx-padding: 2 6 2 6;" +
-                "-fx-text-fill: white; -fx-font-weight: bold;";
-        String heartInactiveStyle = "-fx-background-color: rgba(255,255,255,0.85); -fx-background-radius: 12;" +
-                "-fx-font-size: 12px; -fx-cursor: hand; -fx-padding: 2 6 2 6;" +
-                "-fx-text-fill: #555555; -fx-font-weight: bold;";
-        heartBtn.setStyle(book.isFavourite() ? heartActiveStyle : heartInactiveStyle);
+        heartBtn.getStyleClass().add(book.isFavourite() ? "heart-btn-active" : "heart-btn-inactive");
+
         heartBtn.setOnMouseClicked(event -> {
             book.setFavouriteStatus(!book.isFavourite());
             heartBtn.setText(book.isFavourite() ? "❤" : "♡");
-            heartBtn.setStyle(book.isFavourite() ? heartActiveStyle : heartInactiveStyle);
+            heartBtn.getStyleClass().clear();
+            heartBtn.getStyleClass().add(book.isFavourite() ? "heart-btn-active" : "heart-btn-inactive");
             List<Book> library = Library.loadBooks();
             for (Book b : library)
                 if (b.getFilePath().equals(book.getFilePath()))
@@ -326,11 +319,12 @@ public class Controller {
         });
 
         AnchorPane coverWrapper = new AnchorPane();
-        coverWrapper.setPrefWidth(158); coverWrapper.setPrefHeight(135);
-        AnchorPane.setTopAnchor(coverBox, 0.0); AnchorPane.setLeftAnchor(coverBox, 0.0);
-        AnchorPane.setRightAnchor(coverBox, 0.0); AnchorPane.setBottomAnchor(coverBox, 0.0);
+        coverWrapper.setPrefWidth(158);
+        coverWrapper.setPrefHeight(135);
+        AnchorPane.setTopAnchor(coverBox, 0.0);    AnchorPane.setLeftAnchor(coverBox, 0.0);
+        AnchorPane.setRightAnchor(coverBox, 0.0);  AnchorPane.setBottomAnchor(coverBox, 0.0);
         AnchorPane.setTopAnchor(deleteButton, 3.0); AnchorPane.setRightAnchor(deleteButton, 3.0);
-        AnchorPane.setTopAnchor(heartBtn, 3.0); AnchorPane.setLeftAnchor(heartBtn, 3.0);
+        AnchorPane.setTopAnchor(heartBtn, 3.0);     AnchorPane.setLeftAnchor(heartBtn, 3.0);
         coverWrapper.getChildren().addAll(coverBox, heartBtn, deleteButton);
 
         tile.setOnMouseClicked(event -> {
@@ -338,27 +332,27 @@ public class Controller {
         });
 
         Label titleLbl = new Label(book.getTitle());
-        titleLbl.setWrapText(true); titleLbl.setMaxWidth(155);
-        titleLbl.setStyle("-fx-text-fill: #e0e0e0; -fx-font-size: 11px; -fx-font-weight: bold;");
+        titleLbl.setWrapText(true);
+        titleLbl.setMaxWidth(155);
+        titleLbl.getStyleClass().add("book-card-title");
 
         Label dateAddedLbl = new Label();
         if (book.getDateAdded() > 0) {
             java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM d, yyyy");
             dateAddedLbl.setText("Added: " + sdf.format(new java.util.Date(book.getDateAdded())));
         }
-        dateAddedLbl.setStyle("-fx-text-fill: #888888; -fx-font-size: 9px;");
+        dateAddedLbl.getStyleClass().add("book-card-date");
 
         Label pagesLbl = new Label(book.getTotalPages() + " Pages");
-        pagesLbl.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 10px;");
+        pagesLbl.getStyleClass().add("book-card-pages");
 
-        int pct = (int)(book.getProgressValue() * 100);
+        int pct = (int) (book.getProgressValue() * 100);
         Label progressLbl = new Label(pct + "% read");
-        progressLbl.setStyle("-fx-text-fill: #39FF14; -fx-font-size: 9px; -fx-font-weight: bold;");
+        progressLbl.getStyleClass().add("book-card-progress");
 
         ProgressBar progBar = new ProgressBar(book.getProgressValue());
-        progBar.setPrefWidth(155); progBar.setPrefHeight(8);
-        progBar.setStyle("-fx-accent: #39FF14; -fx-control-inner-background: #444444;" +
-                "-fx-background-color: #444444; -fx-background-radius: 4; -fx-padding: 0;");
+        progBar.setPrefWidth(155);
+        progBar.setPrefHeight(8);
 
         tile.getChildren().addAll(coverWrapper, titleLbl, dateAddedLbl, pagesLbl, progressLbl, progBar);
         return tile;

@@ -29,9 +29,7 @@ public class ChatHandler {
         this.navigator = navigator;
     }
 
-    public void setCurrentBook(Book book) {
-        this.currentBook = book;
-    }
+    public void setCurrentBook(Book book) { this.currentBook = book; }
 
     public void toggleChatPanel() {
         chatPanelVisible = !chatPanelVisible;
@@ -44,7 +42,7 @@ public class ChatHandler {
         String userMessage = chatInput.getText().trim();
         if (userMessage.isEmpty()) return;
 
-        addBubble("You", userMessage, "#0f3460", "#4fc3f7");
+        addBubble("You", userMessage, true);
         chatInput.clear();
 
         String bookContext = "You are a helpful reading assistant. The user is reading '"
@@ -58,14 +56,14 @@ public class ChatHandler {
         chatHistory.add(userMsg);
 
         Label loading = new Label("AI is thinking...");
-        loading.setStyle("-fx-text-fill: #666; -fx-font-size: 10; -fx-padding: 4;");
+        loading.getStyleClass().add("chat-sender-label");
         chatMessages.getChildren().add(loading);
 
         new Thread(() -> {
             String reply = callGroqAPI(bookContext, userMessage);
             javafx.application.Platform.runLater(() -> {
                 chatMessages.getChildren().remove(loading);
-                addBubble("AI", reply, "#1a1a2e", "#e0e0e0");
+                addBubble("AI", reply, false);
                 Map<String, String> assistantMsg = new java.util.HashMap<>();
                 assistantMsg.put("role", "assistant");
                 assistantMsg.put("content", reply);
@@ -74,19 +72,19 @@ public class ChatHandler {
         }).start();
     }
 
-    private void addBubble(String sender, String text, String bgColor, String textColor) {
+    // isUser=true → user bubble styling, isUser=false → AI bubble styling
+    private void addBubble(String sender, String text, boolean isUser) {
         VBox bubble = new VBox(3);
-        bubble.setStyle("-fx-background-color: " + bgColor +
-                "; -fx-background-radius: 10; -fx-padding: 8 12;");
+        bubble.getStyleClass().add(isUser ? "chat-bubble-user" : "chat-bubble-ai");
         bubble.setMaxWidth(240);
 
         Label senderLabel = new Label(sender);
-        senderLabel.setStyle("-fx-font-size: 9; -fx-font-weight: bold; -fx-text-fill: #888;");
+        senderLabel.getStyleClass().add("chat-sender-label");
 
         Label messageLabel = new Label(text);
         messageLabel.setWrapText(true);
         messageLabel.setMaxWidth(220);
-        messageLabel.setStyle("-fx-font-size: 11; -fx-text-fill: " + textColor + ";");
+        messageLabel.getStyleClass().add(isUser ? "chat-text-user" : "chat-text-ai");
 
         bubble.getChildren().addAll(senderLabel, messageLabel);
         chatMessages.getChildren().add(bubble);
@@ -95,10 +93,12 @@ public class ChatHandler {
     private String callGroqAPI(String context, String userPrompt) {
         try {
             java.util.Properties props = new java.util.Properties();
-            java.io.InputStream stream = getClass().getClassLoader().getResourceAsStream("config.properties");
+            java.io.InputStream stream = getClass().getClassLoader()
+                    .getResourceAsStream("config.properties");
             if (stream == null) {
                 stream = new java.io.FileInputStream("src/config.properties");
             }
+            props.load(stream);
             String apiKey = props.getProperty("api.key");
 
             String url = "https://api.groq.com/openai/v1/chat/completions";
@@ -125,15 +125,14 @@ public class ChatHandler {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(response.body());
 
-            if (root.has("error")) {
+            if (root.has("error"))
                 return "Error: " + root.path("error").path("message").asText();
-            }
-            JsonNode choices = root.path("choices");
-            if (choices.isArray() && !choices.isEmpty()) {
-                return choices.get(0).path("message").path("content").asText();
-            }
-            return "No reply from AI.";
 
+            JsonNode choices = root.path("choices");
+            if (choices.isArray() && !choices.isEmpty())
+                return choices.get(0).path("message").path("content").asText();
+
+            return "No reply from AI.";
         } catch (Exception e) {
             return "Error: " + e.getMessage();
         }
