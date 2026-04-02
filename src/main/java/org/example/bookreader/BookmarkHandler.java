@@ -3,7 +3,7 @@ package org.example.bookreader;
 import javafx.scene.control.Button;
 import java.util.List;
 
-public class BookmarkHandler {
+class BookmarkHandler {
     private Button bookmarkButton;
     private Book currentBook;
     private PageNavigator navigator;
