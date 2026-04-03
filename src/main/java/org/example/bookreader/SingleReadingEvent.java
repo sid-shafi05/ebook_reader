@@ -2,7 +2,7 @@ package org.example.bookreader;
 
 // on "date", "bookTitle" was read for "secondsRead" seconds, covering "pagesRead" pages, from "category"
 // one object = one reading session (open book → close book)
-// multiple sessions of the same book on the same day are stored as separate entries — StatsManagement adds them up
+// multiple sessions of the same book on the same day are stored as separate entries, StatsManagement adds them up
 public class SingleReadingEvent {
     private String date;
     private String bookTitle;

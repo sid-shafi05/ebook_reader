@@ -63,7 +63,7 @@ public class BookAdder {
         if (genreResult.isEmpty()) return;
         String finalCategory = genreResult.get();
 
-        // Show a simple "Adding..." alert so the user knows something is happening
+        //Adding....
         Alert loadingAlert = new Alert(Alert.AlertType.INFORMATION);
         loadingAlert.setTitle("Adding Book");
         loadingAlert.setHeaderText(null);

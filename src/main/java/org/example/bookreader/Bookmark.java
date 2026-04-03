@@ -2,10 +2,7 @@ package org.example.bookreader;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-/**
- * Represents a bookmark in a book.
- * Stores the page number and optional notes.
- */
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Bookmark {
     private String bookPath;  // Path to the book file
@@ -21,10 +18,6 @@ public class Bookmark {
         this.dateCreated = System.currentTimeMillis();
     }
 
-    public Bookmark(String bookPath, int pageNumber, String notes) {
-        this(bookPath, pageNumber);
-        this.notes = notes;
-    }
 
     // Getters
     public String getBookPath() { return bookPath; }

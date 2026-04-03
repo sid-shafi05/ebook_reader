@@ -4,10 +4,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -22,12 +25,11 @@ public class Controller {
     @FXML private AnchorPane contentArea;
     @FXML private VBox topBar;
     @FXML private TextField searchField;
-    @FXML private Button allBtn, favBtn, catBtn, statsBtn, addBtn, dailyTargetBtn;
+    @FXML private Button allBtn, favBtn, catBtn, statsBtn,dailyTargetBtn;
     @FXML private Label titleLabel, progressLabel, dateLabel;
-
-    private FlowPane bookGrid;
-    private FlowPane favGrid;
-    private Parent allbooksPage, favPage, catPage, statsPage;
+    @FXML private FlowPane bookGrid;
+    @FXML private FlowPane favGrid;
+    @FXML private Parent allbooksPage, favPage, catPage, statsPage;
     private StatsController statsCtrl;
 
     private LibraryManager libraryManager;
@@ -202,12 +204,12 @@ public class Controller {
             BookController readerBrain = loader.getController();
             readerBrain.startSession(book);
 
-            javafx.stage.Stage readerStage = new javafx.stage.Stage();
-            javafx.scene.Scene scene = new javafx.scene.Scene(readerPage, 1000, 700);
+            Stage readerStage = new javafx.stage.Stage();
+            Scene scene = new javafx.scene.Scene(readerPage, 1000, 700);
             String css = getClass().getResource(
                     "/org/example/bookreader/application.css").toExternalForm();
             scene.getStylesheets().add(css);
-            readerStage.setTitle(book.getTitle() + " - StackShelf Reader");
+            readerStage.setTitle(book.getTitle() + " - PageVault Reader");
             readerStage.setScene(scene);
             readerStage.setMaximized(true);
             readerStage.setOnHidden(e -> refreshBookGrid());
@@ -255,7 +257,6 @@ public class Controller {
         return 60;
     }
 
-    // ── Book tile (all inline styles removed — CSS classes used instead) ──
     VBox createBookTile(Book book) {
         VBox tile = new VBox(6);
         tile.setAlignment(Pos.TOP_CENTER);

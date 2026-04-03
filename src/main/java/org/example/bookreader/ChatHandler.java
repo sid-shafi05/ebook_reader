@@ -72,7 +72,7 @@ public class ChatHandler {
         }).start();
     }
 
-    // isUser=true → user bubble styling, isUser=false → AI bubble styling
+
     private void addBubble(String sender, String text, boolean isUser) {
         VBox bubble = new VBox(3);
         bubble.getStyleClass().add(isUser ? "chat-bubble-user" : "chat-bubble-ai");

@@ -176,12 +176,6 @@ public class PageNavigator {
             zoomResetBtn.setText((int)(zoomLevel * 100) + "%");
     }
 
-    // Keep old signature so BookController.zoomReset() call still compiles
-    public void applyZoom(Button btn) {
-        if (btn != null) this.zoomResetBtn = btn;
-        applyZoom();
-    }
-
     public void unbindWidth() {
         pdfView.fitWidthProperty().unbind();
     }

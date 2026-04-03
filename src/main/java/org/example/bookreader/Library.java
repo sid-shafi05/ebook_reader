@@ -22,7 +22,6 @@ public class Library {
     public static List<Book> loadBooks() {
         File f = new File(File_Name);
         if (!f.exists()) {
-//empty list if no file exists yet
             return new ArrayList<>();
         }
         try {

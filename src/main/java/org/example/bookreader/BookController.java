@@ -128,10 +128,6 @@ public class BookController {
         menuHandler.showColorFilterMenu();
     }
 
-    @FXML public void setColorFilterNormal() { menuHandler.setColorFilterNormal(); }
-    @FXML public void setColorFilterDark()   { menuHandler.setColorFilterDark(); }
-    @FXML public void setColorFilterSepia()  { menuHandler.setColorFilterSepia(); }
-
     @FXML public void toggleNotebookPanel() {
         notebookHandler.toggleNotebookPanel();
     }
