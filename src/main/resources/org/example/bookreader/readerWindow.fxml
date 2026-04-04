@@ -13,7 +13,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <BorderPane prefHeight="750.0" prefWidth="1100.0" style="-fx-background-color: #050508;" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.bookreader.BookController">
-   <!-- TOP BAR -->
    <top>
       <VBox spacing="0.0">
          <children>
@@ -32,7 +31,6 @@
                   <Label fx:id="pageNumberLabel" style="-fx-font-size: 11; -fx-text-fill: #303045; -fx-padding: 0 0 0 6;" text="Page 1 of 1"/>
                </children>
             </HBox>
-            <!-- PAGE SLIDER -->
             <HBox fx:id="sliderSection" alignment="CENTER" spacing="10.0" style="-fx-background-color: #06060e; -fx-border-color: #0d0d18; -fx-border-width: 0 0 1 0; -fx-padding: 10 16 10 16;">
                <children>
                   <Label fx:id="sliderMinLabel" style="-fx-font-size: 10; -fx-font-weight: bold; -fx-text-fill: #252535;" text="1"/>
@@ -44,11 +42,9 @@
          </children>
       </VBox>
    </top>
-   <!-- CENTER -->
    <center>
       <HBox spacing="0.0">
          <children>
-            <!-- MAIN PAGE VIEW -->
             <ScrollPane fx:id="pageScrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" style="-fx-background: #050508; -fx-background-color: #050508;" HBox.hgrow="ALWAYS">
                <content>
                   <StackPane style="-fx-background-color: #050508; -fx-padding: 24;">
@@ -58,7 +54,6 @@
                   </StackPane>
                </content>
             </ScrollPane>
-            <!-- NOTEBOOK PANEL -->
             <VBox fx:id="notebookPanel" spacing="8.0" style="-fx-background-color: #06060e; -fx-border-color: #0d0d18; -fx-border-width: 0 0 0 1; -fx-padding: 14;" prefWidth="275.0" minWidth="275.0" maxWidth="275.0" visible="false" managed="false">
                <children>
                   <HBox alignment="CENTER" spacing="8.0">
@@ -73,7 +68,6 @@
                   <Button onAction="#saveNotesPanel" prefHeight="34.0" maxWidth="Infinity" style="-fx-background-color: #1a1508; -fx-text-fill: #c8a96e; -fx-font-size: 11; -fx-padding: 8; -fx-background-radius: 7; -fx-cursor: hand; -fx-border-color: #c8a96e; -fx-border-width: 1; -fx-border-radius: 7; -fx-font-weight: bold;" text="Save Notes"/>
                </children>
             </VBox>
-            <!-- AI CHAT PANEL -->
             <VBox fx:id="chatPanel" spacing="8.0" style="-fx-background-color: #06060e; -fx-border-color: #0d0d18; -fx-border-width: 0 0 0 1; -fx-padding: 14;" prefWidth="275.0" minWidth="275.0" maxWidth="275.0" visible="false" managed="false">
                <children>
                   <HBox alignment="CENTER_LEFT" spacing="8.0">
@@ -96,7 +90,6 @@
          </children>
       </HBox>
    </center>
-   <!-- BOTTOM TOOLBAR -->
    <bottom>
       <HBox alignment="CENTER" spacing="14.0" style="-fx-background-color: #06060e; -fx-border-color: #0d0d18; -fx-border-width: 1 0 0 0; -fx-padding: 12 28 12 28;">
          <children>
@@ -108,7 +101,6 @@
                   <Button onAction="#showBookmarksPanel" prefHeight="36.0" prefWidth="130.0" styleClass="view-bookmarks-button" text="★ Bookmarks"/>
                </children>
             </HBox>
-            <!-- ZOOM CONTROLS -->
             <HBox alignment="CENTER" spacing="4.0" style="-fx-background-color: #08080f; -fx-background-radius: 7; -fx-padding: 4 8 4 8; -fx-border-color: #101020; -fx-border-width: 1; -fx-border-radius: 7;">
                <children>
                   <Button onAction="#zoomOut" prefHeight="28.0" prefWidth="28.0" style="-fx-background-color: transparent; -fx-text-fill: #404058; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-size: 15; -fx-font-weight: bold;" text="−"/>

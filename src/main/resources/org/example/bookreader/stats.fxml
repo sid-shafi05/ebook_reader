@@ -26,7 +26,6 @@
             AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
 
-            <!-- HEADER -->
             <HBox alignment="CENTER_LEFT" prefHeight="60.0"
                   style="-fx-background-color: #16213e; -fx-border-color: #0f3460; -fx-border-width: 0 0 2 0; -fx-padding: 0 25 0 25;">
                <children>
@@ -36,14 +35,12 @@
                </children>
             </HBox>
 
-            <!-- SCROLLABLE CONTENT -->
             <ScrollPane fitToWidth="true" style="-fx-background-color: #1a1a2e; -fx-background: #1a1a2e;" VBox.vgrow="ALWAYS">
                <content>
                   <VBox prefWidth="750.0" spacing="20.0">
                      <padding><Insets top="20" bottom="20" left="20" right="20" /></padding>
                      <children>
 
-                        <!-- TODAY'S PROGRESS CARD -->
                         <VBox spacing="10.0"
                               style="-fx-background-color: #0f3460; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3); -fx-border-color: #4fc3f7; -fx-border-width: 2; -fx-border-radius: 10;">
                            <padding><Insets top="15" bottom="15" left="15" right="15" /></padding>
@@ -87,7 +84,6 @@
                                     </VBox>
                                  </children>
                               </HBox>
-                              <!-- Add this right before the closing </children> of the Today's Progress VBox -->
                               <HBox spacing="10.0" alignment="CENTER_LEFT">
                                  <children>
                                     <javafx.scene.control.ProgressBar fx:id="todayProgressBar"
@@ -99,7 +95,6 @@
                            </children>
                         </VBox>
 
-                        <!-- STAT CARDS — 3 equal columns -->
                         <GridPane hgap="15.0" prefWidth="710.0">
                            <columnConstraints>
                               <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
@@ -107,7 +102,6 @@
                               <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
                            </columnConstraints>
                            <children>
-                              <!-- Card 1 -->
                               <VBox alignment="CENTER" spacing="6.0" GridPane.columnIndex="0"
                                     style="-fx-background-color: #0f3460; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);">
                                  <padding><Insets top="18" bottom="18" left="10" right="10" /></padding>
@@ -120,7 +114,6 @@
                                     </Label>
                                  </children>
                               </VBox>
-                              <!-- Card 2 -->
                               <VBox alignment="CENTER" spacing="6.0" GridPane.columnIndex="1"
                                     style="-fx-background-color: #0f3460; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);">
                                  <padding><Insets top="18" bottom="18" left="10" right="10" /></padding>
@@ -133,7 +126,6 @@
                                     </Label>
                                  </children>
                               </VBox>
-                              <!-- Card 3 -->
                               <VBox alignment="CENTER" spacing="6.0" GridPane.columnIndex="2"
                                     style="-fx-background-color: #0f3460; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);">
                                  <padding><Insets top="18" bottom="18" left="10" right="10" /></padding>
@@ -149,7 +141,6 @@
                            </children>
                         </GridPane>
 
-                        <!-- TIME RANGE FILTER — Controls both pie chart and line chart -->
                         <HBox spacing="10.0" alignment="CENTER_LEFT"
                               style="-fx-background-color: #16213e; -fx-background-radius: 10; -fx-padding: 12 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);">
                            <children>
@@ -163,7 +154,6 @@
                            </children>
                         </HBox>
 
-                        <!-- CHART 1: Time per Category — PIE CHART -->
                         <VBox spacing="8.0"
                               style="-fx-background-color: #16213e; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);">
                            <padding><Insets top="15" bottom="15" left="15" right="15" /></padding>
@@ -177,7 +167,6 @@
                            </children>
                         </VBox>
 
-                        <!-- CHART 2: Time per Day — LINE CHART -->
                         <VBox spacing="8.0"
                               style="-fx-background-color: #16213e; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);">
                            <padding><Insets top="15" bottom="15" left="15" right="15" /></padding>
